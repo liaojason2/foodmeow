@@ -1,6 +1,9 @@
-from bson.objectid import ObjectId  # 這東西再透過ObjectID去尋找的時候會用到
+import os
+from dotenv import load_dotenv
+from flask import Flask, request, abort
+from func import welcome, amount
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
+    MessageEvent, TextMessage,  TextSendMessage,
 )
 from linebot.exceptions import (
     InvalidSignatureError
@@ -8,21 +11,9 @@ from linebot.exceptions import (
 from linebot import (
     LineBotApi, WebhookHandler
 )
-from pymongo import MongoClient
-import os
-
-from flask import Flask, request, abort
-from dotenv import load_dotenv
-import reply
+from linebot.models.events import Postback, PostbackEvent
 
 load_dotenv()
-
-
-# connection
-conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
-db = conn.foodmeow
-fooddata = db.fooddata
-
 
 app = Flask(__name__)
 
@@ -37,7 +28,6 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
 
     # handle webhook body
     try:
@@ -49,21 +39,18 @@ def callback():
     return 'OK'
 
 
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
+@handler.add(MessageEvent)
+def handle_text_message(event, TextMessage):
 
     if(event.message.text == "開啟選單"):
-        reply.richmenutest(event)
+        welcome.welcomeMenu(event)
 
-    data = {}
-    data['item'] = "apple"
-    data['price'] = 20
-    fooddata.insert_one(data)
+@handler.add(PostbackEvent)
+def test(event, PostbackMessage):
 
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=event.message.text))
-
+    if (event.postback.data == "add"):
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text="success"))
 
 if __name__ == "__main__":
     app.run()
