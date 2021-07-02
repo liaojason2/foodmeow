@@ -15,7 +15,7 @@ from linebot.models.flex_message import BubbleContainer, BoxComponent, TextCompo
 load_dotenv()
 
 
-line_bot_api = LineBotApi(os.getenv("CHANNEL_TOKEN"))
+line_bot_api = LineBotApi(os.getenv("_CHANNEL_TOKEN"))
 
 def welcomeMenu(event):
     flex_message = FlexSendMessage(
