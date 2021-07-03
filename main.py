@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+
 import os
 from dotenv import load_dotenv
 from flask import Flask, request, abort
@@ -17,8 +20,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi(os.getenv("_CHANNEL_TOKEN"))
-handler = WebhookHandler(os.getenv("_CHANNEL_SECRET"))
+line_bot_api = LineBotApi(os.getenv("CHANNEL_TOKEN"))
+handler = WebhookHandler(os.getenv("CHANNEL_SECRET"))
 
 
 @app.route("/callback", methods=['POST'])
@@ -41,7 +44,9 @@ def callback():
 
 @handler.add(MessageEvent)
 def handle_text_message(event, TextMessage):
-
+    line_bot_api.reply_message(
+        event.reply_token, TextSendMessage(text="success"))
+    
     if(event.message.text == "開啟選單"):
         welcome.welcomeMenu(event)
 
@@ -53,4 +58,4 @@ def test(event, PostbackMessage):
             event.reply_token, TextSendMessage(text="success"))
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
