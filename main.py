@@ -48,13 +48,13 @@ def handle_text_message(event, TextMessage):
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text="test"))
 
-    '''if user.checkUserExist(event.profile.userid) == "NewUser":
+    if user.checkUserExist(event.profile.userid) == "NewUser":
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text="歡迎使用本程式"))
 
     if(event.message.text == "test"):
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text="test"))'''
+            event.reply_token, TextSendMessage(text="test"))ß
     
     if(event.message.text == "開啟選單"):
         welcome.welcomeMenu(event)
