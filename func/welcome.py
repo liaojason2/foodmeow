@@ -24,7 +24,6 @@ def welcomeMenu(event):
                 layout="vertical",
                 contents=[
                     TextComponent(text="請選擇操作", align="center"),
-                    
                 ],
             ),
             footer=BoxComponent(
