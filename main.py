@@ -43,7 +43,7 @@ def callback():
 
 @handler.add(MessageEvent)
 def handle_text_message(event, TextMessage):
-    userId = event.source.userId
+    userId = event.source.user_id
     profile = line_bot_api.get_profile(userId)
 
     if(event.message.text == "test"):
