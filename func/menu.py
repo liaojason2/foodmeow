@@ -35,11 +35,68 @@ def welcomeMenu(event):
                             data="Amount"
                         ),
                         style="primary",
-                        offsetBottom="sm"
+                        offsetBottom="5px"
                     ),   
                     ButtonComponent(
                         action=PostbackAction(
                             label="About Foodmeow",
+                            data="AboutFoodmeow"
+                        ),
+                        style="primary"
+                    )
+                ],
+            ),
+            footer=BoxComponent(
+                layout="vertical",
+                contents=[
+                    TextComponent(
+                        text="foodmeow v1.0",
+                        align="center"
+                    ),
+                ],
+            ),
+        ),
+    ),
+    line_bot_api.reply_message(event.reply_token, flex_message)
+
+def amountMenu(event):
+    flex_message = FlexSendMessage(
+        alt_text="menu",
+        contents=BubbleContainer(
+            header=BoxComponent(
+                layout="vertical",
+                contents=[
+                    TextComponent(text="記帳功能選項", align="center"),
+                ],
+            ),
+            body=BoxComponent(
+                layout="vertical",
+                contents=[
+                    ButtonComponent(
+                        action=PostbackAction(
+                            label="食物記帳",
+                            data="Amount"
+                        ),
+                        style="primary",
+                        offsetBottom="sm"
+                    ),   
+                    ButtonComponent(
+                        action=PostbackAction(
+                            label="其他記帳",
+                            data="AboutFoodmeow"
+                        ),
+                        style="primary"
+                    ),
+                    ButtonComponent(
+                        action=PostbackAction(
+                            label="其他記帳",
+                            data="AboutFoodmeow"
+                        ),
+                        style="primary"
+                    ),
+                    ButtonComponent(
+                        action=PostbackAction(
+                            label="其他記帳",
                             data="AboutFoodmeow"
                         ),
                         style="primary"
