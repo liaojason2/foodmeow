@@ -3,7 +3,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, request, abort
-from func import welcome, user
+from func import menu, user
 from linebot.models import (
     MessageEvent, TextMessage,  TextSendMessage,
 )
@@ -51,14 +51,13 @@ def handle_text_message(event, TextMessage):
             event.reply_token, TextSendMessage(text="歡迎使用本程式"))
     
     if(event.message.text == "開啟選單"):
-        welcome.welcomeMenu(event)
+        menu.welcomeMenu(event)
 
 @handler.add(PostbackEvent)
-def test(event, PostbackMessage):
+def postback_message(event, PostbackMessage):
 
-    if (event.postback.data == "add"):
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text="success"))
+    if (event.postback.data == "Amount"):
+        menu.amountMenu(event)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
