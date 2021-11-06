@@ -30,14 +30,29 @@ def welcomeMenu(event):
                 layout="vertical",
                 contents=[
                     ButtonComponent(
-                        action=PostbackAction(label="記帳", data="add"),
-                    ),                
+                        action=PostbackAction(
+                            label="記帳",
+                            data="Amount"
+                        ),
+                        style="primary",
+                        offsetBottom="sm"
+                    ),   
+                    ButtonComponent(
+                        action=PostbackAction(
+                            label="About Foodmeow",
+                            data="AboutFoodmeow"
+                        ),
+                        style="primary"
+                    )
                 ],
             ),
             footer=BoxComponent(
                 layout="vertical",
                 contents=[
-                    TextComponent(text="請選擇操作", align="center"),
+                    TextComponent(
+                        text="foodmeow v1.0",
+                        align="center"
+                    ),
                 ],
             ),
         ),
