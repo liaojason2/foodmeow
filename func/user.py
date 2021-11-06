@@ -11,12 +11,30 @@ users = db.users
 
 def checkUserExist(profile):
     userId = profile.user_id
+    displayName = profile.display_name
     user = users.find_one({
         "userId": userId
     })
-    if(user == None):
+    if(user is None):
         users.insert_one({
             "userId": userId,
+            "displayName": displayName,
             "status": "free",
         })
         return "NewUser"
+        
+def checkUserStatus(userId):
+    user = users.find_one({
+        "userId": userId,
+    })
+    return user['status']
+
+def changeUserStatus(userId, status):
+    users.update_one({
+        "userId": userId,
+    },
+    {
+        '$set': {
+            "status": status,
+        }
+    })
