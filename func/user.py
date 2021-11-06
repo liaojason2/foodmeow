@@ -9,13 +9,14 @@ conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 users = db.users
 
-def checkUserExist(userid):
+def checkUserExist(profile):
+    userId = profile.user_id
     user = users.find_one({
-        "userId": userid
+        "userId": userId
     })
     if(user == None):
         users.insert_one({
-            "userId": userid,
+            "userId": userId,
             "status": "free",
         })
         return "NewUser"
