@@ -19,6 +19,3 @@ def checkUserExist(userid):
             "status": "free",
         })
         return "NewUser"
-    return "OldUser"
-
-print(checkUserExist("12345"))
