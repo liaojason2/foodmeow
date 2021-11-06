@@ -54,7 +54,7 @@ def handle_text_message(event, TextMessage):
 
     if(event.message.text == "test"):
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text="test"))ß
+            event.reply_token, TextSendMessage(text="test"))
     
     if(event.message.text == "開啟選單"):
         welcome.welcomeMenu(event)
