@@ -14,7 +14,7 @@ from linebot.models.actions import PostbackAction
 from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent, ButtonComponent
 load_dotenv()
 
-line_bot_api = LineBotApi(os.environ.get("CHANNEL_TOKEN"))
+line_bot_api = LineBotApi(os.get("CHANNEL_TOKEN"))
 
 def welcomeMenu(event):
     flex_message = FlexSendMessage(
