@@ -100,7 +100,7 @@ def postback_message(event, PostbackMessage):
         data = event.postback.data
         data = data.split()
         food = data[0]
-        foodAmount = int(data[1])
+        foodAmount = float(data[1])
         amount.insertFoodData(food, foodAmount)
         user.deleteTempData(userId)
         user.changeUserStatus(userId, "free")
@@ -131,7 +131,7 @@ def postback_message(event, PostbackMessage):
         total = amount.getTotalAmount()
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = total)
-        )
+        ) 
     
     if(event.postback.data == "giveAmount"):
         user.changeUserStatus(userId, "giveAmount")
