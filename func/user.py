@@ -60,3 +60,13 @@ def getTempData(userId):
         "userId": userId,
     })
     return user['tempData']
+
+def deleteTempData(userId):
+    users.find_one_and_update({
+        "userId": userId,
+    },
+    {
+        '$set': {
+            "tempData": "",
+        }
+    })

@@ -13,7 +13,7 @@ from linebot.exceptions import (
 from linebot import (
     LineBotApi, WebhookHandler
 )
-from linebot.models.events import Postback, PostbackEvent
+from linebot.models.events import PostbackEvent
 
 from func import menu, amount
 
@@ -88,7 +88,7 @@ def postback_message(event, PostbackMessage):
         food = data[0]
         foodAmount = data[1]
         amount.insertFoodData(food, foodAmount)
-        user.updateTempData(userId, '')
+        user.deleteTempData(userId)
         user.changeUserStatus(userId, "free")
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "新增成功")
