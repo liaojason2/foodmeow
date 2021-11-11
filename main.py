@@ -71,7 +71,7 @@ def handle_text_message(event, TextMessage):
 
 @ handler.add(PostbackEvent)
 def postback_message(event, PostbackMessage):
-    userId=event.source.user_id
+    userId = event.source.user_id
 
     if (event.postback.data == "Amount"):
         menu.amountMenu(event)
@@ -87,7 +87,9 @@ def postback_message(event, PostbackMessage):
         data = data.split()
         food = data[0]
         foodAmount = data[1]
-        amount.insertData(food, foodAmount)
+        amount.insertFoodData(food, foodAmount)
+        user.updateTempData(userId, '')
+        user.changeUserStatus(userId, "free")
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "新增成功")
         )
