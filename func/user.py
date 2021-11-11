@@ -1,5 +1,5 @@
 import os
-#from datetime import datetime
+from datetime import datetime
 from dotenv import load_dotenv
 from pymongo import MongoClient
 #from bson.objectid import ObjectId
@@ -20,6 +20,7 @@ def checkUserExist(profile):
             "userId": userId,
             "displayName": displayName,
             "status": "free",
+            "tempData": "",
         })
         return "NewUser"
         
@@ -36,5 +37,36 @@ def changeUserStatus(userId, status):
     {
         '$set': {
             "status": status,
+        }
+    })
+
+def updateTempData(userId, data):
+    user = users.find_one({
+        "userId": userId,
+    })
+    if user['tempData'] != "":
+        data = user['tempData'] + " " + data
+    users.update_one({
+        "userId": userId,
+    },
+    {
+        '$set': {
+            "tempData": data,
+        }
+    })
+
+def getTempData(userId):
+    user = users.find_one({
+        "userId": userId,
+    })
+    return user['tempData']
+
+def deleteTempData(userId):
+    users.find_one_and_update({
+        "userId": userId,
+    },
+    {
+        '$set': {
+            "tempData": "",
         }
     })

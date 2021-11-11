@@ -13,7 +13,9 @@ from linebot.exceptions import (
 from linebot import (
     LineBotApi, WebhookHandler
 )
-from linebot.models.events import Postback, PostbackEvent
+from linebot.models.events import PostbackEvent
+
+from func import menu, amount
 
 load_dotenv()
 
@@ -49,15 +51,48 @@ def handle_text_message(event, TextMessage):
     if user.checkUserExist(profile) == "NewUser":
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text="歡迎使用本程式"))
-    
-    if(event.message.text == "開啟選單"):
+
+    elif(event.message.text == "開啟選單"):
         menu.welcomeMenu(event)
 
-@handler.add(PostbackEvent)
+    elif(user.checkUserStatus(userId) == "AddFoodAmount"):
+        user.updateTempData(userId, event.message.text)
+        user.changeUserStatus(userId, "AddFoodAmountMoney")
+        message = "請輸入" + event.message.text + "的金額"
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=message)
+        )
+
+    elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
+        menu.confirm(event)
+
+
+
+
+@ handler.add(PostbackEvent)
 def postback_message(event, PostbackMessage):
+    userId = event.source.user_id
 
     if (event.postback.data == "Amount"):
         menu.amountMenu(event)
+
+    if(event.postback.data == "AddFoodAmount"):
+        user.changeUserStatus(userId, "AddFoodAmount")
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text = "請輸入食物")
+        )
+    
+    if(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
+        data = event.postback.data
+        data = data.split()
+        food = data[0]
+        foodAmount = data[1]
+        amount.insertFoodData(food, foodAmount)
+        user.deleteTempData(userId)
+        user.changeUserStatus(userId, "free")
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text = "新增成功")
+        )
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
