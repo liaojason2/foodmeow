@@ -105,7 +105,7 @@ def amountMenu(event):
                     ButtonComponent(
                         action=PostbackAction(
                             label="歷史",
-                            data="historyAmount"
+                            data="getHistoryAmount"
                         ),
                         style="primary"
                     ),

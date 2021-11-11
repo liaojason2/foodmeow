@@ -145,9 +145,11 @@ def postback_message(event, PostbackMessage):
             event.reply_token, TextSendMessage(text = "已完成結帳，金額 " + str(total) + " 元")
         )
 
-    
-
-    
+    if(event.postback.data == "getHistoryAmount"):
+        history = amount.getHistory()
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text = history)
+        )
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

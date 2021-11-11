@@ -42,28 +42,21 @@ def insertData(subject, money: float):
             "total": money,
         }
     )
-    return "新增" + object + "成功"
+    return "新增" + subject + "成功"
 
 
 def getTotalAmount():
     totalAmount = 0.0
-    count = 0
-    foods = data.find().sort("time", -1).limit(100)
+    foods = data.find()
     for amount in foods:
-        total = amount['total']
-        print(total, end=" ")
-        if(total <= 0):
-            count += 1
-        if(count == 3):
-            break
-        totalAmount += total
-        print(totalAmount)
+        money = amount['total']
+        totalAmount += float(money)
     return totalAmount
 
 def giveAmount(money):
     data.insert_one({
         "time": datetime.now(),
-        "object": datetime.now().strftime("%Y/%m/%d"),
+        "subject": datetime.now().strftime("%Y/%m/%d"),
         "money": -money,
         "addition": 0,
         "total": -money,
@@ -73,8 +66,10 @@ def giveAmount(money):
 def getHistory():
     foods = data.find().sort("time", -1).limit(100)
     message = ""
-    for food in foods: 
+    count = 0
+    for food in foods:
+        count += 1
         reply = ""
-        reply = str(food['object']) + " " + str(food['money']) + "/" + str(food['total']) + '\n'
+        reply = str(count) + str(food['subject']) + " " + str(food['money']) + "/" + str(food['total']) + '\n'
         message += reply
     return message
