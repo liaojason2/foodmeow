@@ -125,9 +125,9 @@ def postback_message(event, PostbackMessage):
     
     
     if(event.postback.data == "totalAmount"):
-        amount.getTotalAmount()
+        total = amount.getTotalAmount()
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = "請輸入食物")
+            event.reply_token, TextSendMessage(text = total)
         )
 
     
