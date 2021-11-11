@@ -55,16 +55,16 @@ def handle_text_message(event, TextMessage):
     elif(event.message.text == "開啟選單"):
         menu.welcomeMenu(event)
 
-    elif(user.checkUserStatus == "AddFoodAmount"):
+    elif(user.checkUserStatus(userId) == "AddFoodAmount"):
         user.updateTempData(userId, event.message.text)
-        user.checkUserStatus(userId, "AddFoodAmountMoney")
+        user.changeUserStatus(userId, "AddFoodAmountMoney")
         message = "請輸入" + event.message.text + "的金額"
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=message)
         )
 
-    elif(user.changeUserStatus == "AddFoodAmountMoney"):
-        menu.confirm
+    elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
+        menu.confirm(event)
 
 
 

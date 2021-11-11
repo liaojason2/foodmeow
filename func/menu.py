@@ -126,7 +126,7 @@ def amountMenu(event):
 
 
 def confirm(event):
-    foodObject = user.getTempData(event.message.user_id)
+    foodObject = user.getTempData(event.source.user_id)
     continue_data = foodObject + " " + event.message.text
     prompt_message = '請確認是否要將 ' + event.message.text + " 的 " + foodObject + "加入資料庫中"
     message = TemplateSendMessage(
