@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+import os
+import user
 from linebot import LineBotApi
 from linebot.models import TemplateSendMessage, FlexSendMessage, PostbackTemplateAction
 from linebot.models.template import ConfirmTemplate
@@ -6,10 +9,7 @@ from linebot.models.flex_message import BubbleContainer, BoxComponent, TextCompo
 
 import sys
 sys.path.append('./func')
-import user
 
-import os
-from dotenv import load_dotenv
 load_dotenv()
 
 
@@ -59,6 +59,7 @@ def welcomeMenu(event):
     ),
     line_bot_api.reply_message(event.reply_token, flex_message)
 
+
 def amountMenu(event):
     flex_message = FlexSendMessage(
         alt_text="menu",
@@ -89,18 +90,25 @@ def amountMenu(event):
                     ),
                     ButtonComponent(
                         action=PostbackAction(
-                            label="其他記帳",
-                            data="AboutFoodmeow"
+                            label="總額",
+                            data="totalAmount"
                         ),
                         style="primary"
                     ),
                     ButtonComponent(
                         action=PostbackAction(
-                            label="其他記帳",
-                            data="AboutFoodmeow"
+                            label="結帳",
+                            data="payAmount"
                         ),
                         style="primary"
-                    )
+                    ),
+                    ButtonComponent(
+                        action=PostbackAction(
+                            label="歷史",
+                            data="historyAmount"
+                        ),
+                        style="primary"
+                    ),
                 ],
             ),
             footer=BoxComponent(
