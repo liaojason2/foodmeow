@@ -4,13 +4,11 @@ from config import getFoodMultiple
 
 import os
 from dotenv import load_dotenv
-from linebot import models
+#from linebot import models
 load_dotenv()
 
-
-
 from pymongo import MongoClient
-from bson.objectid import ObjectId
+#from bson.objectid import ObjectId
 
 from datetime import datetime
 
@@ -20,12 +18,12 @@ conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 data = db.data
 
-def insertFoodData(object, money: int):
+def insertFoodData(subject, money: int):
     addition = money * getFoodMultiple()
     data.insert_one(
         {
             "time": datetime.now(),
-            "object": object,
+            "object": subject,
             "money": money,
             "addition": addition,
             "total": money + addition,
@@ -33,11 +31,11 @@ def insertFoodData(object, money: int):
     )
     return "新增" + " " + str(money+addition) + " 元 " + object + " 成功"
 
-def insertData(object, money: int):
+def insertData(subject, money: int):
     data.insert_one(
         {
             "time": datetime.now(),
-            "object": object,
+            "object": subject,
             "money": int(money),
             "addition": 0,
             "total": int(money),
