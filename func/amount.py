@@ -13,7 +13,7 @@ from pymongo import MongoClient
 from datetime import datetime
 import pytz
 
-currentTime = pytz.timezone.localize(currentTime)
+currentTime = pytz.timezone("Asia/Taipei").localize(datetime.now())
 
 
 load_dotenv()
