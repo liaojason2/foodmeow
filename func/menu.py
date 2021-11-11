@@ -83,7 +83,7 @@ def amountMenu(event):
                     ButtonComponent(
                         action=PostbackAction(
                             label="食物記帳",
-                            data="Amount"
+                            data="AddFoodAmount"
                         ),
                         style="primary",
                         offsetBottom="sm"
