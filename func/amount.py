@@ -11,6 +11,10 @@ from pymongo import MongoClient
 #from bson.objectid import ObjectId
 
 from datetime import datetime
+import pytz
+
+currentTime = pytz.timezone.localize(currentTime)
+
 
 load_dotenv()
 
@@ -23,7 +27,7 @@ def insertFoodData(subject, money: float):
     total = money + addition
     data.insert_one(
         {
-            "time": datetime.now(),
+            "time": currentTime,
             "subject": subject,
             "money": money,
             "addition": addition,
@@ -35,7 +39,7 @@ def insertFoodData(subject, money: float):
 def insertData(subject, money: float):
     data.insert_one(
         {
-            "time": datetime.now(),
+            "time": currentTime,
             "subject": subject,
             "money": money,
             "addition": 0,
@@ -55,8 +59,8 @@ def getTotalAmount():
 
 def giveAmount(money):
     data.insert_one({
-        "time": datetime.now(),
-        "subject": datetime.now().strftime("%Y/%m/%d"),
+        "time": currentTime,
+        "subject": currentTime.strftime("%Y/%m/%d"),
         "money": -money,
         "addition": 0,
         "total": -money,
