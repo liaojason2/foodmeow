@@ -15,7 +15,7 @@ from linebot import (
 )
 from linebot.models.events import Postback, PostbackEvent
 
-from func import amount
+from func import menu, amount
 
 load_dotenv()
 

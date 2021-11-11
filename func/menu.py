@@ -1,5 +1,8 @@
-from linebot.models.template import ConfirmTemplate
+import sys
+sys.path.append('./func')
 import user
+
+from linebot.models.template import ConfirmTemplate
 from linebot.models import (
     Template, TextMessage, TextSendMessage,
     TemplateSendMessage, ButtonsTemplate, MessageTemplateAction, PostbackAction, FlexSendMessage, messages, PostbackTemplateAction

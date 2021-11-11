@@ -1,10 +1,13 @@
+import sys
+sys.path.append('.')
+from config import getFoodMultiple
+
 import os
 from dotenv import load_dotenv
+from linebot import models
 load_dotenv()
 
-import sys
-sys.path.append('./module')
-import config
+
 
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -18,7 +21,7 @@ db = conn.foodmeow
 data = db.data
 
 def insertFoodData(object, money):
-    addition = money * config.getFoodMultiple()
+    addition = money * getFoodMultiple()
     data.insert_one(
         {
             "time": datetime.now(),
