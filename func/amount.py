@@ -70,6 +70,6 @@ def getHistory():
     for food in foods:
         count += 1
         reply = ""
-        reply = str(count) + str(food['subject']) + " " + str(food['money']) + "/" + str(food['total']) + '\n'
+        reply = str(count) + ". " + str(food['subject']) + " " + str(food['money']) + "/" + str(food['total']) + '\n'
         message += reply
     return message
