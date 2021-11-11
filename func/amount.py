@@ -20,16 +20,17 @@ data = db.data
 
 def insertFoodData(subject, money: int):
     addition = money * getFoodMultiple()
+    total = money + addition
     data.insert_one(
         {
             "time": datetime.now(),
             "object": subject,
             "money": money,
             "addition": addition,
-            "total": money + addition,
+            "total": total,
         }
     )
-    return "新增" + " " + str(money+addition) + " 元 " + object + " 成功"
+    return "新增" + " " + str(total) + " 元 " + subject + " 成功"
 
 def insertData(subject, money: int):
     data.insert_one(
