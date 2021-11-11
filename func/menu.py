@@ -1,6 +1,8 @@
+from linebot.models.template import ConfirmTemplate
+import user
 from linebot.models import (
     Template, TextMessage, TextSendMessage,
-    TemplateSendMessage, ButtonsTemplate, MessageTemplateAction, PostbackAction, FlexSendMessage, messages,
+    TemplateSendMessage, ButtonsTemplate, MessageTemplateAction, PostbackAction, FlexSendMessage, messages, PostbackTemplateAction
 )
 from linebot.exceptions import (
     InvalidSignatureError, LineBotApiError
@@ -14,7 +16,9 @@ from linebot.models.actions import PostbackAction
 from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent, ButtonComponent
 load_dotenv()
 
+
 line_bot_api = LineBotApi(os.getenv("CHANNEL_TOKEN"))
+
 
 def welcomeMenu(event):
     flex_message = FlexSendMessage(
@@ -36,7 +40,7 @@ def welcomeMenu(event):
                         ),
                         style="primary",
                         offsetBottom="5px"
-                    ),   
+                    ),
                     ButtonComponent(
                         action=PostbackAction(
                             label="About Foodmeow",
@@ -59,6 +63,7 @@ def welcomeMenu(event):
     ),
     line_bot_api.reply_message(event.reply_token, flex_message)
 
+
 def amountMenu(event):
     flex_message = FlexSendMessage(
         alt_text="menu",
@@ -79,7 +84,7 @@ def amountMenu(event):
                         ),
                         style="primary",
                         offsetBottom="sm"
-                    ),   
+                    ),
                     ButtonComponent(
                         action=PostbackAction(
                             label="其他記帳",
@@ -112,6 +117,30 @@ def amountMenu(event):
                     ),
                 ],
             ),
-        ),
+        )
     ),
     line_bot_api.reply_message(event.reply_token, flex_message)
+
+
+def confirm(event):
+    foodObject = user.getTempData(event.message.user_id)
+    continue_data = foodObject + " " + event.message.text
+    prompt_message = '請確認是否要將 ' + event.message.text + " 的 " + foodObject + "加入資料庫中"
+    message = TemplateSendMessage(
+        alt_text='動作確認',
+        template=ConfirmTemplate(
+            title='這是ConfirmTemplate',
+            text=prompt_message,
+            actions=[
+                PostbackTemplateAction(
+                    label='是',
+                    data=continue_data
+                ),
+                PostbackTemplateAction(
+                    label='否',
+                    data="forcequit"
+                )
+            ]
+        )
+    )
+    line_bot_api.reply_message(event.reply_token, message)

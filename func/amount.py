@@ -1,7 +1,16 @@
 import os
-from datetime import datetime
 from dotenv import load_dotenv
+load_dotenv()
+
+import sys
+sys.path.append('./module')
+import config
+
 from pymongo import MongoClient
+from bson.objectid import ObjectId
+
+from datetime import datetime
+
 load_dotenv()
 
 conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
@@ -9,7 +18,7 @@ db = conn.foodmeow
 data = db.data
 
 def insertFoodData(object, money):
-    addition = money * 0.5
+    addition = money * config.getFoodMultiple()
     data.insert_one(
         {
             "time": datetime.now(),
