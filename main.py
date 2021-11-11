@@ -90,13 +90,13 @@ def postback_message(event, PostbackMessage):
     if(event.postback.data == "Amount"):
         menu.amountMenu(event)
 
-    if(event.postback.data == "addFoodAmount"):
+    elif(event.postback.data == "addFoodAmount"):
         user.changeUserStatus(userId, "AddFoodAmount")
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "請輸入食物")
         )
 
-    if(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
+    elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
         data = event.postback.data
         data = data.split()
         food = data[0]
@@ -108,7 +108,7 @@ def postback_message(event, PostbackMessage):
             event.reply_token, TextSendMessage(text = "新增成功")
         )
 
-    if(event.postback.data == "addAmount"):
+    elif(event.postback.data == "addAmount"):
         user.changeUserStatus(userId, "AddAmount")
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "請輸入項目")
@@ -118,8 +118,8 @@ def postback_message(event, PostbackMessage):
         data = event.postback.data
         data = data.split()
         subject = data[0]
-        amount = int(data[1])
-        amount.insertFoodData(subject, amount)
+        subjectAmount = int(data[1])
+        amount.insertFoodData(subject, subjectAmount)
         user.deleteTempData(userId)
         user.changeUserStatus(userId, "free")
         line_bot_api.reply_message(
