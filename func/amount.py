@@ -64,7 +64,7 @@ def giveAmount(money):
     data.insert_one({
         "time": datetime.now(),
         "object": datetime.now().strftime("%Y/%m/%d"),
-        "money": 0,
+        "money": -money,
         "addition": 0,
         "total": -money,
     })

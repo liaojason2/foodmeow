@@ -133,13 +133,13 @@ def postback_message(event, PostbackMessage):
             event.reply_token, TextSendMessage(text = total)
         )
     
-    if(event.postback.data == "payAmount"):
-        user.changeUserStatus(userId, "payAmount")
-        menu.payAmountConfirm(event)
+    if(event.postback.data == "giveAmount"):
+        user.changeUserStatus(userId, "giveAmount")
+        menu.giveAmountConfirm(event)
     
-    if(user.checkUserStatus(userId) == "gaveAmount"):
+    if(user.checkUserStatus(userId) == "giveAmount"):
         total = event.postback.data
-        amount.giveAmount(int(event.postback.data))
+        amount.giveAmount(float(total))
         user.changeUserStatus(userId, "free")
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "已完成結帳，金額 " + str(total) + " 元")
