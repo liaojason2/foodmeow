@@ -1,17 +1,15 @@
+from linebot import LineBotApi
+from linebot.models import TemplateSendMessage, FlexSendMessage, PostbackTemplateAction
+from linebot.models.template import ConfirmTemplate
+from linebot.models.actions import PostbackAction
+from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent, ButtonComponent
+
 import sys
 sys.path.append('./func')
 import user
 
-from linebot.models.template import ConfirmTemplate
-from linebot.models import (
-    TemplateSendMessage, PostbackAction, FlexSendMessage, PostbackTemplateAction
-)
-from linebot import (
-    LineBotApi
-)
 import os
 from dotenv import load_dotenv
-from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent, ButtonComponent
 load_dotenv()
 
 

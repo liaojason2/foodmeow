@@ -86,7 +86,7 @@ def postback_message(event, PostbackMessage):
         data = event.postback.data
         data = data.split()
         food = data[0]
-        foodAmount = data[1]
+        foodAmount = int(data[1])
         amount.insertFoodData(food, foodAmount)
         user.deleteTempData(userId)
         user.changeUserStatus(userId, "free")
