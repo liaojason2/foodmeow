@@ -119,7 +119,7 @@ def postback_message(event, PostbackMessage):
         data = data.split()
         subject = data[0]
         subjectAmount = int(data[1])
-        amount.insertFoodData(subject, subjectAmount)
+        amount.insertData(subject, subjectAmount)
         user.deleteTempData(userId)
         user.changeUserStatus(userId, "free")
         line_bot_api.reply_message(
