@@ -55,6 +55,8 @@ def handle_text_message(event, TextMessage):
     elif(event.message.text == "開啟選單"):
         menu.welcomeMenu(event)
 
+    # Add food amount
+
     elif(user.checkUserStatus(userId) == "AddFoodAmount"):
         user.updateTempData(userId, event.message.text)
         user.changeUserStatus(userId, "AddFoodAmountMoney")
@@ -66,6 +68,18 @@ def handle_text_message(event, TextMessage):
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
         menu.confirm(event)
 
+    # Add amount
+    elif(user.checkUserStatus(userId) == "AddAmount"):
+        user.updateTempData(userId, event.message.text)
+        user.changeUserStatus(userId, "AddAmountMoney")
+        message = "請輸入" + event.message.text + "的金額"
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=message)
+        )
+
+    elif(user.checkUserStatus(userId) == "AddAmountMoney"):
+        menu.confirm(event)
+
 
 
 
@@ -73,15 +87,12 @@ def handle_text_message(event, TextMessage):
 def postback_message(event, PostbackMessage):
     userId = event.source.user_id
 
-    if (event.postback.data == "Amount"):
-        menu.amountMenu(event)
-
-    if(event.postback.data == "AddFoodAmount"):
+    if(event.postback.data == "addFoodAmount"):
         user.changeUserStatus(userId, "AddFoodAmount")
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "請輸入食物")
         )
-    
+
     if(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
         data = event.postback.data
         data = data.split()
@@ -93,6 +104,25 @@ def postback_message(event, PostbackMessage):
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "新增成功")
         )
+
+    if(event.postback.data == "addAmount"):
+        user.changeUserStatus(userId, "AddAmount")
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text = "請輸入項目")
+        )
+
+    if(user.checkUserStatus(userId) == "AddAmountMoney"):
+        data = event.postback.data
+        data = data.split()
+        subject = data[0]
+        amount = int(data[1])
+        amount.insertFoodData(subject, amount)
+        user.deleteTempData(userId)
+        user.changeUserStatus(userId, "free")
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text = "新增成功")
+        )
+    
     
     if(event.postback.data == "totalAmount"):
         amount.getTotalAmount()
