@@ -64,7 +64,7 @@ def giveAmount(money):
     return True
 
 def getHistory():
-    foods = data.find().sort("time", -1).limit(100)
+    foods = data.find().sort("time", -1).limit(20)
     message = ""
     count = 0
     for food in foods:
