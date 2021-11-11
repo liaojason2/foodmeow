@@ -58,7 +58,7 @@ def getTotalAmount():
             break
         totalAmount += total
         print(totalAmount)
-    return "總額" + str(totalAmount)
+    return totalAmount
 
 def giveAmount(money):
     data.insert_one({
