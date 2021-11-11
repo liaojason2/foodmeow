@@ -68,7 +68,7 @@ def giveAmount(money):
         "addition": 0,
         "total": -money,
     })
-    return "success"
+    return True
 
 def getHistory():
     foods = data.find().sort("time", -1).limit(100)

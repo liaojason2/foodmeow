@@ -6,7 +6,7 @@ from linebot.models.flex_message import BubbleContainer, BoxComponent, TextCompo
 
 import sys
 sys.path.append('./func')
-import user
+import user, amount
 
 import os
 from dotenv import load_dotenv
@@ -98,7 +98,7 @@ def amountMenu(event):
                     ButtonComponent(
                         action=PostbackAction(
                             label="結帳",
-                            data="payAmount"
+                            data="giveAmount"
                         ),
                         style="primary"
                     ),
@@ -129,6 +129,29 @@ def confirm(event):
     foodObject = user.getTempData(event.source.user_id)
     continue_data = foodObject + " " + event.message.text
     prompt_message = '請確認是否要將 ' + event.message.text + " 的 " + foodObject + "加入資料庫中"
+    message = TemplateSendMessage(
+        alt_text='動作確認',
+        template=ConfirmTemplate(
+            title='這是ConfirmTemplate',
+            text=prompt_message,
+            actions=[
+                PostbackTemplateAction(
+                    label='是',
+                    data=continue_data
+                ),
+                PostbackTemplateAction(
+                    label='否',
+                    data="forcequit"
+                )
+            ]
+        )
+    )
+    line_bot_api.reply_message(event.reply_token, message)
+
+def giveAmountConfirm(event):
+    total = amount.getTotalAmount()
+    continue_data = total
+    prompt_message = '目前累積總額為 ' + str(total) + " ，確認結帳？ "
     message = TemplateSendMessage(
         alt_text='動作確認',
         template=ConfirmTemplate(

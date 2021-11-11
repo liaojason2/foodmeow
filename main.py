@@ -132,6 +132,20 @@ def postback_message(event, PostbackMessage):
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = total)
         )
+    
+    if(event.postback.data == "payAmount"):
+        user.changeUserStatus(userId, "payAmount")
+        menu.payAmountConfirm(event)
+    
+    if(user.checkUserStatus(userId) == "gaveAmount"):
+        total = event.postback.data
+        amount.giveAmount(int(event.postback.data))
+        user.changeUserStatus(userId, "free")
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text = "已完成結帳，金額 " + str(total) + " 元")
+        )
+
+    
 
     
 
