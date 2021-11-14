@@ -43,7 +43,14 @@ def welcomeMenu(event):
                             data="AboutFoodmeow"
                         ),
                         style="primary"
-                    )
+                    ),
+                    ButtonComponent(
+                        action=PostbackAction(
+                            label="退出、故障修復",
+                            data="forceQuit"
+                        ),
+                        style="primary"
+                    ),
                 ],
             ),
             footer=BoxComponent(
@@ -109,6 +116,13 @@ def amountMenu(event):
                         ),
                         style="primary"
                     ),
+                    ButtonComponent(
+                        action=PostbackAction(
+                            label="退出、故障修復",
+                            data="forceQuit"
+                        ),
+                        style="primary"
+                    ),
                 ],
             ),
             footer=BoxComponent(
@@ -141,7 +155,7 @@ def confirm(event):
                 ),
                 PostbackTemplateAction(
                     label='否',
-                    data="forcequit"
+                    data="forceQuit"
                 )
             ]
         )
@@ -164,7 +178,7 @@ def giveAmountConfirm(event):
                 ),
                 PostbackTemplateAction(
                     label='否',
-                    data="forcequit"
+                    data="forceQuit"
                 )
             ]
         )

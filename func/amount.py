@@ -11,7 +11,6 @@ from pymongo import MongoClient
 #from bson.objectid import ObjectId
 
 from datetime import datetime, timedelta
-import pytz
 
 currentTime = datetime.now() + timedelta(hours=8)
 
