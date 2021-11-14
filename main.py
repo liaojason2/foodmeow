@@ -87,6 +87,9 @@ def handle_text_message(event, TextMessage):
 def postback_message(event, PostbackMessage):
     userId = event.source.user_id
 
+    if(event.postback.data == "forceQuit"):
+        user.clearDataToDefault(userId)
+
     if(event.postback.data == "Amount"):
         menu.amountMenu(event)
 

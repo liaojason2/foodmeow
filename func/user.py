@@ -70,3 +70,7 @@ def deleteTempData(userId):
             "tempData": "",
         }
     })
+
+def clearDataToDefault(userId):
+    deleteTempData(userId)
+    changeUserStatus(userId, "free")
