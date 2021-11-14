@@ -89,6 +89,9 @@ def postback_message(event, PostbackMessage):
 
     if(event.postback.data == "forceQuit"):
         user.clearDataToDefault(userId)
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text = "您已退出操作，請重新開始")
+        )
 
     if(event.postback.data == "Amount"):
         menu.amountMenu(event)
