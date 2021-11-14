@@ -103,22 +103,24 @@ def postback_message(event, PostbackMessage):
         )
 
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
-        #try:
-        data = event.postback.data
-        data = data.split()
-        food = data[0:-1]
-        foodAmount = float(data[-1])
-        amount.insertFoodData(food, foodAmount)
-        user.deleteTempData(userId)
-        user.changeUserStatus(userId, "free")
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = "新增成功")
-        )
-        #except TypeError:
-        #    user.clearDataToDefault(userId)
-        #    line_bot_api.reply_message(
-        #        event.reply_token, TextSendMessage(text = "輸入格式有誤，請重新操作")
-        #    )
+        try:
+            data = event.postback.data
+            data = data.split()
+            food = ""
+            for i in range(0, len(data)-1):
+                food += data[i]
+            foodAmount = float(data[-1])
+            amount.insertFoodData(food, foodAmount)
+            user.deleteTempData(userId)
+            user.changeUserStatus(userId, "free")
+            line_bot_api.reply_message(
+                event.reply_token, TextSendMessage(text = "新增成功")
+            )
+        except TypeError:
+            user.clearDataToDefault(userId)
+            line_bot_api.reply_message(
+                event.reply_token, TextSendMessage(text = "輸入格式有誤，請重新操作")
+            )
 
 
     elif(event.postback.data == "addAmount"):
