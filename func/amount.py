@@ -20,13 +20,14 @@ conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 data = db.data
 
-def insertFoodData(subject, money: float):
+def insertFoodData(subject: str, money: float):
     addition = money * getFoodMultiple()
     total = money + addition
     data.insert_one(
         {
             "time": currentTime,
             "subject": subject,
+            "category": "food",
             "money": money,
             "addition": addition,
             "total": total,
@@ -34,11 +35,12 @@ def insertFoodData(subject, money: float):
     )
     return "新增" + " " + str(total) + " 元 " + subject + " 成功"
 
-def insertData(subject, money: float):
+def insertData(subject: str, money: float):
     data.insert_one(
         {
             "time": currentTime,
             "subject": subject,
+            "category": "", #todo function
             "money": money,
             "addition": 0,
             "total": money,
