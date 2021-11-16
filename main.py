@@ -156,7 +156,7 @@ def postback_message(event, PostbackMessage):
     
     if(user.checkUserStatus(userId) == "giveAmount"):
         total = event.postback.data
-        total = math.floor(total)
+        total = math.floor(float(total))
         amount.giveAmount(float(total))
         user.changeUserStatus(userId, "free")
         line_bot_api.reply_message(
