@@ -165,7 +165,7 @@ def confirm(event):
 def giveAmountConfirm(event):
     total = amount.getTotalAmount()
     continue_data = total
-    prompt_message = '目前累積總額為 ' + str(total) + " ，確認結帳？ "
+    prompt_message = '目前累積總額為 ' + str(total) + " ，確認結帳？（若有小數會自動退位）"
     message = TemplateSendMessage(
         alt_text='動作確認',
         template=ConfirmTemplate(

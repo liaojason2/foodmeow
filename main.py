@@ -17,6 +17,8 @@ from linebot.models.events import PostbackEvent
 
 from func import menu, amount
 
+import math
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -154,6 +156,7 @@ def postback_message(event, PostbackMessage):
     
     if(user.checkUserStatus(userId) == "giveAmount"):
         total = event.postback.data
+        total = math.floor(float(total))
         amount.giveAmount(float(total))
         user.changeUserStatus(userId, "free")
         line_bot_api.reply_message(
