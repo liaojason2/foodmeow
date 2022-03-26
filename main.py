@@ -57,8 +57,7 @@ def handle_text_message(event, TextMessage):
     elif(event.message.text == "開啟選單"):
         menu.welcomeMenu(event)
 
-    # Add food amount
-
+    # Add food amount step 2
     elif(user.checkUserStatus(userId) == "AddFoodAmount"):
         user.updateTempData(userId, event.message.text)
         user.changeUserStatus(userId, "AddFoodAmountMoney")
@@ -67,6 +66,7 @@ def handle_text_message(event, TextMessage):
             event.reply_token, TextSendMessage(text=message)
         )
 
+    # Add food amount step 3 (comfirm food amount correct)
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
         menu.confirm(event)
 
@@ -89,21 +89,25 @@ def handle_text_message(event, TextMessage):
 def postback_message(event, PostbackMessage):
     userId = event.source.user_id
 
+    # Force Quit (if anything wrong)
     if(event.postback.data == "forceQuit"):
         user.clearDataToDefault(userId)
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "您已退出操作，請重新開始")
         )
 
+    # Open Amount Menu
     if(event.postback.data == "Amount"):
         menu.amountMenu(event)
 
+    # Add Food Amount Step 1
     elif(event.postback.data == "addFoodAmount"):
         user.changeUserStatus(userId, "AddFoodAmount")
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "請輸入食物")
         )
 
+    # Add Food Amount to database
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
         try:
             data = event.postback.data
@@ -124,18 +128,21 @@ def postback_message(event, PostbackMessage):
                 event.reply_token, TextSendMessage(text = "輸入格式有誤，請重新操作")
             )
 
-
+    # Add Amount Step 1
     elif(event.postback.data == "addAmount"):
         user.changeUserStatus(userId, "AddAmount")
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "請輸入項目")
         )
 
+    # Add Amount to database
     if(user.checkUserStatus(userId) == "AddAmountMoney"):
         data = event.postback.data
         data = data.split()
-        subject = data[0]
-        subjectAmount = int(data[1])
+        subject = ""
+        for i in range(0, len(data)-1):
+            subject += data[i]
+        subjectAmount = float(data[-1])
         amount.insertData(subject, subjectAmount)
         user.deleteTempData(userId)
         user.changeUserStatus(userId, "free")
@@ -143,13 +150,14 @@ def postback_message(event, PostbackMessage):
             event.reply_token, TextSendMessage(text = "新增成功")
         )
     
-    
+    # Get total amount expect already checkout
     if(event.postback.data == "totalAmount"):
         total = amount.getTotalAmount()
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = total)
         ) 
     
+
     if(event.postback.data == "giveAmount"):
         user.changeUserStatus(userId, "giveAmount")
         menu.giveAmountConfirm(event)
