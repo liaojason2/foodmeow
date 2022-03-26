@@ -129,6 +129,7 @@ def amountMenu(event):
                 layout="vertical",
                 contents=[
                     TextComponent(
+                        text="foodmeow v1.0.1",
                         align="center"
                     ),
                 ],
