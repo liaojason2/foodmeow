@@ -115,15 +115,18 @@ def handle_text_message(event, TextMessage):
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         if (exchangeRate != 1):
             prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + " 加入資料庫中（匯率 " + exchangeRate + "）。"
-        # Pass to confirmAmount section
+        # Prompt confirm message to user
         menu.confirmAmount(subject, amount, prompt_message, reply_token)
 
-
+    # User request to change exchange rate
     elif(user.checkUserStatus(userId) == "updateExchangeRate"):
+        # Get user desire exchange rate
         exchangeRate = event.message.text
+        # Define prompt_message to confirm section
         prompt_message = '請確認匯價為 ' + exchangeRate
-        reply_token = event.reply_token
+        # Change status for user to confirm exchange rate
         user.changeUserStatus(userId, "updateExchangeRateConfirm")
+        # Prompt confirm message to user
         menu.confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token)
 
 @handler.add(PostbackEvent)
