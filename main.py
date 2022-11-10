@@ -72,7 +72,7 @@ def handle_text_message(event, TextMessage):
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
         subject = user.getTempData(userId)
         amount = float(event.message.text)
-        exchangeRate = user.getExchangeRate()
+        exchangeRate = user.getExchangeRate(userId)
         amount = amount * exchangeRate
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         if (exchangeRate != 1):
