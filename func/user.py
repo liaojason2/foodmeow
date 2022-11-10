@@ -93,14 +93,14 @@ def deleteTempData(userId):
 Currency exchange rate
 '''
 
-def getCurrencyExchangeRate(userId):
+def getExchangeRate(userId):
     user = users.find_one({
         "userId": userId,
     })
     return user['currencyExchangeRate']
 
 
-def updateCurrencyExchangeRate(userId, currencyExchangeRate: float):
+def updateExchangeRate(userId, currencyExchangeRate: float):
     users.update_one({
         "userId": userId,
     },

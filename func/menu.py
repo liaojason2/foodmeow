@@ -118,6 +118,13 @@ def amountMenu(event):
                     ),
                     ButtonComponent(
                         action=PostbackAction(
+                            label="變更匯率",
+                            data="updateExchangeRate"
+                        ),
+                        style="primary"
+                    ),
+                    ButtonComponent(
+                        action=PostbackAction(
                             label="退出、故障修復",
                             data="forceQuit"
                         ),
@@ -139,7 +146,7 @@ def amountMenu(event):
     line_bot_api.reply_message(event.reply_token, flex_message)
 
 
-def confirm(subject, amount, prompt_message, reply_token):
+def confirmAmount(subject, amount, prompt_message, reply_token):
     continue_data = subject + " " + amount
     message = TemplateSendMessage(
         alt_text='動作確認',
@@ -182,3 +189,24 @@ def giveAmountConfirm(event):
         )
     )
     line_bot_api.reply_message(event.reply_token, message)
+
+def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token):
+    continue_data = exchangeRate
+    message = TemplateSendMessage(
+        alt_text='動作確認',
+        template=ConfirmTemplate(
+            title='加入資料庫確認',
+            text=prompt_message,
+            actions=[
+                PostbackTemplateAction(
+                    label='是',
+                    data=continue_data
+                ),
+                PostbackTemplateAction(
+                    label='否',
+                    data="forceQuit"
+                )
+            ]
+        )
+    )
+    line_bot_api.reply_message(reply_token, message)

@@ -74,7 +74,7 @@ def handle_text_message(event, TextMessage):
         amount = event.message.text
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         reply_token = event.reply_token
-        menu.confirm(subject, amount, prompt_message, reply_token)
+        menu.confirmAmount(subject, amount, prompt_message, reply_token)
 
     # Add amount
     elif(user.checkUserStatus(userId) == "AddAmount"):
@@ -84,20 +84,26 @@ def handle_text_message(event, TextMessage):
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=message)
         )
-
+    
+    # Add amount step 3 (comfirm amount correct)
     elif(user.checkUserStatus(userId) == "AddAmountMoney"):
         subject = user.getTempData(userId)
         amount = event.message.text
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         reply_token = event.reply_token
-        menu.confirm(subject, amount, prompt_message, reply_token)
+        menu.confirmAmount(subject, amount, prompt_message, reply_token)
 
+    elif(user.checkUserStatus(userId) == "updateExchangeRate"):
+        exchangeRate = event.message.text
+        prompt_message = '請確認匯價為 ' + exchangeRate
+        reply_token = event.reply_token
+        user.changeUserStatus(userId, "updateExchangeRateConfirm")
+        menu.confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token)
 
-
-
-@ handler.add(PostbackEvent)
+@handler.add(PostbackEvent)
 def postback_message(event, PostbackMessage):
     userId = event.source.user_id
+    postbackData = event.postback.data
 
     # Force Quit (if anything wrong)
     if(event.postback.data == "forceQuit"):
@@ -186,6 +192,21 @@ def postback_message(event, PostbackMessage):
         history = amount.getHistory()
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = history)
+        )
+    
+    # Change Exchange Rate Step 1
+    if(postbackData == "updateExchangeRate"):
+        user.changeUserStatus(userId, "updateExchangeRate")
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text = "請輸入匯價")
+        )
+
+    if(user.checkUserStatus(userId) == "updateExchangeRateConfirm"):
+        exchangeRate = float(postbackData)
+        user.updateExchangeRate(userId, exchangeRate)
+        user.changeUserStatus(userId, "free")
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text = "變更成功")
         )
 
 if __name__ == "__main__":
