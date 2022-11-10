@@ -74,9 +74,11 @@ def handle_text_message(event, TextMessage):
         amount = float(event.message.text)
         exchangeRate = user.getExchangeRate(userId)
         amount = amount * exchangeRate
-        prompt_message = '請確認是否要將 ' + str(amount) + " 的 " + subject + "加入資料庫中"
+        amount = str(amount)
+        exchangeRate = str(exchangeRate)
+        prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         if (exchangeRate != 1):
-            prompt_message = '請確認是否要將 ' + str(amount) + " 的 " + subject + "加入資料庫中（適用匯率 " + str(exchangeRate) + " 。"
+            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中（適用匯率 " + exchangeRate + " 。"
         reply_token = event.reply_token
         menu.confirmAmount(subject, amount, prompt_message, reply_token)
 
