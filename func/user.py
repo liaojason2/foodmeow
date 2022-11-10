@@ -97,16 +97,16 @@ def getExchangeRate(userId):
     user = users.find_one({
         "userId": userId,
     })
-    return user['currencyExchangeRate']
+    return user['exchangeRate']
 
 
-def updateExchangeRate(userId, currencyExchangeRate: float):
+def updateExchangeRate(userId, exchangeRate: float):
     users.update_one({
         "userId": userId,
     },
     {
         '$set': {
-            "currencyExchangeRate": currencyExchangeRate,
+            "exchangeRate": exchangeRate,
         }
     })
 
