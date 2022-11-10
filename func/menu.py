@@ -14,7 +14,7 @@ load_dotenv()
 
 
 line_bot_api = LineBotApi(os.getenv("CHANNEL_TOKEN"))
-
+foodmeow_version = "foodmeow v" + str(os.getenv("FOODMEOW_VERSION"))
 
 def welcomeMenu(event):
     flex_message = FlexSendMessage(
@@ -57,8 +57,8 @@ def welcomeMenu(event):
                 layout="vertical",
                 contents=[
                     TextComponent(
-                        text="foodmeow v1.0.1",
-                        align="center"
+                        text = foodmeow_version,
+                        align = "center"
                     ),
                 ],
             ),
@@ -118,6 +118,13 @@ def amountMenu(event):
                     ),
                     ButtonComponent(
                         action=PostbackAction(
+                            label="變更匯率",
+                            data="updateExchangeRate"
+                        ),
+                        style="primary"
+                    ),
+                    ButtonComponent(
+                        action=PostbackAction(
                             label="退出、故障修復",
                             data="forceQuit"
                         ),
@@ -129,8 +136,8 @@ def amountMenu(event):
                 layout="vertical",
                 contents=[
                     TextComponent(
-                        text="foodmeow v1.0.1",
-                        align="center"
+                        text = foodmeow_version,
+                        align = "center"
                     ),
                 ],
             ),
@@ -139,14 +146,12 @@ def amountMenu(event):
     line_bot_api.reply_message(event.reply_token, flex_message)
 
 
-def confirm(event):
-    foodObject = user.getTempData(event.source.user_id)
-    continue_data = foodObject + " " + event.message.text
-    prompt_message = '請確認是否要將 ' + event.message.text + " 的 " + foodObject + "加入資料庫中"
+def confirmAmount(subject, amount, prompt_message, reply_token):
+    continue_data = subject + " " + amount
     message = TemplateSendMessage(
         alt_text='動作確認',
         template=ConfirmTemplate(
-            title='這是ConfirmTemplate',
+            title='加入資料庫確認',
             text=prompt_message,
             actions=[
                 PostbackTemplateAction(
@@ -160,7 +165,7 @@ def confirm(event):
             ]
         )
     )
-    line_bot_api.reply_message(event.reply_token, message)
+    line_bot_api.reply_message(reply_token, message)
 
 def giveAmountConfirm(event):
     total = amount.getTotalAmount()
@@ -184,3 +189,24 @@ def giveAmountConfirm(event):
         )
     )
     line_bot_api.reply_message(event.reply_token, message)
+
+def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token):
+    continue_data = exchangeRate
+    message = TemplateSendMessage(
+        alt_text='動作確認',
+        template=ConfirmTemplate(
+            title='加入資料庫確認',
+            text=prompt_message,
+            actions=[
+                PostbackTemplateAction(
+                    label='是',
+                    data=continue_data
+                ),
+                PostbackTemplateAction(
+                    label='否',
+                    data="forceQuit"
+                )
+            ]
+        )
+    )
+    line_bot_api.reply_message(reply_token, message)

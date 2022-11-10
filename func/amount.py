@@ -20,7 +20,7 @@ conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 data = db.data
 
-def insertFoodData(subject: str, money: float):
+def insertFoodData(userId, subject: str, money: float):
     addition = money * getFoodMultiple()
     total = money + addition
     data.insert_one(

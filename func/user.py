@@ -5,10 +5,17 @@ from pymongo import MongoClient
 #from bson.objectid import ObjectId
 load_dotenv()
 
+'''
+Connect to MongoDB.
+'''
+
 conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 users = db.users
 
+'''
+Check user exist in database.
+'''
 def checkUserExist(profile):
     userId = profile.user_id
     displayName = profile.display_name
@@ -21,15 +28,22 @@ def checkUserExist(profile):
             "displayName": displayName,
             "status": "free",
             "tempData": "",
+            "currencyExchangeRate": 1,
         })
         return "NewUser"
-        
+
+'''
+Check user exist in status
+'''
 def checkUserStatus(userId):
     user = users.find_one({
         "userId": userId,
     })
     return user['status']
 
+'''
+Change status when user is running some function.
+'''
 def changeUserStatus(userId, status):
     users.update_one({
         "userId": userId,
@@ -39,6 +53,10 @@ def changeUserStatus(userId, status):
             "status": status,
         }
     })
+
+'''
+Temp data for user who is operate some function.
+'''
 
 def updateTempData(userId, data):
     user = users.find_one({
@@ -59,7 +77,7 @@ def getTempData(userId):
     user = users.find_one({
         "userId": userId,
     })
-    return user['tempData']
+    return user['tempData']    
 
 def deleteTempData(userId):
     users.find_one_and_update({
@@ -71,6 +89,30 @@ def deleteTempData(userId):
         }
     })
 
+'''
+Currency exchange rate
+'''
+
+def getExchangeRate(userId):
+    user = users.find_one({
+        "userId": userId,
+    })
+    return user['exchangeRate']
+
+
+def updateExchangeRate(userId, exchangeRate: float):
+    users.update_one({
+        "userId": userId,
+    },
+    {
+        '$set': {
+            "exchangeRate": exchangeRate,
+        }
+    })
+
+'''
+Clear all data to default if there is anything error.
+'''
 def clearDataToDefault(userId):
     deleteTempData(userId)
     changeUserStatus(userId, "free")
