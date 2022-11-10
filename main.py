@@ -69,8 +69,7 @@ def handle_text_message(event, TextMessage):
             event.reply_token, TextSendMessage(text=message)
         )
 
-    # Add food amount step 3 (comfirm food amount correct)
-    elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
+    def getUserTypedAmountAndPassToConfirm(userId, event):
         # Get amount subject from previous action
         subject = user.getTempData(userId)
         # Get amount from user
@@ -89,6 +88,11 @@ def handle_text_message(event, TextMessage):
         # Pass to confirmAmount section
         menu.confirmAmount(subject, amount, prompt_message, reply_token)
 
+
+    # Add food amount step 3 (comfirm food amount correct)
+    if(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
+        getUserTypedAmountAndPassToConfirm(userId, event)
+
     # Add amount
     elif(user.checkUserStatus(userId) == "AddAmount"):
         user.updateTempData(userId, event.message.text)
@@ -100,23 +104,7 @@ def handle_text_message(event, TextMessage):
     
     # Add amount step 3 (comfirm amount correct)
     elif(user.checkUserStatus(userId) == "AddAmountMoney"):
-        # Get amount subject from previous action
-        subject = user.getTempData(userId)
-        # Get amount from user
-        amount = event.message.text
-        # Get exchange rate
-        exchangeRate = user.getExchangeRate(userId)
-        # Count exchange rate and convert to integer
-        amount = int(float(amount) * float(exchangeRate))
-        # Covert to string for showing prompt_message
-        amount = str(amount)
-        exchangeRate = str(exchangeRate)
-        # Define prompt_message to confirm section
-        prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
-        if (exchangeRate != 1):
-            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + " 加入資料庫中（匯率 " + exchangeRate + "）。"
-        # Prompt confirm message to user
-        menu.confirmAmount(subject, amount, prompt_message, reply_token)
+        getUserTypedAmountAndPassToConfirm(userId, event)
 
     # User request to change exchange rate
     elif(user.checkUserStatus(userId) == "updateExchangeRate"):
