@@ -71,8 +71,12 @@ def handle_text_message(event, TextMessage):
     # Add food amount step 3 (comfirm food amount correct)
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
         subject = user.getTempData(userId)
-        amount = event.message.text
+        amount = float(event.message.text)
+        exchangeRate = user.getExchangeRate()
+        amount = amount * exchangeRate
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
+        if (exchangeRate != 1):
+            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中（適用匯率 " + exchangeRate + " 。"
         reply_token = event.reply_token
         menu.confirmAmount(subject, amount, prompt_message, reply_token)
 
@@ -132,7 +136,6 @@ def postback_message(event, PostbackMessage):
             for i in range(0, len(data)-1):
                 food += data[i]
             foodAmount = float(data[-1])
-
             amount.insertFoodData(userId, food, foodAmount)
             user.deleteTempData(userId)
             user.changeUserStatus(userId, "free")
