@@ -16,6 +16,7 @@ from linebot import (
 from linebot.models.events import PostbackEvent
 
 from func import menu, amount
+from func import user
 
 import math
 
@@ -34,6 +35,7 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
 
     # handle webhook body
     try:
@@ -116,7 +118,7 @@ def postback_message(event, PostbackMessage):
             for i in range(0, len(data)-1):
                 food += data[i]
             foodAmount = float(data[-1])
-            amount.insertFoodData(food, foodAmount)
+            amount.insertFoodData(userId, food, foodAmount)
             user.deleteTempData(userId)
             user.changeUserStatus(userId, "free")
             line_bot_api.reply_message(
@@ -178,4 +180,5 @@ def postback_message(event, PostbackMessage):
         )
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run()
+

@@ -28,7 +28,7 @@ def checkUserExist(profile):
             "displayName": displayName,
             "status": "free",
             "tempData": "",
-            "currency": "TWD",
+            "currencyExchangeRate": 1,
         })
         return "NewUser"
 
@@ -89,6 +89,30 @@ def deleteTempData(userId):
         }
     })
 
+'''
+Currency exchange rate
+'''
+
+def getCurrencyExchangeRate(userId):
+    user = users.find_one({
+        "userId": userId,
+    })
+    return user['currencyExchangeRate']
+
+
+def updateCurrencyExchangeRate(userId, currencyExchangeRate: float):
+    users.update_one({
+        "userId": userId,
+    },
+    {
+        '$set': {
+            "currencyExchangeRate": currencyExchangeRate,
+        }
+    })
+
+'''
+Clear all data to default if there is anything error.
+'''
 def clearDataToDefault(userId):
     deleteTempData(userId)
     changeUserStatus(userId, "free")

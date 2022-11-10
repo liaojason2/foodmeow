@@ -14,14 +14,17 @@ from datetime import datetime, timedelta
 
 currentTime = datetime.now() + timedelta(hours=8)
 
+sys.path.insert(1, '/Users/jason/projects/foodmeow')
+from user import getCurrencyExchangeRate
+
 load_dotenv()
 
 conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 data = db.data
 
-def insertFoodData(subject: str, money: float):
-    addition = money * getFoodMultiple()
+def insertFoodData(userId, subject: str, money: float):
+    addition = money * getFoodMultiple() * getCurrencyExchangeRate(userId)
     total = money + addition
     data.insert_one(
         {
