@@ -24,7 +24,8 @@ db = conn.foodmeow
 data = db.data
 
 def insertFoodData(userId, subject: str, money: float):
-    addition = money * getFoodMultiple() * getCurrencyExchangeRate(userId)
+    money = money * getCurrencyExchangeRate(userId)
+    addition = money * getFoodMultiple()
     total = money + addition
     data.insert_one(
         {
