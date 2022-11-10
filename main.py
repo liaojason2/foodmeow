@@ -51,6 +51,7 @@ def callback():
 def handle_text_message(event, TextMessage):
     userId = event.source.user_id
     profile = line_bot_api.get_profile(userId)
+    reply_token = event.reply_token
 
     if user.checkUserExist(profile) == "NewUser":
         line_bot_api.reply_message(
@@ -72,16 +73,20 @@ def handle_text_message(event, TextMessage):
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
         # Get amount subject from previous action
         subject = user.getTempData(userId)
-        # Get amount 
+        # Get amount from user
         amount = event.message.text
+        # Get exchange rate
         exchangeRate = user.getExchangeRate(userId)
+        # Count exchange rate and convert to integer
         amount = int(float(amount) * float(exchangeRate))
+        # Covert to string for showing prompt_message
         amount = str(amount)
         exchangeRate = str(exchangeRate)
+        # Define prompt_message to confirm section
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         if (exchangeRate != 1):
-            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中（匯率 " + exchangeRate + "）。"
-        reply_token = event.reply_token
+            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + " 加入資料庫中（匯率 " + exchangeRate + "）。"
+        # Pass to confirmAmount section
         menu.confirmAmount(subject, amount, prompt_message, reply_token)
 
     # Add amount
@@ -95,11 +100,24 @@ def handle_text_message(event, TextMessage):
     
     # Add amount step 3 (comfirm amount correct)
     elif(user.checkUserStatus(userId) == "AddAmountMoney"):
+        # Get amount subject from previous action
         subject = user.getTempData(userId)
+        # Get amount from user
         amount = event.message.text
+        # Get exchange rate
+        exchangeRate = user.getExchangeRate(userId)
+        # Count exchange rate and convert to integer
+        amount = int(float(amount) * float(exchangeRate))
+        # Covert to string for showing prompt_message
+        amount = str(amount)
+        exchangeRate = str(exchangeRate)
+        # Define prompt_message to confirm section
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
-        reply_token = event.reply_token
+        if (exchangeRate != 1):
+            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + " 加入資料庫中（匯率 " + exchangeRate + "）。"
+        # Pass to confirmAmount section
         menu.confirmAmount(subject, amount, prompt_message, reply_token)
+
 
     elif(user.checkUserStatus(userId) == "updateExchangeRate"):
         exchangeRate = event.message.text
