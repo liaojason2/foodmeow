@@ -74,7 +74,7 @@ def handle_text_message(event, TextMessage):
         amount = event.message.text
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         reply_token = event.reply_token
-        menu.confirm(userId, amount, reply_token)
+        menu.confirm(subject, amount, prompt_message, reply_token)
 
     # Add amount
     elif(user.checkUserStatus(userId) == "AddAmount"):
@@ -90,7 +90,7 @@ def handle_text_message(event, TextMessage):
         amount = event.message.text
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         reply_token = event.reply_token
-        menu.confirm(userId, amount, reply_token)
+        menu.confirm(subject, amount, prompt_message, reply_token)
 
 
 
