@@ -70,10 +70,12 @@ def handle_text_message(event, TextMessage):
 
     # Add food amount step 3 (comfirm food amount correct)
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
+        # Get amount subject from previous action
         subject = user.getTempData(userId)
+        # Get amount 
         amount = event.message.text
         exchangeRate = user.getExchangeRate(userId)
-        amount = float(amount) * float(exchangeRate)
+        amount = int(float(amount) * float(exchangeRate))
         amount = str(amount)
         exchangeRate = str(exchangeRate)
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
