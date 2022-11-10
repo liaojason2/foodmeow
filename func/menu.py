@@ -139,10 +139,8 @@ def amountMenu(event):
     line_bot_api.reply_message(event.reply_token, flex_message)
 
 
-def confirm(userId, amount, reply_token):
-    subject = user.getTempData(userId)
+def confirm(subject, amount, prompt_message, reply_token):
     continue_data = subject + " " + amount
-    prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
     message = TemplateSendMessage(
         alt_text='動作確認',
         template=ConfirmTemplate(

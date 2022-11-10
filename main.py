@@ -70,7 +70,9 @@ def handle_text_message(event, TextMessage):
 
     # Add food amount step 3 (comfirm food amount correct)
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
+        subject = user.getTempData(userId)
         amount = event.message.text
+        prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         reply_token = event.reply_token
         menu.confirm(userId, amount, reply_token)
 
@@ -84,7 +86,9 @@ def handle_text_message(event, TextMessage):
         )
 
     elif(user.checkUserStatus(userId) == "AddAmountMoney"):
+        subject = user.getTempData(userId)
         amount = event.message.text
+        prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         reply_token = event.reply_token
         menu.confirm(userId, amount, reply_token)
 
