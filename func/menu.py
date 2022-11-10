@@ -139,14 +139,14 @@ def amountMenu(event):
     line_bot_api.reply_message(event.reply_token, flex_message)
 
 
-def confirm(event):
-    foodObject = user.getTempData(event.source.user_id)
-    continue_data = foodObject + " " + event.message.text
-    prompt_message = '請確認是否要將 ' + event.message.text + " 的 " + foodObject + "加入資料庫中"
+def confirm(userId, amount, reply_token):
+    subject = user.getTempData(userId)
+    continue_data = subject + " " + amount
+    prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
     message = TemplateSendMessage(
         alt_text='動作確認',
         template=ConfirmTemplate(
-            title='這是ConfirmTemplate',
+            title='加入資料庫確認',
             text=prompt_message,
             actions=[
                 PostbackTemplateAction(
@@ -160,7 +160,7 @@ def confirm(event):
             ]
         )
     )
-    line_bot_api.reply_message(event.reply_token, message)
+    line_bot_api.reply_message(reply_token, message)
 
 def giveAmountConfirm(event):
     total = amount.getTotalAmount()

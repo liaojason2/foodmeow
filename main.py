@@ -70,7 +70,9 @@ def handle_text_message(event, TextMessage):
 
     # Add food amount step 3 (comfirm food amount correct)
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
-        menu.confirm(event)
+        amount = event.message.text
+        reply_token = event.reply_token
+        menu.confirm(userId, amount, reply_token)
 
     # Add amount
     elif(user.checkUserStatus(userId) == "AddAmount"):
@@ -82,7 +84,9 @@ def handle_text_message(event, TextMessage):
         )
 
     elif(user.checkUserStatus(userId) == "AddAmountMoney"):
-        menu.confirm(event)
+        amount = event.message.text
+        reply_token = event.reply_token
+        menu.confirm(userId, amount, reply_token)
 
 
 
@@ -118,6 +122,7 @@ def postback_message(event, PostbackMessage):
             for i in range(0, len(data)-1):
                 food += data[i]
             foodAmount = float(data[-1])
+
             amount.insertFoodData(userId, food, foodAmount)
             user.deleteTempData(userId)
             user.changeUserStatus(userId, "free")
