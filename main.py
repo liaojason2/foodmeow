@@ -71,14 +71,14 @@ def handle_text_message(event, TextMessage):
     # Add food amount step 3 (comfirm food amount correct)
     elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
         subject = user.getTempData(userId)
-        amount = float(event.message.text)
+        amount = event.message.text
         exchangeRate = user.getExchangeRate(userId)
-        amount = amount * exchangeRate
+        amount = float(amount) * float(exchangeRate)
         amount = str(amount)
         exchangeRate = str(exchangeRate)
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         if (exchangeRate != 1):
-            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中（適用匯率 " + exchangeRate + " 。"
+            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中（匯率 " + exchangeRate + "）。"
         reply_token = event.reply_token
         menu.confirmAmount(subject, amount, prompt_message, reply_token)
 
