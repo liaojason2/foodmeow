@@ -80,11 +80,10 @@ def handle_text_message(event, TextMessage):
         amount = int(float(amount) * float(exchangeRate))
         # Covert to string for showing prompt_message
         amount = str(amount)
-        exchangeRate = str(exchangeRate)
         # Define prompt_message to confirm section
         prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
         if (exchangeRate != 1.0):
-            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + " 加入資料庫中（匯率 " + exchangeRate + "）。"
+            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
         # Pass to confirmAmount section
         menu.confirmAmount(subject, amount, prompt_message, reply_token)
 
