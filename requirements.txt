@@ -19,7 +19,7 @@ itsdangerous==2.0.1
 Jinja2==3.0.1
 lazy-object-proxy==1.4.1
 line-bot-sdk==1.19.0
-MarkupSafe==2.0.1
+MarkupSafe==2.1.2
 mccabe==0.6.1
 multidict==6.0.2
 pycodestyle==2.7.0
@@ -32,6 +32,6 @@ requests==2.25.1
 six==1.16.0
 toml==0.10.2
 urllib3==1.26.6
-Werkzeug==2.0.1
+Werkzeug==2.2.3
 wrapt==1.12.1
 yarl==1.8.1
