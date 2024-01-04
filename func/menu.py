@@ -8,13 +8,15 @@ import sys
 sys.path.append('./func')
 import user, amount
 
+from ..config import getFoodmeowVersion
+
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
 
 line_bot_api = LineBotApi(os.getenv("CHANNEL_TOKEN"))
-foodmeow_version = "foodmeow v" + str(os.getenv("FOODMEOW_VERSION"))
+foodmeow_version = "foodmeow v" + getFoodmeowVersion()
 
 def welcomeMenu(event):
     flex_message = FlexSendMessage(
