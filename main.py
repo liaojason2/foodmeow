@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import os
+import math
 from dotenv import load_dotenv
 from flask import Flask, request, abort
-from func import menu, user
 from linebot.models import (
     MessageEvent, TextMessage,  TextSendMessage,
 )
@@ -14,11 +14,7 @@ from linebot import (
     LineBotApi, WebhookHandler
 )
 from linebot.models.events import PostbackEvent
-
-from func import menu, amount
-from func import user
-
-import math
+from func import amount, menu, user
 
 load_dotenv()
 

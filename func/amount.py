@@ -4,11 +4,10 @@ from config import getFoodMultiple
 
 import os
 from dotenv import load_dotenv
-#from linebot import models
 load_dotenv()
+from .config import getFoodMultiple
 
 from pymongo import MongoClient
-#from bson.objectid import ObjectId
 
 from datetime import datetime, timedelta
 
