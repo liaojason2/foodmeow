@@ -1,14 +1,16 @@
+import sys
 from linebot import LineBotApi
 from linebot.models import TemplateSendMessage, FlexSendMessage, PostbackTemplateAction
 from linebot.models.template import ConfirmTemplate
 from linebot.models.actions import PostbackAction
 from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent, ButtonComponent
 
-import sys
+
+#import from user.py and amount.py
 sys.path.append('./func')
 import user, amount
-
-from ..config import getFoodmeowVersion
+sys.path.append('.')
+from config import getFoodmeowVersion
 
 import os
 from dotenv import load_dotenv
