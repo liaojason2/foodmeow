@@ -1,7 +1,3 @@
-import sys
-sys.path.append('.')
-from config import getFoodMultiple
-
 import os
 from dotenv import load_dotenv
 load_dotenv()
