@@ -18,57 +18,65 @@ load_dotenv()
 line_bot_api = LineBotApi(os.getenv("CHANNEL_TOKEN"))
 foodmeow_version = "foodmeow v" + getFoodmeowVersion()
 
-def welcomeMenu(event):
-    flex_message = FlexSendMessage(
-        alt_text="menu",
-        contents=BubbleContainer(
-            header=BoxComponent(
-                layout="vertical",
-                contents=[
-                    TextComponent(text="請選擇操作", align="center"),
-                ],
-            ),
-            body=BoxComponent(
-                layout="vertical",
-                contents=[
-                    ButtonComponent(
-                        action=PostbackAction(
-                            label="記帳",
-                            data="Amount"
-                        ),
-                        style="primary",
-                        offsetBottom="5px"
-                    ),
-                    ButtonComponent(
-                        action=PostbackAction(
-                            label="About Foodmeow",
-                            data="AboutFoodmeow"
-                        ),
-                        style="primary"
-                    ),
-                    ButtonComponent(
-                        action=PostbackAction(
-                            label="退出、故障修復",
-                            data="forceQuit"
-                        ),
-                        style="primary"
-                    ),
-                ],
-            ),
-            footer=BoxComponent(
-                layout="vertical",
-                contents=[
-                    TextComponent(
-                        text = foodmeow_version,
-                        align = "center"
-                    ),
-                ],
-            ),
-        ),
-    ),
-    line_bot_api.reply_message(event.reply_token, flex_message)
-
-
+def welcomeMenu(event, configuration):
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[
+                    FlexMessage(
+                        alt_text="menu",
+                        contents=FlexBubble(
+                            header=FlexBox(
+                                layout="vertical",
+                                contents= [
+                                    FlexText(
+                                        text="請選擇操作",
+                                        align="center"
+                                    ),
+                                ]                                
+                            ),               
+                            body=FlexBox(
+                                layout="vertical",
+                                contents= [
+                                    FlexButton(
+                                        action=PostbackAction(
+                                            label="記帳",
+                                            data="Amount"
+                                        ),
+                                        style="primary",
+                                    ),
+                                    FlexButton(
+                                        action=URIAction(
+                                            label="About Foodmeow",
+                                            uri="https://www.foodmeow.com/about"
+                                        ),
+                                        style="primary"
+                                    ),
+                                    FlexButton(
+                                        action=PostbackAction(
+                                            label="退出、故障修復",
+                                            data="forceQuit"
+                                        ),
+                                        style="primary"
+                                    ),
+                                ]
+                            ),
+                            footer=FlexBox(
+                                layout="vertical",
+                                contents= [
+                                    FlexText(
+                                        text=foodmeow_version,
+                                        align="center"
+                                    ),
+                                ]
+                            )
+                        )
+                    )
+                ]
+            )
+        )
 def amountMenu(event):
     flex_message = FlexSendMessage(
         alt_text="menu",

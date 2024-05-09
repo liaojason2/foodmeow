@@ -51,13 +51,22 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_text_message(event):
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        userId = event.source.user_id
+        profile = line_bot_api.get_profile(userId)
+        reply_token = event.reply_token
 
-    if user.checkUserExist(profile) == "NewUser":
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text="歡迎使用本程式"))
+        if user.checkUserExist(profile) == "NewUser":
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=event.reply_token,
+                    messages=[TextMessage(text="歡迎使用本程式")]
+                )
+            )
 
-    elif(event.message.text == "開啟選單"):
-        menu.welcomeMenu(event)
+        elif(event.message.text == "開啟選單"):
+            menu.welcomeMenu(event, configuration)
 
     # Add food amount step 2
     elif(user.checkUserStatus(userId) == "AddFoodAmount"):
