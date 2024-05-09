@@ -1,10 +1,43 @@
 import sys
 import os
+'''
 from linebot import LineBotApi
 from linebot.models import TemplateSendMessage, FlexSendMessage, PostbackTemplateAction
 from linebot.models.template import ConfirmTemplate
 from linebot.models.actions import PostbackAction
 from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent, ButtonComponent
+'''
+from linebot.v3 import (
+    WebhookHandler
+)
+from linebot.v3.exceptions import (
+    InvalidSignatureError
+)
+from linebot.v3.messaging import (
+    Configuration,
+    ApiClient,
+    MessagingApi,
+    ReplyMessageRequest,
+    TextMessage,
+    FlexMessage,
+    FlexContainer,
+    FlexBubble,
+    FlexContainer
+)
+
+from linebot.v3.messaging.models import (
+    FlexBox,
+    FlexText,
+    FlexButton,
+    TextMessage,
+    PostbackAction,
+    URIAction
+)
+
+from linebot.v3.webhooks import (
+    MessageEvent,
+    TextMessageContent
+)
 
 # Import amount and foodmeow version
 from . import amount
