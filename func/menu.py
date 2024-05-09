@@ -48,7 +48,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-line_bot_api = LineBotApi(os.getenv("CHANNEL_TOKEN"))
 foodmeow_version = "foodmeow v" + getFoodmeowVersion()
 
 def welcomeMenu(event, configuration):
