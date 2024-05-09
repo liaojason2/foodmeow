@@ -4,24 +4,31 @@ import os
 import math
 from dotenv import load_dotenv
 from flask import Flask, request, abort
-from linebot.models import (
-    MessageEvent, TextMessage,  TextSendMessage,
+from linebot.v3 import (
+    WebhookHandler
 )
-from linebot.exceptions import (
+from linebot.v3.exceptions import (
     InvalidSignatureError
 )
-from linebot import (
-    LineBotApi, WebhookHandler
+from linebot.v3.messaging import (
+    Configuration,
+    ApiClient,
+    MessagingApi,
+    ReplyMessageRequest,
+    TextMessage
 )
-from linebot.models.events import PostbackEvent
+from linebot.v3.webhooks import (
+    MessageEvent,
+    TextMessageContent
+)
 from func import amount, menu, user
 
 load_dotenv()
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi(os.getenv("CHANNEL_TOKEN"))
-handler = WebhookHandler(os.getenv("CHANNEL_SECRET"))
+configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
+handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 
 
 @app.route("/callback", methods=['POST'])
@@ -37,17 +44,13 @@ def callback():
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
-        print("Invalid signature. Please check your channel access token/channel secret.")
+        app.logger.info("Invalid signature. Please check your channel access token/channel secret.")
         abort(400)
 
     return 'OK'
 
-
-@handler.add(MessageEvent)
-def handle_text_message(event, TextMessage):
-    userId = event.source.user_id
-    profile = line_bot_api.get_profile(userId)
-    reply_token = event.reply_token
+@handler.add(MessageEvent, message=TextMessageContent)
+def handle_text_message(event):
 
     if user.checkUserExist(profile) == "NewUser":
         line_bot_api.reply_message(
