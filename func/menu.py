@@ -110,6 +110,7 @@ def welcomeMenu(event, configuration):
                 ]
             )
         )
+'''
 def amountMenu(event):
     flex_message = FlexSendMessage(
         alt_text="menu",
@@ -253,3 +254,4 @@ def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token):
         )
     )
     line_bot_api.reply_message(reply_token, message)
+'''

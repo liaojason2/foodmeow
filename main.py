@@ -68,6 +68,7 @@ def handle_text_message(event):
         elif(event.message.text == "開啟選單"):
             menu.welcomeMenu(event, configuration)
 
+'''
     # Add food amount step 2
     elif(user.checkUserStatus(userId) == "AddFoodAmount"):
         user.updateTempData(userId, event.message.text)
@@ -231,6 +232,7 @@ def postback_message(event, PostbackMessage):
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text = "變更成功")
         )
+'''
 
 if __name__ == "__main__":
     app.run()
