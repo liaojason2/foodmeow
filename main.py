@@ -239,14 +239,6 @@ def handle_postback_message(event):
 def postback_message(event, PostbackMessage):
     userId = event.source.user_id
     postbackData = event.postback.data
-    
-    # Get total amount expect already checkout
-    if(event.postback.data == "totalAmount"):
-        total = amount.getTotalAmount()
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = total)
-        ) 
-    
 
     if(event.postback.data == "giveAmount"):
         user.changeUserStatus(userId, "giveAmount")
