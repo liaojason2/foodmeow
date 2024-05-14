@@ -71,7 +71,7 @@ def handle_text_message(event):
             menu.welcomeMenu(event, configuration)
 
 @handler.add(PostbackEvent)
-def handle_text_message(event):
+def handle_postback_message(event):
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         userId = event.source.user_id
@@ -91,8 +91,6 @@ def handle_text_message(event):
         # Open Amount Menu
         if(postbackData == "Amount"):
             menu.amountMenu(event, configuration)
-
-
 
 '''
     # Add food amount step 2
