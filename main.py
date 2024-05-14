@@ -210,6 +210,18 @@ def handle_postback_message(event):
                     messages=[TextMessage(text="新增成功")]
                 )
             )
+        
+        # Get total amount expect already checkout
+        if(postbackData == "totalAmount"):
+            total = amount.getTotalAmount()
+            total = str(total)
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=replyToken,
+                    messages=[TextMessage(text = total)]
+                )
+            )
+
 
 '''
     # User request to change exchange rate
