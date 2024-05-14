@@ -222,6 +222,22 @@ def handle_postback_message(event):
                 )
             )
 
+        # Give amount confirm
+        if (postbackData == "giveAmount"):
+            user.changeUserStatus(userId, "giveAmount")
+            menu.giveAmountConfirm(event, configuration)
+
+        if(user.checkUserStatus(userId) == "giveAmount"):
+            total = event.postback.data
+            total = math.floor(float(total))
+            amount.giveAmount(float(total))
+            user.changeUserStatus(userId, "free")
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=replyToken,
+                    messages=[TextMessage(text = "已完成結帳，金額 " + str(total) + " 元")]
+                )
+            )
 
 '''
     # User request to change exchange rate
@@ -239,19 +255,6 @@ def handle_postback_message(event):
 def postback_message(event, PostbackMessage):
     userId = event.source.user_id
     postbackData = event.postback.data
-
-    if(event.postback.data == "giveAmount"):
-        user.changeUserStatus(userId, "giveAmount")
-        menu.giveAmountConfirm(event)
-    
-    if(user.checkUserStatus(userId) == "giveAmount"):
-        total = event.postback.data
-        total = math.floor(float(total))
-        amount.giveAmount(float(total))
-        user.changeUserStatus(userId, "free")
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = "已完成結帳，金額 " + str(total) + " 元")
-        )
 
     if(event.postback.data == "getHistoryAmount"):
         history = amount.getHistory()

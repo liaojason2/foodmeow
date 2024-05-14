@@ -229,6 +229,38 @@ def confirmAmount(subject, amount, prompt_message, reply_token, configuration):
                 ]
             )
         )
+
+def giveAmountConfirm(event, configuration):
+    total = amount.getTotalAmount()
+    continue_data = str(total)
+    prompt_message = '目前累積總額為 ' + str(total) + " ，確認結帳？（若有小數會自動退位）"
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[
+                    TemplateMessage(
+                        altText='動作確認',
+                        template=ConfirmTemplate(
+                            title='這是ConfirmTemplate',
+                            text=prompt_message,
+                            actions=[
+                                PostbackAction(
+                                    label='是',
+                                    data=continue_data
+                                ),
+                                PostbackAction(
+                                    label='否',
+                                    data="forceQuit"
+                                )
+                            ]
+                        )
+                    )
+                ]
+            )
+        )
+
             
 '''
 def giveAmountConfirm(event):
