@@ -19,7 +19,9 @@ from linebot.v3.messaging import (
 )
 from linebot.v3.webhooks import (
     MessageEvent,
-    TextMessageContent
+    TextMessageContent,
+    PostbackEvent,
+    PostbackContent,
 )
 from func import amount, menu, user
 
@@ -67,6 +69,19 @@ def handle_text_message(event):
 
         elif(event.message.text == "開啟選單"):
             menu.welcomeMenu(event, configuration)
+
+@handler.add(PostbackEvent)
+def handle_text_message(event):
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        userId = event.source.user_id
+        replyToken = event.reply_token
+        postbackData = event.postback.data
+
+
+        # Open Amount Menu
+        if(postbackData == "Amount"):
+            menu.amountMenu(event, configuration)
 
 '''
     # Add food amount step 2
