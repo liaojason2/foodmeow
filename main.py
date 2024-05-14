@@ -124,6 +124,13 @@ def handle_text_message(event):
         elif(user.checkUserStatus(userId) == "AddAmountMoney"):
             passUserTypedAmountToConfirmMenu(userId, event)
 
+        # User request to change exchange rate
+        elif(user.checkUserStatus(userId) == "updateExchangeRate"):
+            exchangeRate = receivedMessage
+            prompt_message = '請確認匯價為 ' + exchangeRate
+            user.changeUserStatus(userId, "updateExchangeRateConfirm")
+            menu.confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token, configuration)
+
         
 @handler.add(PostbackEvent)
 def handle_postback_message(event):
@@ -239,7 +246,7 @@ def handle_postback_message(event):
                 )
             )
 
-        if(event.postback.data == "getHistoryAmount"):
+        if(postbackData == "getHistoryAmount"):
             history = amount.getHistory()
             line_bot_api.reply_message_with_http_info(
                 ReplyMessageRequest(
@@ -247,43 +254,27 @@ def handle_postback_message(event):
                     messages=[TextMessage(text = history)]
                 )
             )
-        
 
-'''
-    # User request to change exchange rate
-    elif(user.checkUserStatus(userId) == "updateExchangeRate"):
-        # Get user desire exchange rate
-        exchangeRate = event.message.text
-        # Define prompt_message to confirm section
-        prompt_message = '請確認匯價為 ' + exchangeRate
-        # Change status for user to confirm exchange rate
-        user.changeUserStatus(userId, "updateExchangeRateConfirm")
-        # Prompt confirm message to user
-        menu.confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token)
+        # User request to change exchange rate
+        if(postbackData == "updateExchangeRate"):
+            user.changeUserStatus(userId, "updateExchangeRate")
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=replyToken,
+                    messages=[TextMessage(text = "請輸入匯價")]
+                )
+            )
 
-@handler.add(PostbackEvent)
-def postback_message(event, PostbackMessage):
-    userId = event.source.user_id
-    postbackData = event.postback.data
-
-
-    
-    # Change Exchange Rate Step 1
-    if(postbackData == "updateExchangeRate"):
-        user.changeUserStatus(userId, "updateExchangeRate")
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = "請輸入匯價")
-        )
-
-    if(user.checkUserStatus(userId) == "updateExchangeRateConfirm"):
-        exchangeRate = float(postbackData)
-        user.updateExchangeRate(userId, exchangeRate)
-        user.changeUserStatus(userId, "free")
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = "變更成功")
-        )
-'''
+        if(user.checkUserStatus(userId) == "updateExchangeRateConfirm"):
+            exchangeRate = float(postbackData)
+            user.updateExchangeRate(userId, exchangeRate)
+            user.changeUserStatus(userId, "free")
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=replyToken,
+                    messages=[TextMessage(text = "變更成功")]
+                )
+            )
 
 if __name__ == "__main__":
     app.run()
-

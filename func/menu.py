@@ -261,49 +261,31 @@ def giveAmountConfirm(event, configuration):
             )
         )
 
-            
-'''
-def giveAmountConfirm(event):
-    total = amount.getTotalAmount()
-    continue_data = total
-    prompt_message = '目前累積總額為 ' + str(total) + " ，確認結帳？（若有小數會自動退位）"
-    message = TemplateSendMessage(
-        alt_text='動作確認',
-        template=ConfirmTemplate(
-            title='這是ConfirmTemplate',
-            text=prompt_message,
-            actions=[
-                PostbackTemplateAction(
-                    label='是',
-                    data=continue_data
-                ),
-                PostbackTemplateAction(
-                    label='否',
-                    data="forceQuit"
-                )
-            ]
-        )
-    )
-    line_bot_api.reply_message(event.reply_token, message)
-
-def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token):
+def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token, configuration):
     continue_data = exchangeRate
-    message = TemplateSendMessage(
-        alt_text='動作確認',
-        template=ConfirmTemplate(
-            title='加入資料庫確認',
-            text=prompt_message,
-            actions=[
-                PostbackTemplateAction(
-                    label='是',
-                    data=continue_data
-                ),
-                PostbackTemplateAction(
-                    label='否',
-                    data="forceQuit"
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        line_bot_api.reply_message_with_http_info(
+        ReplyMessageRequest(
+            reply_token=reply_token,
+            messages=[
+                TemplateMessage(
+                    altText='動作確認',
+                    template=ConfirmTemplate(
+                        title='加入資料庫確認',
+                        text=prompt_message,
+                        actions=[
+                            PostbackAction(
+                                label='是',
+                                data=continue_data
+                            ),
+                            PostbackAction(
+                                label='否',
+                                data="forceQuit"
+                            )
+                        ]
+                    )
                 )
             ]
         )
     )
-    line_bot_api.reply_message(reply_token, message)
-'''
