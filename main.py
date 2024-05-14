@@ -119,7 +119,11 @@ def handle_text_message(event):
                     messages=[TextMessage(text=replyMessage)]
                 )
             )
+
+        # Add amount step 3 (comfirm amount correct)
+        elif(user.checkUserStatus(userId) == "AddAmountMoney"):
             passUserTypedAmountToConfirmMenu(userId, event)
+
         
 @handler.add(PostbackEvent)
 def handle_postback_message(event):
@@ -178,6 +182,36 @@ def handle_postback_message(event):
                         messages=[TextMessage(text="新增失敗，請重新輸入")]
                     )
                 )
+
+        # Add amount step 1
+        elif(postbackData == "addAmount"):
+            user.changeUserStatus(userId, "AddAmount")
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=replyToken,
+                    messages=[TextMessage(text="請輸入項目")]
+                )
+            )
+
+        # Add amount to database
+        if(user.checkUserStatus(userId) == "AddAmountMoney"):
+            data = event.postback.data
+            data = data.split()
+            subject = ""
+            for i in range(0, len(data)-1):
+                subject += data[i]
+            subjectAmount = float(data[-1])
+            amount.insertData(subject, subjectAmount)
+            user.deleteTempData(userId)
+            user.changeUserStatus(userId, "free")
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=replyToken,
+                    messages=[TextMessage(text="新增成功")]
+                )
+            )
+
+'''
     # User request to change exchange rate
     elif(user.checkUserStatus(userId) == "updateExchangeRate"):
         # Get user desire exchange rate
@@ -193,28 +227,6 @@ def handle_postback_message(event):
 def postback_message(event, PostbackMessage):
     userId = event.source.user_id
     postbackData = event.postback.data
-
-    # Add Amount Step 1
-    elif(event.postback.data == "addAmount"):
-        user.changeUserStatus(userId, "AddAmount")
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = "請輸入項目")
-        )
-
-    # Add Amount to database
-    if(user.checkUserStatus(userId) == "AddAmountMoney"):
-        data = event.postback.data
-        data = data.split()
-        subject = ""
-        for i in range(0, len(data)-1):
-            subject += data[i]
-        subjectAmount = float(data[-1])
-        amount.insertData(subject, subjectAmount)
-        user.deleteTempData(userId)
-        user.changeUserStatus(userId, "free")
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = "新增成功")
-        )
     
     # Get total amount expect already checkout
     if(event.postback.data == "totalAmount"):
