@@ -21,7 +21,6 @@ from linebot.v3.webhooks import (
     MessageEvent,
     TextMessageContent,
     PostbackEvent,
-    PostbackContent,
 )
 from func import amount, menu, user
 
