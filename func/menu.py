@@ -1,13 +1,3 @@
-import sys
-import os
-'''
-from linebot import LineBotApi
-from linebot.models import TemplateSendMessage, FlexSendMessage, PostbackTemplateAction
-from linebot.models.template import ConfirmTemplate
-from linebot.models.actions import PostbackAction
-from linebot.models.flex_message import BubbleContainer, BoxComponent, TextComponent, ButtonComponent
-'''
-
 from linebot.v3.messaging import (
     ApiClient,
     MessagingApi,
