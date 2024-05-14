@@ -78,10 +78,21 @@ def handle_text_message(event):
         replyToken = event.reply_token
         postbackData = event.postback.data
 
+        # Force Quit (if anything wrong)
+        if(postbackData  == "forceQuit"):
+            user.clearDataToDefault(userId)
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=replyToken,
+                    messages=[TextMessage(text="您已退出操作，請重新開始")]
+                )
+            )
 
         # Open Amount Menu
         if(postbackData == "Amount"):
             menu.amountMenu(event, configuration)
+
+
 
 '''
     # Add food amount step 2
