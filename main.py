@@ -239,6 +239,16 @@ def handle_postback_message(event):
                 )
             )
 
+        if(event.postback.data == "getHistoryAmount"):
+            history = amount.getHistory()
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=replyToken,
+                    messages=[TextMessage(text = history)]
+                )
+            )
+        
+
 '''
     # User request to change exchange rate
     elif(user.checkUserStatus(userId) == "updateExchangeRate"):
@@ -256,11 +266,7 @@ def postback_message(event, PostbackMessage):
     userId = event.source.user_id
     postbackData = event.postback.data
 
-    if(event.postback.data == "getHistoryAmount"):
-        history = amount.getHistory()
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = history)
-        )
+
     
     # Change Exchange Rate Step 1
     if(postbackData == "updateExchangeRate"):
