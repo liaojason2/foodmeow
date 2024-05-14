@@ -22,7 +22,10 @@ from linebot.v3.messaging import (
     FlexMessage,
     FlexContainer,
     FlexBubble,
-    FlexContainer
+    FlexContainer,
+    TemplateMessage,
+    ConfirmTemplate
+    
 )
 
 from linebot.v3.messaging.models import (
@@ -197,108 +200,37 @@ def amountMenu(event, configuration):
                 ]
             )
         )
+
+def confirmAmount(subject, amount, prompt_message, reply_token, configuration):
+    continue_data = subject + " " + amount
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=reply_token,
+                messages=[
+                    TemplateMessage(
+                        altText='動作確認',
+                        template=ConfirmTemplate(
+                            title='加入資料庫確認',
+                            text=prompt_message,
+                            actions=[
+                                PostbackAction(
+                                    label='是',
+                                    data=continue_data
+                                ),
+                                PostbackAction(
+                                    label='否',
+                                    data="forceQuit"
+                                )
+                            ]
+                        )
+                    )
+                ]
+            )
+        )
             
 '''
-def amountMenu(event):
-    flex_message = FlexSendMessage(
-        alt_text="menu",
-        contents=BubbleContainer(
-            header=BoxComponent(
-                layout="vertical",
-                contents=[
-                    TextComponent(text="記帳功能選項", align="center"),
-                ],
-            ),
-            body=BoxComponent(
-                layout="vertical",
-                contents=[
-                    ButtonComponent(
-                        action=PostbackAction(
-                            label="食物記帳",
-                            data="addFoodAmount"
-                        ),
-                        style="primary",
-                        offsetBottom="sm"
-                    ),
-                    ButtonComponent(
-                        action=PostbackAction(
-                            label="其他記帳",
-                            data="addAmount"
-                        ),
-                        style="primary"
-                    ),
-                    ButtonComponent(
-                        action=PostbackAction(
-                            label="總額",
-                            data="totalAmount"
-                        ),
-                        style="primary"
-                    ),
-                    ButtonComponent(
-                        action=PostbackAction(
-                            label="結帳",
-                            data="giveAmount"
-                        ),
-                        style="primary"
-                    ),
-                    ButtonComponent(
-                        action=PostbackAction(
-                            label="歷史",
-                            data="getHistoryAmount"
-                        ),
-                        style="primary"
-                    ),
-                    ButtonComponent(
-                        action=PostbackAction(
-                            label="變更匯率",
-                            data="updateExchangeRate"
-                        ),
-                        style="primary"
-                    ),
-                    ButtonComponent(
-                        action=PostbackAction(
-                            label="退出、故障修復",
-                            data="forceQuit"
-                        ),
-                        style="primary"
-                    ),
-                ],
-            ),
-            footer=BoxComponent(
-                layout="vertical",
-                contents=[
-                    TextComponent(
-                        text = foodmeow_version,
-                        align = "center"
-                    ),
-                ],
-            ),
-        )
-    ),
-    line_bot_api.reply_message(event.reply_token, flex_message)
-
-
-def confirmAmount(subject, amount, prompt_message, reply_token):
-    continue_data = subject + " " + amount
-    message = TemplateSendMessage(
-        alt_text='動作確認',
-        template=ConfirmTemplate(
-            title='加入資料庫確認',
-            text=prompt_message,
-            actions=[
-                PostbackTemplateAction(
-                    label='是',
-                    data=continue_data
-                ),
-                PostbackTemplateAction(
-                    label='否',
-                    data="forceQuit"
-                )
-            ]
-        )
-    )
-    line_bot_api.reply_message(reply_token, message)
-
 def giveAmountConfirm(event):
     total = amount.getTotalAmount()
     continue_data = total

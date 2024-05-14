@@ -51,6 +51,27 @@ def callback():
 
     return 'OK'
 
+def passUserTypedAmountToConfirmMenu(userId, event):
+    receivedMessage = event.message.text
+    replyToken = event.reply_token
+
+    # Get amount subject from previous action
+    subject = user.getTempData(userId)
+    # Get amount from user
+    amount = receivedMessage
+    # Get exchange rate
+    exchangeRate = user.getExchangeRate(userId)
+    # Count exchange rate and convert to integer
+    amount = int(float(amount) * float(exchangeRate))
+    # Covert to string for showing prompt_message
+    amount = str(amount)
+    # Define prompt_message to confirm section
+    prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
+    if (exchangeRate != 1.0):
+        prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
+    # Pass to confirmAmount section
+    menu.confirmAmount(subject, amount, prompt_message, replyToken, configuration)
+
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_text_message(event):
     with ApiClient(configuration) as api_client:
@@ -58,18 +79,35 @@ def handle_text_message(event):
         userId = event.source.user_id
         profile = line_bot_api.get_profile(userId)
         reply_token = event.reply_token
+        receivedMessage = event.message.text
 
         if user.checkUserExist(profile) == "NewUser":
             line_bot_api.reply_message_with_http_info(
                 ReplyMessageRequest(
-                    reply_token=event.reply_token,
+                    reply_token=reply_token,
                     messages=[TextMessage(text="歡迎使用本程式")]
                 )
             )
 
-        elif(event.message.text == "開啟選單"):
+        elif(receivedMessage == "開啟選單"):
             menu.welcomeMenu(event, configuration)
 
+        # Add food amount step 2
+        elif(user.checkUserStatus(userId) == "AddFoodAmount"):
+            user.updateTempData(userId, receivedMessage)
+            user.changeUserStatus(userId, "AddFoodAmountMoney")
+            replyMessage = "請輸入" + receivedMessage + "的金額"
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=reply_token,
+                    messages=[TextMessage(text=replyMessage)]
+                )
+            )
+
+        # Add food amount step 3 (confirm food amount correct)
+        elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
+            passUserTypedAmountToConfirmMenu(userId, event)
+        
 @handler.add(PostbackEvent)
 def handle_postback_message(event):
     with ApiClient(configuration) as api_client:
@@ -93,38 +131,6 @@ def handle_postback_message(event):
             menu.amountMenu(event, configuration)
 
 '''
-    # Add food amount step 2
-    elif(user.checkUserStatus(userId) == "AddFoodAmount"):
-        user.updateTempData(userId, event.message.text)
-        user.changeUserStatus(userId, "AddFoodAmountMoney")
-        message = "請輸入" + event.message.text + "的金額"
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=message)
-        )
-
-    def getUserTypedAmountAndPassToConfirm(userId, event):
-        # Get amount subject from previous action
-        subject = user.getTempData(userId)
-        # Get amount from user
-        amount = event.message.text
-        # Get exchange rate
-        exchangeRate = user.getExchangeRate(userId)
-        # Count exchange rate and convert to integer
-        amount = int(float(amount) * float(exchangeRate))
-        # Covert to string for showing prompt_message
-        amount = str(amount)
-        # Define prompt_message to confirm section
-        prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
-        if (exchangeRate != 1.0):
-            prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
-        # Pass to confirmAmount section
-        menu.confirmAmount(subject, amount, prompt_message, reply_token)
-
-
-    # Add food amount step 3 (comfirm food amount correct)
-    if(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
-        getUserTypedAmountAndPassToConfirm(userId, event)
-
     # Add amount
     elif(user.checkUserStatus(userId) == "AddAmount"):
         user.updateTempData(userId, event.message.text)
@@ -153,45 +159,6 @@ def handle_postback_message(event):
 def postback_message(event, PostbackMessage):
     userId = event.source.user_id
     postbackData = event.postback.data
-
-    # Force Quit (if anything wrong)
-    if(event.postback.data == "forceQuit"):
-        user.clearDataToDefault(userId)
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = "您已退出操作，請重新開始")
-        )
-
-    # Open Amount Menu
-    if(event.postback.data == "Amount"):
-        menu.amountMenu(event)
-
-    # Add Food Amount Step 1
-    elif(event.postback.data == "addFoodAmount"):
-        user.changeUserStatus(userId, "AddFoodAmount")
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text = "請輸入食物")
-        )
-
-    # Add Food Amount to database
-    elif(user.checkUserStatus(userId) == "AddFoodAmountMoney"):
-        try:
-            data = event.postback.data
-            data = data.split()
-            food = ""
-            for i in range(0, len(data)-1):
-                food += data[i]
-            foodAmount = float(data[-1])
-            amount.insertFoodData(userId, food, foodAmount)
-            user.deleteTempData(userId)
-            user.changeUserStatus(userId, "free")
-            line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text = "新增成功")
-            )
-        except TypeError:
-            user.clearDataToDefault(userId)
-            line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text = "輸入格式有誤，請重新操作")
-            )
 
     # Add Amount Step 1
     elif(event.postback.data == "addAmount"):
