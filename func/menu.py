@@ -6,7 +6,7 @@ from linebot.v3.messaging import (
     FlexBubble,
     TemplateMessage,
     ConfirmTemplate
-    
+
 )
 
 from linebot.v3.messaging.models import (
@@ -28,6 +28,7 @@ load_dotenv()
 
 foodmeow_version = "foodmeow v" + getFoodmeowVersion()
 
+
 def welcomeMenu(event, configuration):
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
@@ -40,16 +41,16 @@ def welcomeMenu(event, configuration):
                         contents=FlexBubble(
                             header=FlexBox(
                                 layout="vertical",
-                                contents= [
+                                contents=[
                                     FlexText(
                                         text="請選擇操作",
                                         align="center"
                                     ),
-                                ]                                
-                            ),               
+                                ]
+                            ),
                             body=FlexBox(
                                 layout="vertical",
-                                contents= [
+                                contents=[
                                     FlexButton(
                                         action=PostbackAction(
                                             label="記帳",
@@ -75,7 +76,7 @@ def welcomeMenu(event, configuration):
                             ),
                             footer=FlexBox(
                                 layout="vertical",
-                                contents= [
+                                contents=[
                                     FlexText(
                                         text=foodmeow_version,
                                         align="center"
@@ -87,6 +88,7 @@ def welcomeMenu(event, configuration):
                 ]
             )
         )
+
 
 def amountMenu(event, configuration):
     with ApiClient(configuration) as api_client:
@@ -171,10 +173,11 @@ def amountMenu(event, configuration):
                                 ],
                             ),
                         )
-                    )     
+                    )
                 ]
             )
         )
+
 
 def confirmAmount(subject, amount, prompt_message, reply_token, configuration):
     continue_data = subject + " " + amount
@@ -204,6 +207,7 @@ def confirmAmount(subject, amount, prompt_message, reply_token, configuration):
                 ]
             )
         )
+
 
 def giveAmountConfirm(event, configuration):
     total = amount.getTotalAmount()
@@ -236,31 +240,32 @@ def giveAmountConfirm(event, configuration):
             )
         )
 
+
 def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token, configuration):
     continue_data = exchangeRate
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
-        ReplyMessageRequest(
-            reply_token=reply_token,
-            messages=[
-                TemplateMessage(
-                    altText='動作確認',
-                    template=ConfirmTemplate(
-                        title='加入資料庫確認',
-                        text=prompt_message,
-                        actions=[
-                            PostbackAction(
-                                label='是',
-                                data=continue_data
-                            ),
-                            PostbackAction(
-                                label='否',
-                                data="forceQuit"
-                            )
-                        ]
+            ReplyMessageRequest(
+                reply_token=reply_token,
+                messages=[
+                    TemplateMessage(
+                        altText='動作確認',
+                        template=ConfirmTemplate(
+                            title='加入資料庫確認',
+                            text=prompt_message,
+                            actions=[
+                                PostbackAction(
+                                    label='是',
+                                    data=continue_data
+                                ),
+                                PostbackAction(
+                                    label='否',
+                                    data="forceQuit"
+                                )
+                            ]
+                        )
                     )
-                )
-            ]
+                ]
+            )
         )
-    )
