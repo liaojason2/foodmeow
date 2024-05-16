@@ -1,5 +1,5 @@
 foodMultiple = 0.5
-foodmeowVersion = "1.1.4 beta"
+foodmeowVersion = "1.1.4 beta 2"
 
 def getFoodMultiple(): 
     return foodMultiple
