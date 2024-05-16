@@ -1,11 +1,10 @@
+from datetime import datetime, timedelta
+from pymongo import MongoClient
+from .config import getFoodMultiple
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from .config import getFoodMultiple
 
-from pymongo import MongoClient
-
-from datetime import datetime, timedelta
 
 currentTime = datetime.now() + timedelta(hours=8)
 
@@ -14,6 +13,7 @@ load_dotenv()
 conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 data = db.data
+
 
 def insertFoodData(userId, subject: str, money: float):
     addition = money * getFoodMultiple()
@@ -30,12 +30,13 @@ def insertFoodData(userId, subject: str, money: float):
     )
     return "新增" + " " + str(total) + " 元 " + subject + " 成功"
 
+
 def insertData(subject: str, money: float):
     data.insert_one(
         {
             "time": currentTime,
             "subject": subject,
-            "category": "", #todo function
+            "category": "",  # todo function
             "money": money,
             "addition": 0,
             "total": money,
@@ -52,6 +53,7 @@ def getTotalAmount():
         totalAmount += float(money)
     return totalAmount
 
+
 def giveAmount(money):
     data.insert_one({
         "time": currentTime,
@@ -62,6 +64,7 @@ def giveAmount(money):
     })
     return True
 
+
 def getHistory():
     foods = data.find().sort("time", -1).limit(20)
     message = ""
@@ -69,6 +72,7 @@ def getHistory():
     for food in foods:
         count += 1
         reply = ""
-        reply = str(count) + ". " + str(food['subject']) + " " + str(food['money']) + "/" + str(food['total']) + '\n'
+        reply = str(count) + ". " + str(food['subject']) + " " + \
+            str(food['money']) + "/" + str(food['total']) + '\n'
         message += reply
     return message
