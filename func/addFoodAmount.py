@@ -54,15 +54,20 @@ def sendReplyMessage(line_bot_api, reply_token, message_text):
 
 with ApiClient(configuration) as api_client:
 
+    def extractEventVariables(event):
+        user_id = event.source.user_id
+        reply_token = event.reply_token
+        message_text = event.message.text if hasattr(event, 'message') else None
+        postback_data = event.postback.data if hasattr(event, 'postback') else None
+        return user_id, reply_token, message_text, postback_data
+
     """
     Handles the request when user want to add a new food data.
     prompting for user to input the subject of food they want to add
     """
     def addFoodAmountRequest(event):
         line_bot_api = MessagingApi(api_client)
-
-        user_id = event.source.user_id
-        reply_token = event.reply_token
+        user_id, reply_token, _, _ = extractEventVariables(event)
 
         changeUserStatus(user_id, "addFoodAmount")
         sendReplyMessage(line_bot_api, reply_token, "請輸入欲新增的食物")
@@ -74,9 +79,7 @@ with ApiClient(configuration) as api_client:
     def addFoodAmountMoneyRequest(event):
  
         line_bot_api = MessagingApi(api_client)
-        user_id = event.source.user_id
-        reply_token = event.reply_token
-        receivedMessage = event.message.text
+        user_id, reply_token, receivedMessage, _ = extractEventVariables(event)
 
         updateTempData(user_id, receivedMessage)
         changeUserStatus(user_id, "addFoodAmountMoney")
@@ -90,7 +93,7 @@ with ApiClient(configuration) as api_client:
     """
     def confirmAddFoodData(event):
 
-        user_id = event.source.user_id
+        user_id, _, _, _ = extractEventVariables(event)
         passUserTypedAmountToConfirmMenu(user_id, event)
         
     """
@@ -103,12 +106,10 @@ with ApiClient(configuration) as api_client:
     def addFoodDataToDatabase(event):
 
         line_bot_api = MessagingApi(api_client)
-        user_id = event.source.user_id
-        reply_token = event.reply_token
-        data = event.postback.data
+        user_id, reply_token, _, postback_data = extractEventVariables(event)
 
         try:
-            data = data.split()
+            data = postback_data.split()
             food = " ".join(data[:-1])
             foodAmount = float(data[-1])
             amount.insertFoodData(user_id, food, foodAmount)
