@@ -22,7 +22,7 @@ from linebot.v3.webhooks import (
     TextMessageContent,
     PostbackEvent,
 )
-from func import amount, menu, user
+from func import amount, menu, user, addFoodAmount
 
 load_dotenv()
 
@@ -98,19 +98,11 @@ def handle_text_message(event):
 
         # Add food amount step 2
         elif (user.checkUserStatus(userId) == "addFoodAmount"):
-            user.updateTempData(userId, receivedMessage)
-            user.changeUserStatus(userId, "addFoodAmountMoney")
-            replyMessage = "請輸入" + receivedMessage + "的金額"
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=reply_token,
-                    messages=[TextMessage(text=replyMessage)]
-                )
-            )
+            addFoodAmount.addFoodAmountMoneyRequest(event)
 
         # Add food amount step 3 (confirm food amount correct)
         elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
-            passUserTypedAmountToConfirmMenu(userId, event)
+            addFoodAmount.confirmAddFoodData(event)
 
         # Add amount step 2
         elif (user.checkUserStatus(userId) == "AddAmount"):
@@ -161,39 +153,11 @@ def handle_postback_message(event):
 
         # Add food amount step 1
         elif (postbackData == "addFoodAmount"):
-            user.changeUserStatus(userId, "addFoodAmount")
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=replyToken,
-                    messages=[TextMessage(text="請輸入欲新增的食物")]
-                )
-            )
+            addFoodAmount.addFoodAmountRequest(event)
 
         # Add food amount to database
         elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
-            try:
-                data = event.postback.data
-                data = data.split()
-                food = ""
-                for i in range(0, len(data)-1):
-                    food += data[i]
-                foodAmount = float(data[-1])
-                amount.insertFoodData(userId, food, foodAmount)
-                user.deleteTempData(userId)
-                user.changeUserStatus(userId, "free")
-                line_bot_api.reply_message_with_http_info(
-                    ReplyMessageRequest(
-                        reply_token=replyToken,
-                        messages=[TextMessage(text="新增成功")]
-                    )
-                )
-            except:
-                line_bot_api.reply_message_with_http_info(
-                    ReplyMessageRequest(
-                        reply_token=replyToken,
-                        messages=[TextMessage(text="新增失敗，請重新輸入")]
-                    )
-                )
+            addFoodAmount.addFoodDataToDatabase(event)
 
         # Add amount step 1
         elif (postbackData == "addAmount"):
