@@ -44,6 +44,14 @@ def passUserTypedAmountToConfirmMenu(userId, event):
     # Pass to confirmAmount section
     confirmAmount(subject, amount, prompt_message, replyToken, configuration)
 
+def sendReplyMessage(line_bot_api, reply_token, message_text):
+    line_bot_api.reply_message_with_http_info(
+        ReplyMessageRequest(
+            reply_token=reply_token,
+            messages=[TextMessage(text=message_text)]
+        )
+    )
+
 with ApiClient(configuration) as api_client:
 
     """
@@ -57,21 +65,15 @@ with ApiClient(configuration) as api_client:
         reply_token = event.reply_token
 
         changeUserStatus(user_id, "addFoodAmount")
-        line_bot_api.reply_message_with_http_info(
-            ReplyMessageRequest(
-                reply_token=reply_token,
-                messages=[TextMessage(text="請輸入欲新增的食物")]
-            )
-        )
+        sendReplyMessage(line_bot_api, reply_token, "請輸入欲新增的食物")
 
     """
     Handles the event when a user requests to add the amount of money for a food subject typed in previous subject.
     prompting for user to input the subject of food they want to add
     """
     def addFoodAmountMoneyRequest(event):
-
+ 
         line_bot_api = MessagingApi(api_client)
-
         user_id = event.source.user_id
         reply_token = event.reply_token
         receivedMessage = event.message.text
@@ -79,12 +81,8 @@ with ApiClient(configuration) as api_client:
         updateTempData(user_id, receivedMessage)
         changeUserStatus(user_id, "addFoodAmountMoney")
         replyMessage = "請輸入" + receivedMessage + "的金額"
-        line_bot_api.reply_message_with_http_info(
-            ReplyMessageRequest(
-                reply_token=reply_token,
-                messages=[TextMessage(text=replyMessage)]
-            )
-        )
+        sendReplyMessage(line_bot_api, reply_token, replyMessage)
+
 
     """
     Handles the event to confirm to add food data to database.
@@ -94,7 +92,7 @@ with ApiClient(configuration) as api_client:
 
         user_id = event.source.user_id
         passUserTypedAmountToConfirmMenu(user_id, event)
-
+        
     """
     Adds food data to the database based on previous user typed.
 
@@ -105,7 +103,6 @@ with ApiClient(configuration) as api_client:
     def addFoodDataToDatabase(event):
 
         line_bot_api = MessagingApi(api_client)
-
         user_id = event.source.user_id
         reply_token = event.reply_token
         data = event.postback.data
@@ -117,18 +114,8 @@ with ApiClient(configuration) as api_client:
             amount.insertFoodData(user_id, food, foodAmount)
             deleteTempData(user_id)
             changeUserStatus(user_id, "free")
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=reply_token,
-                    messages=[TextMessage(text="新增成功")]
-                )
-            )
+            sendReplyMessage(line_bot_api, reply_token, "新增成功")
         except:
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=reply_token,
-                    messages=[TextMessage(text="新增失敗，請重新輸入")]
-                )
-            )
+            sendReplyMessage(line_bot_api, reply_token, "新增失敗，請重新輸入")
 
 
