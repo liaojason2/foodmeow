@@ -23,6 +23,7 @@ configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 
 def passUserTypedAmountToConfirmMenu(userId, event):
+    """Pass user-typed amount to confirm menu."""
     receivedMessage = event.message.text
     replyToken = event.reply_token
 
@@ -45,6 +46,7 @@ def passUserTypedAmountToConfirmMenu(userId, event):
     confirmAmount(subject, amount, prompt_message, replyToken, configuration)
 
 def sendReplyMessage(line_bot_api, reply_token, message_text):
+    """Send a reply message."""
     line_bot_api.reply_message_with_http_info(
         ReplyMessageRequest(
             reply_token=reply_token,
@@ -55,29 +57,31 @@ def sendReplyMessage(line_bot_api, reply_token, message_text):
 with ApiClient(configuration) as api_client:
 
     def extractEventVariables(event):
+        """Extract variables from the event."""
         user_id = event.source.user_id
         reply_token = event.reply_token
         message_text = event.message.text if hasattr(event, 'message') else None
         postback_data = event.postback.data if hasattr(event, 'postback') else None
         return user_id, reply_token, message_text, postback_data
 
-    """
-    Handles the request when user want to add a new food data.
-    prompting for user to input the subject of food they want to add
-    """
     def addFoodAmountRequest(event):
+        """
+        Handle the request when user wants to add new food data.
+
+        Prompt for user to input the subject of food they want to add.
+        """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, _ = extractEventVariables(event)
 
         changeUserStatus(user_id, "addFoodAmount")
         sendReplyMessage(line_bot_api, reply_token, "請輸入欲新增的食物")
 
-    """
-    Handles the event when a user requests to add the amount of money for a food subject typed in previous subject.
-    prompting for user to input the subject of food they want to add
-    """
     def addFoodAmountMoneyRequest(event):
- 
+        """
+        Handle the event when a user requests to add the amount of money for a food subject typed in previous subject.
+
+        Prompt for user to input the subject of food they want to add.
+        """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, receivedMessage, _ = extractEventVariables(event)
 
@@ -86,25 +90,23 @@ with ApiClient(configuration) as api_client:
         replyMessage = "請輸入" + receivedMessage + "的金額"
         sendReplyMessage(line_bot_api, reply_token, replyMessage)
 
-
-    """
-    Handles the event to confirm to add food data to database.
-    Prompting a y/n message to let user to confirm to add food data to database.
-    """
     def confirmAddFoodData(event):
+        """
+        Handle the event to confirm to add food data to database.
 
+        Prompt a y/n message to let user confirm to add food data to database.
+        """
         user_id, _, _, _ = extractEventVariables(event)
         passUserTypedAmountToConfirmMenu(user_id, event)
-        
-    """
-    Adds food data to the database based on previous user typed.
 
-    It then processes the data to extract the food name and amount, and inserts
-    this information into the database. If the operation is successful, it sends
-    a success message to the user. If there is an error, it sends a failure message.
-    """
     def addFoodDataToDatabase(event):
+        """
+        Add food data to the database based on previous user input.
 
+        Process the data to extract the food name and amount, and insert
+        this information into the database. If the operation is successful, send
+        a success message to the user. If there is an error, send a failure message.
+        """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, postback_data = extractEventVariables(event)
 
