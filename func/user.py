@@ -58,8 +58,7 @@ def updateTempData(userId, data):
     user = users.find_one({
         "userId": userId,
     })
-    if user['tempData'] != "":
-        data = user['tempData'] + " " + data
+    # Object
     users.update_one({
         "userId": userId,
     },

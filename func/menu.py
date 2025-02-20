@@ -17,9 +17,11 @@ from linebot.v3.messaging.models import (
     URIAction
 )
 
+import json
+
 # Import amount and foodmeow version
 from . import amount
-from .config import getFoodmeowVersion
+from .config import getFoodmeowVersion, getCategory
 
 # Load dotenv
 from dotenv import load_dotenv
@@ -180,7 +182,6 @@ def amountMenu(event, configuration):
 
 
 def confirmAmount(subject, amount, prompt_message, reply_token, configuration):
-    continue_data = subject + " " + amount
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
@@ -195,7 +196,7 @@ def confirmAmount(subject, amount, prompt_message, reply_token, configuration):
                             actions=[
                                 PostbackAction(
                                     label='是',
-                                    data=continue_data
+                                    data="Yes"
                                 ),
                                 PostbackAction(
                                     label='否',
@@ -264,6 +265,59 @@ def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token, configu
                                     data="forceQuit"
                                 )
                             ]
+                        )
+                    )
+                ]
+            )
+        )
+
+def selectDataCategory(event, configuration):
+
+    # Get category list
+    category_list = getCategory()
+    selectCategoryContent = []
+    for category in category_list:
+        selectCategoryContent.append(
+            FlexButton(
+                action=PostbackAction(
+                    label=category_list[category],
+                    data=category
+                ),
+                style="primary"
+            )
+        )
+
+    with ApiClient(configuration) as api_client:
+        line_bot_api = MessagingApi(api_client)
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[
+                    FlexMessage(
+                        altText="menu",
+                        contents=FlexBubble(
+                            header=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(
+                                        text="請選擇記帳類別",
+                                        align="center"
+                                    ),
+                                ]
+                            ),
+                            body=FlexBox(
+                                layout="vertical",
+                                contents=selectCategoryContent
+                            ),
+                            footer=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(
+                                        text=foodmeow_version,
+                                        align="center"
+                                    ),
+                                ]
+                            )
                         )
                     )
                 ]

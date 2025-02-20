@@ -114,21 +114,24 @@ def handle_text_message(event):
             addFoodAmount.confirmAddFoodData(event)
 
         # Add amount
-        elif (user.checkUserStatus(userId) == "addDataSubject"):
-            '''
-            Add amount step 2
+        elif (user.checkUserStatus(userId) == "addDataCategory"):
+            addData.selectDataCategory(event)
 
-            Receive user-typed subject and prompt user to enter amount.
-            '''
-            addData.addDataMoneyRequest(event)
+        elif (user.checkUserStatus(userId) == "addDataSubject"):
+            addData.addDataSubjectRequest(event)
 
         elif (user.checkUserStatus(userId) == "addDataMoney"):
             '''
-            Add amount step 3
-
-            Receive user-typed amount and prompt for user to confirm the amount.
             '''
-            addData.confirmAddData(event)
+            addData.addDataMoneyRequest(event)
+
+        # elif (user.checkUserStatus(userId) == "addDataMoney"):
+        #     '''
+        #     Add amount step 4
+
+        #     Receive user-typed amount and prompt for user to confirm the amount.
+        #     '''
+        #     addData.confirmAddData(event)
 
         # User request to change exchange rate
         elif (user.checkUserStatus(userId) == "updateExchangeRate"):
@@ -188,14 +191,22 @@ def handle_postback_message(event):
             Add amount step 1
             
             Receive Postback event "addData"
+            '''
+            addData.selectDataCategoryRequest(event)
+
+        if (user.checkUserStatus(userId) == "addDataCategory"):
+            '''
+            Add amount step 2
+
+            Receive Postback event "addDataCategory"
 
             Prompt for user to input the subject of data they want to add.
             '''
-            addData.addDataRequest(event)
+            addData.addDataCategoryRequest(event)
 
-        if (user.checkUserStatus(userId) == "addDataMoney"):
+        if user.checkUserStatus(userId) == "addDataMoney" and postbackData == "Yes":
             '''
-            Add amount step 4
+            Add amount step 5
 
             Receive Postback event "addDataMoney"
 

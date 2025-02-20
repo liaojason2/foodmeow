@@ -31,18 +31,21 @@ def insertFoodData(userId, subject: str, money: float):
     return "新增" + " " + str(total) + " 元 " + subject + " 成功"
 
 
-def insertData(subject: str, money: float):
-    data.insert_one(
-        {
-            "time": currentTime,
-            "subject": subject,
-            "category": "",  # todo function
-            "money": money,
-            "addition": 0,
-            "total": money,
-        }
-    )
-    return "新增" + subject + "成功"
+def insertData(subject: str, money: float, category: str):
+    try:
+        data.insert_one(
+            {
+                "time": currentTime,
+                "subject": subject,
+                "category": category,  # todo function
+                "money": money,
+                "addition": 0,
+                "total": money,
+            }
+        )
+        return True
+    except Exception as e:
+        return e
 
 
 def getTotalAmount():
