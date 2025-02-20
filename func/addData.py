@@ -27,10 +27,7 @@ def passUserTypedAmountToConfirmMenu(userId, event):
     receivedMessage = event.message.text
     replyToken = event.reply_token
 
-    # Get amount subject from previous action
-    subject = getTempData(userId)
-    # Get amount from user
-    amount = receivedMessage
+
     # Get exchange rate
     exchangeRate = getExchangeRate(userId)
     # Count exchange rate and convert to integer
@@ -64,7 +61,7 @@ with ApiClient(configuration) as api_client:
         postback_data = event.postback.data if hasattr(event, 'postback') else None
         return user_id, reply_token, message_text, postback_data
 
-    def addAmountRequest(event):
+    def addDataRequest(event):
         """
         Handle the request when user wants to add new data.
 
@@ -73,10 +70,11 @@ with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, _ = extractEventVariables(event)
 
-        changeUserStatus(user_id, "AddAmount")
         sendReplyMessage(line_bot_api, reply_token, "請輸入欲新增的項目")
+        changeUserStatus(user_id, "addDataSubject")
 
-    def addAmountMoneyRequest(event):
+
+    def addDataMoneyRequest(event):
         """
         Handle the event when a user requests to add the amount of money for a subject typed in previous subject.
 
@@ -86,9 +84,10 @@ with ApiClient(configuration) as api_client:
         user_id, reply_token, receivedMessage, _ = extractEventVariables(event)
 
         updateTempData(user_id, receivedMessage)
-        changeUserStatus(user_id, "AddAmountMoney")
         replyMessage = "請輸入" + receivedMessage + "的金額"
         sendReplyMessage(line_bot_api, reply_token, replyMessage)
+        changeUserStatus(user_id, "addDataMoney")
+
 
     def confirmAddData(event):
         """
@@ -96,8 +95,27 @@ with ApiClient(configuration) as api_client:
 
         Prompt a y/n message to let user confirm to add data to database.
         """
-        user_id, _, _, _ = extractEventVariables(event)
-        passUserTypedAmountToConfirmMenu(user_id, event)
+        user_id, reply_token, receivedMessage, _ = extractEventVariables(event)
+        
+        # Get amount subject from previous action
+        subject = getTempData(user_id)
+        # Get amount from user
+        amount = receivedMessage
+
+        # Get exchange rate
+        exchangeRate = getExchangeRate(user_id)
+        # Count exchange rate and convert to integer
+        amount = int(float(amount) * float(exchangeRate))
+        # Covert to string for showing prompt_message
+        amount = str(amount)
+
+        # Define prompt_message to confirm section
+        prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
+        if (exchangeRate != 1.0):
+            prompt_message = '請確認是否要將 ' + amount + " 的 " + \
+                    subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
+        # Pass to confirmAmount section
+        confirmAmount(subject, amount, prompt_message, reply_token, configuration)
 
     def addDataToDatabase(event):
         """

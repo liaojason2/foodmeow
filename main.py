@@ -114,15 +114,15 @@ def handle_text_message(event):
             addFoodAmount.confirmAddFoodData(event)
 
         # Add amount
-        elif (user.checkUserStatus(userId) == "AddAmount"):
+        elif (user.checkUserStatus(userId) == "addDataSubject"):
             '''
             Add amount step 2
 
-            Receive user-typed subject and prompt for user to confirm the amount.
+            Receive user-typed subject and prompt user to enter amount.
             '''
-            addAmount.addAmountMoneyRequest(event)
+            addAmount.addDataMoneyRequest(event)
 
-        elif (user.checkUserStatus(userId) == "AddAmountMoney"):
+        elif (user.checkUserStatus(userId) == "addDataMoney"):
             '''
             Add amount step 3
 
@@ -183,21 +183,21 @@ def handle_postback_message(event):
             addFoodAmount.addFoodDataToDatabase(event)
 
         # Add amount
-        elif (postbackData == "addAmount"):
+        elif (postbackData == "addData"):
             '''
             Add amount step 1
             
-            Receive Postback event "addAmount"
+            Receive Postback event "addData"
 
             Prompt for user to input the subject of data they want to add.
             '''
-            addAmount.addAmountRequest(event)
+            addAmount.addDataRequest(event)
 
-        if (user.checkUserStatus(userId) == "AddAmountMoney"):
+        if (user.checkUserStatus(userId) == "addDataMoney"):
             '''
             Add amount step 4
 
-            Receive Postback event "AddAmountMoney"
+            Receive Postback event "addDataMoney"
 
             Add data to the database based on previous user input.
             '''

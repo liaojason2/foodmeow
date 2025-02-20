@@ -122,7 +122,7 @@ def amountMenu(event, configuration):
                                     FlexButton(
                                         action=PostbackAction(
                                             label="其他記帳",
-                                            data="addAmount"
+                                            data="addData"
                                         ),
                                         style="primary"
                                     ),
