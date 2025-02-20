@@ -22,7 +22,7 @@ from linebot.v3.webhooks import (
     TextMessageContent,
     PostbackEvent,
 )
-from func import amount, menu, user, addFoodAmount
+from func import amount, menu, user, addFoodAmount, addAmount
 
 load_dotenv()
 
@@ -113,21 +113,22 @@ def handle_text_message(event):
             '''
             addFoodAmount.confirmAddFoodData(event)
 
-        # Add amount step 2
+        # Add amount
         elif (user.checkUserStatus(userId) == "AddAmount"):
-            user.updateTempData(userId, receivedMessage)
-            user.changeUserStatus(userId, "AddAmountMoney")
-            replyMessage = "請輸入" + receivedMessage + "的金額"
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=reply_token,
-                    messages=[TextMessage(text=replyMessage)]
-                )
-            )
+            '''
+            Add amount step 2
 
-        # Add amount step 3 (comfirm amount correct)
+            Receive user-typed subject and prompt for user to confirm the amount.
+            '''
+            addAmount.addAmountMoneyRequest(event)
+
         elif (user.checkUserStatus(userId) == "AddAmountMoney"):
-            passUserTypedAmountToConfirmMenu(userId, event)
+            '''
+            Add amount step 3
+
+            Receive user-typed amount and prompt for user to confirm the amount.
+            '''
+            addAmount.confirmAddData(event)
 
         # User request to change exchange rate
         elif (user.checkUserStatus(userId) == "updateExchangeRate"):
@@ -181,33 +182,26 @@ def handle_postback_message(event):
             '''
             addFoodAmount.addFoodDataToDatabase(event)
 
-        # Add amount step 1
+        # Add amount
         elif (postbackData == "addAmount"):
-            user.changeUserStatus(userId, "AddAmount")
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=replyToken,
-                    messages=[TextMessage(text="請輸入項目")]
-                )
-            )
+            '''
+            Add amount step 1
+            
+            Receive Postback event "addAmount"
 
-        # Add amount to database
+            Prompt for user to input the subject of data they want to add.
+            '''
+            addAmount.addAmountRequest(event)
+
         if (user.checkUserStatus(userId) == "AddAmountMoney"):
-            data = event.postback.data
-            data = data.split()
-            subject = ""
-            for i in range(0, len(data)-1):
-                subject += data[i]
-            subjectAmount = float(data[-1])
-            amount.insertData(subject, subjectAmount)
-            user.deleteTempData(userId)
-            user.changeUserStatus(userId, "free")
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=replyToken,
-                    messages=[TextMessage(text="新增成功")]
-                )
-            )
+            '''
+            Add amount step 4
+
+            Receive Postback event "AddAmountMoney"
+
+            Add data to the database based on previous user input.
+            '''
+            addAmount.addDataToDatabase(event)
 
         # Get total amount expect already checkout
         if (postbackData == "totalAmount"):
