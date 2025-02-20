@@ -18,6 +18,7 @@ from .user import (
 from .menu import confirmAmount, selectDataCategory
 from . import amount
 from .amount import insertData
+from .config import getFoodMultiple
 
 load_dotenv()
 
@@ -27,6 +28,7 @@ handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 def passUserTypedAmountToConfirmMenu(userId, event, tempData):
     """Pass user-typed amount to confirm menu."""
     replyToken = event.reply_token
+    user_id = event.source.user_id
 
     category = tempData["category"]
     subject = tempData["subject"]
@@ -35,9 +37,23 @@ def passUserTypedAmountToConfirmMenu(userId, event, tempData):
     # Get exchange rate
     exchangeRate = getExchangeRate(userId)
     # Count exchange rate and convert to integer
-    amount = int(float(amount) * float(exchangeRate))
-    # Covert to string for showing prompt_message
-    amount = str(amount)
+    amount = float(amount) * float(exchangeRate)
+
+    addition = 0.0
+    if category == "food":
+        addition = getFoodMultiple()
+
+    additionAmount = amount * addition
+    additionResult = amount + additionAmount
+
+    amount = additionResult
+    tempData = getTempData(user_id)
+    tempData["money"] = amount
+    updateTempData(user_id, tempData)
+
+    # Covert to message
+    amount = f'{amount} (+{additionAmount})'
+    
     confirmAmount(category, subject, amount, exchangeRate, replyToken, configuration)
 
 def sendReplyMessage(line_bot_api, reply_token, message_text):

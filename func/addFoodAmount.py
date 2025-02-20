@@ -73,9 +73,14 @@ with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, _ = extractEventVariables(event)
 
-        changeUserStatus(user_id, "addFoodAmount")
-        sendReplyMessage(line_bot_api, reply_token, "請輸入欲新增的食物")
+        tempData = {
+            "category": "food"
+        }
 
+        updateTempData(user_id, tempData)        
+        sendReplyMessage(line_bot_api, reply_token, "請輸入欲新增的食物")
+        changeUserStatus(user_id, "addDataSubject")
+'''
     def addFoodAmountMoneyRequest(event):
         """
         Handle the event when a user requests to add the amount of money for a food subject typed in previous subject.
@@ -123,5 +128,5 @@ with ApiClient(configuration) as api_client:
             sendReplyMessage(line_bot_api, reply_token, "新增成功")
         except:
             sendReplyMessage(line_bot_api, reply_token, "新增失敗，請重新輸入")
-
+'''
 

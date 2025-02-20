@@ -97,21 +97,21 @@ def handle_text_message(event):
             menu.welcomeMenu(event, configuration)
 
         # Add food amount
-        elif (user.checkUserStatus(userId) == "addFoodAmount"):
-            '''
-            Add food amount step 2
+        # elif (user.checkUserStatus(userId) == "addFoodAmount"):
+        #     '''
+        #     Add food amount step 2
 
-            Receive user-typed food subject and prompt for user to input the amount of money.
-            '''
-            addFoodAmount.addFoodAmountMoneyRequest(event)
+        #     Receive user-typed food subject and prompt for user to input the amount of money.
+        #     '''
+        #     addFoodAmount.addFoodAmountMoneyRequest(event)
 
-        elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
-            '''
-            Add food amount step 3
+        # elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
+        #     '''
+        #     Add food amount step 3
 
-            Receive user-typed amount and prompt for user to confirm the amount.
-            '''
-            addFoodAmount.confirmAddFoodData(event)
+        #     Receive user-typed amount and prompt for user to confirm the amount.
+            # '''
+            # addFoodAmount.confirmAddFoodData(event)
 
         # Add amount
         elif (user.checkUserStatus(userId) == "addDataCategory"):
@@ -175,15 +175,17 @@ def handle_postback_message(event):
             '''
             addFoodAmount.addFoodAmountRequest(event)
 
-        elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
-            '''
-            Add food amount step 4
+     
+        # elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
+        #     '''
+        #     Add food amount step 4
 
-            Receive Postback event "addFoodAmountMoney"
+        #     Receive Postback event "addFoodAmountMoney"
             
-            Handle the event to confirm to add food data to database.
-            '''
-            addFoodAmount.addFoodDataToDatabase(event)
+        #     Handle the event to confirm to add food data to database.
+        #     '''
+        #     addFoodAmount.addFoodDataToDatabase(event)
+        
 
         # Add amount
         elif (postbackData == "addData"):
