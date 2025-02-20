@@ -8,11 +8,15 @@ from linebot.v3.messaging import (
     TextMessage
     
 )
-from linebot.v3 import WebhookHandler
+from linebot.v3 import (
+    WebhookHandler
+)
+
 from .user import (
     changeUserStatus, updateTempData, getTempData, getExchangeRate, deleteTempData
 )
 from .menu import confirmAmount, selectDataCategory
+from . import amount
 from .amount import insertData
 
 load_dotenv()
@@ -28,11 +32,18 @@ def passUserTypedAmountToConfirmMenu(userId, event, tempData):
     subject = tempData["subject"]
     amount = tempData["money"]
 
+    # Get exchange rate
     exchangeRate = getExchangeRate(userId)
-    amount = str(int(float(amount) * float(exchangeRate)))
-    prompt_message = f'請確認是否要將 {amount} 的 {subject} 加入資料庫中'
-    if exchangeRate != 1.0:
-        prompt_message += f'（匯率 {exchangeRate}）。'
+    # Count exchange rate and convert to integer
+    amount = int(float(amount) * float(exchangeRate))
+    # Covert to string for showing prompt_message
+    amount = str(amount)
+    # Define prompt_message to confirm section
+    prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
+    if (exchangeRate != 1.0):
+        prompt_message = '請確認是否要將 ' + amount + " 的 " + \
+            subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
+    # Pass to confirmAmount section
     confirmAmount(subject, amount, prompt_message, replyToken, configuration)
 
 def sendReplyMessage(line_bot_api, reply_token, message_text):
@@ -56,7 +67,9 @@ with ApiClient(configuration) as api_client:
     
     def selectDataCategoryRequest(event):
         """
-        Handle the request to open a menu to select a data category for data.
+        Handle the request when user wants to add new data.
+
+        Prompt for user to input the subject of they want to add.
         """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, _ = extractEventVariables(event)
@@ -65,44 +78,74 @@ with ApiClient(configuration) as api_client:
         changeUserStatus(user_id, "addDataCategory")
 
     def addDataCategoryRequest(event):
-        """Handle the request to add category for data."""
+        """
+
+        """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, postback_data = extractEventVariables(event)
 
-        tempData = {"category": postback_data}
+        tempData = {
+            "category": postback_data
+        }
+
         updateTempData(user_id, tempData)        
         sendReplyMessage(line_bot_api, reply_token, "請輸入欲新增的項目")
         changeUserStatus(user_id, "addDataSubject")
 
+
     def addDataSubjectRequest(event):
-        """Handle the request to add subject for data."""
+        """
+        Handle the request when user wants to add new data.
+
+        Prompt for user to input the subject of they want to add.
+        """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, message_text, _ = extractEventVariables(event)
 
         tempData = getTempData(user_id)
+
         tempData["subject"] = message_text
         updateTempData(user_id, tempData)        
-        sendReplyMessage(line_bot_api, reply_token, f"請輸入{message_text}的金額")
+        replyMessage = "請輸入" + message_text + "的金額"
+        sendReplyMessage(line_bot_api, reply_token, replyMessage)
         changeUserStatus(user_id, "addDataMoney")
 
+
     def addDataMoneyRequest(event):
-        """Handle the request to add the amount of money for data."""
+        """
+        Handle the event when a user requests to add the amount of money for a subject typed in previous subject.
+
+        Prompt for user to input the subject of they want to add.
+        """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, message_text, _ = extractEventVariables(event)
 
         tempData = getTempData(user_id)
+
         tempData["money"] = message_text
+
         updateTempData(user_id, tempData)
         passUserTypedAmountToConfirmMenu(user_id, event, tempData)  
         
     def addDataToDatabase(event):
-        """Add data to the database based on previous user input."""
+        """
+        Add data to the database based on previous user input.
+
+        Process the data to extract the name and amount, and insert
+        this information into the database. If the operation is successful, send
+        a success message to the user. If there is an error, send a failure message.
+        """
         line_bot_api = MessagingApi(api_client)
-        user_id, reply_token, _, _ = extractEventVariables(event)
+        user_id, reply_token, _, postback_data = extractEventVariables(event)
 
         try:
             tempData = getTempData(user_id)
-            insertData(tempData["subject"], tempData["money"], tempData["category"])
+
+            category = tempData["category"]
+            subject = tempData["subject"]
+            amount = tempData["money"]
+            
+            insertData(subject, amount, category)
             deleteTempData(user_id)
             changeUserStatus(user_id, "free")
             sendReplyMessage(line_bot_api, reply_token, "新增成功")
