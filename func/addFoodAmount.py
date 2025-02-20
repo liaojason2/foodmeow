@@ -103,6 +103,9 @@ with ApiClient(configuration) as api_client:
         """
         Add food data to the database based on previous user input.
 
+        Postback data: <food name> <amount>
+        Postback data example: "apple juice 100"
+
         Process the data to extract the food name and amount, and insert
         this information into the database. If the operation is successful, send
         a success message to the user. If there is an error, send a failure message.
