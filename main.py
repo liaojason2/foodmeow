@@ -22,7 +22,7 @@ from linebot.v3.webhooks import (
     TextMessageContent,
     PostbackEvent,
 )
-from func import amount, menu, user, addFoodAmount, addAmount
+from func import addData, amount, menu, user, addFoodAmount
 
 load_dotenv()
 
@@ -120,7 +120,7 @@ def handle_text_message(event):
 
             Receive user-typed subject and prompt user to enter amount.
             '''
-            addAmount.addDataMoneyRequest(event)
+            addData.addDataMoneyRequest(event)
 
         elif (user.checkUserStatus(userId) == "addDataMoney"):
             '''
@@ -128,7 +128,7 @@ def handle_text_message(event):
 
             Receive user-typed amount and prompt for user to confirm the amount.
             '''
-            addAmount.confirmAddData(event)
+            addData.confirmAddData(event)
 
         # User request to change exchange rate
         elif (user.checkUserStatus(userId) == "updateExchangeRate"):
@@ -191,7 +191,7 @@ def handle_postback_message(event):
 
             Prompt for user to input the subject of data they want to add.
             '''
-            addAmount.addDataRequest(event)
+            addData.addDataRequest(event)
 
         if (user.checkUserStatus(userId) == "addDataMoney"):
             '''
@@ -201,7 +201,7 @@ def handle_postback_message(event):
 
             Add data to the database based on previous user input.
             '''
-            addAmount.addDataToDatabase(event)
+            addData.addDataToDatabase(event)
 
         # Get total amount expect already checkout
         if (postbackData == "totalAmount"):
