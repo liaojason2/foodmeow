@@ -22,7 +22,7 @@ from linebot.v3.webhooks import (
     TextMessageContent,
     PostbackEvent,
 )
-from func import addData, amount, menu, user, addFoodAmount
+from func import addData, amount, menu, user, addFoodAmount, addData
 
 load_dotenv()
 
