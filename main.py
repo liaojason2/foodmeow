@@ -96,12 +96,21 @@ def handle_text_message(event):
         elif (receivedMessage == "開啟選單"):
             menu.welcomeMenu(event, configuration)
 
-        # Add food amount step 2
+        # Add food amount
         elif (user.checkUserStatus(userId) == "addFoodAmount"):
+            '''
+            Add food amount step 2
+
+            Receive user-typed food subject and prompt for user to input the amount of money.
+            '''
             addFoodAmount.addFoodAmountMoneyRequest(event)
 
-        # Add food amount step 3 (confirm food amount correct)
         elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
+            '''
+            Add food amount step 3
+
+            Receive user-typed amount and prompt for user to confirm the amount.
+            '''
             addFoodAmount.confirmAddFoodData(event)
 
         # Add amount step 2
@@ -151,12 +160,25 @@ def handle_postback_message(event):
         if (postbackData == "Amount"):
             menu.amountMenu(event, configuration)
 
-        # Add food amount step 1
+        # Add food amount
         elif (postbackData == "addFoodAmount"):
+            '''
+            Add food amount step 1
+
+            Receive Postback event "addFoodAmount"
+            
+            Prompt for user to input the subject of food they want to add.
+            '''
             addFoodAmount.addFoodAmountRequest(event)
 
-        # Add food amount to database
         elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
+            '''
+            Add food amount step 4
+
+            Receive Postback event "addFoodAmountMoney"
+            
+            Handle the event to confirm to add food data to database.
+            '''
             addFoodAmount.addFoodDataToDatabase(event)
 
         # Add amount step 1
