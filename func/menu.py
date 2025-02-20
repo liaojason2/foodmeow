@@ -181,28 +181,61 @@ def amountMenu(event, configuration):
         )
 
 
-def confirmAmount(subject, amount, prompt_message, reply_token, configuration):
+def confirmAmount(category, subject, money, currencyRate, reply_token, configuration):
+    """Create a confirmation message for adding data."""
+    categorys = getCategory()
+    category = categorys[category]
+
+    datas = {
+        "類別": category,
+        "名稱": subject,
+        "匯率": currencyRate if currencyRate != 1.0 else None,
+        "金額": money,
+    }
+
+    bodyContents = [
+        FlexBox(
+            layout='baseline',
+            spacing='sm',
+            contents=[
+                FlexText(text=key, color='#aaaaaa', size='md', flex=1, align='start'),
+                FlexText(text=str(value), wrap=True, color='#666666', size='md', flex=5)
+            ]
+        ) for key, value in datas.items() if value is not None
+    ]
+
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=reply_token,
                 messages=[
-                    TemplateMessage(
-                        altText='動作確認',
-                        template=ConfirmTemplate(
-                            title='加入資料庫確認',
-                            text=prompt_message,
-                            actions=[
-                                PostbackAction(
-                                    label='是',
-                                    data="Yes"
-                                ),
-                                PostbackAction(
-                                    label='否',
-                                    data="forceQuit"
-                                )
-                            ]
+                    FlexMessage(
+                        altText="新增資料確認",
+                        contents=FlexBubble(
+                            body=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(text='新增資料確認', weight='bold', size='xl', align='center'),
+                                    FlexBox(layout='vertical', margin='lg', spacing='sm', contents=bodyContents),
+                                ],
+                            ),
+                            footer=FlexBox(
+                                layout="vertical",
+                                spacing='sm',
+                                contents=[
+                                    FlexButton(
+                                        style='primary',
+                                        height='sm',
+                                        action=PostbackAction(label='新增', data='Yes')
+                                    ),
+                                    FlexButton(
+                                        style='link',
+                                        height='sm',
+                                        action=PostbackAction(label='取消', data='forceQuit')
+                                    ),
+                                ],
+                            ),
                         )
                     )
                 ]
@@ -270,6 +303,7 @@ def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token, configu
                 ]
             )
         )
+
 
 def selectDataCategory(event, configuration):
 
