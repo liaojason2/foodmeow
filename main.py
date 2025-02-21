@@ -188,12 +188,18 @@ def handle_postback_message(event):
         
 
         # Add amount
-        elif (postbackData == "addData"):
+        elif (postbackData[:7] =="addData"):
             '''
             Add amount step 1
             
             Receive Postback event "addData"
             '''
+
+            if len(postbackData.split(" ")) > 1:
+                event.postback.data = postbackData.split(" ")[1]
+                addData.addDataCategoryRequest(event)
+                return
+            
             addData.selectDataCategoryRequest(event)
 
         if (user.checkUserStatus(userId) == "addDataCategory"):

@@ -179,7 +179,7 @@ with ApiClient(configuration) as api_client:
             )
         )
 
-    def selectDataCategory(event, configuration):
+    def selectDataCategory(event):
 
         # Get category list
         category_list = getCategory()
@@ -291,6 +291,80 @@ with ApiClient(configuration) as api_client:
                                         style='link',
                                         height='sm',
                                         action=PostbackAction(label='取消', data='forceQuit')
+                                    ),
+                                ],
+                            ),
+                        )
+                    )
+                ]
+            )
+        )
+
+    def addDataSuccess(category, subject, money, currencyRate, reply_token):
+        """Create a confirmation message for adding data."""
+        categoryMap = getCategory()
+        categoryLabel = categoryMap[category]
+        infoItems = {
+            "類別": categoryLabel,
+            "名稱": subject,
+            "匯率": currencyRate if currencyRate != 1.0 else None,
+            "金額": money,
+        }
+
+        bodyContents = [
+            FlexBox(
+                layout='baseline',
+                spacing='sm',
+                contents=[
+                    FlexText(text=key, color='#aaaaaa', size='md', flex=1, align='start'),
+                    FlexText(text=str(value), wrap=True, color='#666666', size='md', flex=5)
+                ]
+            )
+            for key, value in infoItems.items() if value is not None
+        ]
+
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=reply_token,
+                messages=[
+                    FlexMessage(
+                        altText="新增資料確認",
+                        contents=FlexBubble(
+                            body=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(
+                                        text='已成功新增資料',
+                                        weight='bold',
+                                        size='xl',
+                                        align='center'
+                                    ),
+                                    FlexBox(
+                                        layout='vertical',
+                                        margin='lg',
+                                        spacing='sm',
+                                        contents=bodyContents
+                                    ),
+                                ],
+                            ),
+                            footer=FlexBox(
+                                layout="vertical",
+                                spacing='sm',
+                                contents=[
+                                    FlexButton(
+                                        style='primary',
+                                        height='sm',
+                                        action=PostbackAction(label='新增資料', data='addData')
+                                    ),
+                                    FlexButton(
+                                        style='primary',
+                                        height='sm',
+                                        action=PostbackAction(label='新增同類型資料', data=f'addData {category}')
+                                    ),
+                                    FlexButton(
+                                        style="link",
+                                        size="sm",
+                                        action=PostbackAction(label="退出、故障修復", data="forceQuit"),
                                     ),
                                 ],
                             ),
