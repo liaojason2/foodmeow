@@ -145,6 +145,7 @@ with ApiClient(configuration) as api_client:
         amount = tempData["money"]
 
         # Count exchange rate
+        # TODO: Use int instead of float to avoid decimal point
         exchangeRate = getExchangeRate(user_id)
         amount = float(amount) * float(exchangeRate)
         tempData["exchangeRate"] = exchangeRate # Add exchange rate to tempData
