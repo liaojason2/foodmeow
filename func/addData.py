@@ -155,9 +155,9 @@ with ApiClient(configuration) as api_client:
             addition = getFoodMultiple()
 
         additionAmount = amount * addition
-        additionResult = amount + additionAmount
+        amount = amount + additionAmount
 
-        amount = additionResult
+        tempData['additionAmount'] = additionAmount # Add addition amount to tempData
         tempData["money"] = amount # Add calculated amount to tempData
         updateTempData(user_id, tempData)
 
@@ -184,8 +184,9 @@ with ApiClient(configuration) as api_client:
             subject = tempData["subject"]
             amount = tempData["money"]
             exchangeRate = tempData["exchangeRate"]
+            additionAmount = tempData["additionAmount"]
 
-            insertData(subject, amount, category)
+            insertData(subject, amount, additionAmount, category)
             addDataSuccess(category, subject, amount, exchangeRate, reply_token)
             deleteTempData(user_id)
             changeUserStatus(user_id, "free")

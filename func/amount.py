@@ -14,24 +14,25 @@ conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 data = db.data
 
+# DEPRECATED: insertFoodData Merge with insertData in 1.2.0
 
-def insertFoodData(userId, subject: str, money: float):
-    addition = money * getFoodMultiple()
-    total = money + addition
-    data.insert_one(
-        {
-            "time": currentTime,
-            "subject": subject,
-            "category": "food",
-            "money": money,
-            "addition": addition,
-            "total": total,
-        }
-    )
-    return "新增" + " " + str(total) + " 元 " + subject + " 成功"
+# def insertFoodData(userId, subject: str, money: float):
+#     addition = money * getFoodMultiple()
+#     total = money + addition
+#     data.insert_one(
+#         {
+#             "time": currentTime,
+#             "subject": subject,
+#             "category": "food",
+#             "money": money,
+#             "addition": addition,
+#             "total": total,
+#         }
+#     )
+#     return "新增" + " " + str(total) + " 元 " + subject + " 成功"
 
 
-def insertData(subject: str, money: float, category: str):
+def insertData(subject: str, money: float, addition: float, category: str):
     try:
         data.insert_one(
             {
@@ -39,7 +40,7 @@ def insertData(subject: str, money: float, category: str):
                 "subject": subject,
                 "category": category,  # todo function
                 "money": money,
-                "addition": 0,
+                "addition": addition,
                 "total": money,
             }
         )
