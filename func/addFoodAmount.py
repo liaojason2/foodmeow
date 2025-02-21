@@ -43,7 +43,7 @@ def passUserTypedAmountToConfirmMenu(userId, event):
         prompt_message = '請確認是否要將 ' + amount + " 的 " + \
             subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
     # Pass to confirmAmount section
-    confirmAmount(subject, amount, prompt_message, replyToken, configuration)
+    confirmAmount(subject, amount, prompt_message, replyToken)
 
 def sendReplyMessage(line_bot_api, reply_token, message_text):
     """Send a reply message."""

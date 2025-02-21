@@ -30,7 +30,7 @@ load_dotenv()
 foodmeow_version = "foodmeow v" + getFoodmeowVersion()
 configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
 
-
+# TODO: Remove configuration from every function parameters
 with ApiClient(configuration) as api_client:
     line_bot_api = MessagingApi(api_client)
 
@@ -93,7 +93,7 @@ with ApiClient(configuration) as api_client:
         )
 
 
-    def amountMenu(event, configuration):
+    def amountMenu(event):
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
@@ -180,7 +180,7 @@ with ApiClient(configuration) as api_client:
         )
 
 
-    def confirmAmount(category, subject, money, currencyRate, reply_token, configuration):
+    def confirmAmount(category, subject, money, currencyRate, reply_token):
         """Create a confirmation message for adding data."""
         categoryMap = getCategory()
         categoryLabel = categoryMap[category]

@@ -54,7 +54,7 @@ def passUserTypedAmountToConfirmMenu(userId, event, tempData):
     # Covert to message
     amount = f'{amount} (+{additionAmount})'
     
-    confirmAmount(category, subject, amount, exchangeRate, replyToken, configuration)
+    confirmAmount(category, subject, amount, exchangeRate, replyToken)
 
 def sendReplyMessage(line_bot_api, reply_token, message_text):
     """Send a reply message."""

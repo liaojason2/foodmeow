@@ -73,7 +73,7 @@ def passUserTypedAmountToConfirmMenu(userId, event):
             subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
     # Pass to confirmAmount section
     menu.confirmAmount(subject, amount, prompt_message,
-                       replyToken, configuration)
+                       replyToken)
 
 
 @handler.add(MessageEvent, message=TextMessageContent)
@@ -162,7 +162,7 @@ def handle_postback_message(event):
 
         # Open Amount Menu
         if (postbackData == "Amount"):
-            menu.amountMenu(event, configuration)
+            menu.amountMenu(event)
 
         # Add food amount
         elif (postbackData == "addFoodAmount"):
