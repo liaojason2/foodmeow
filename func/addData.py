@@ -158,14 +158,14 @@ with ApiClient(configuration) as api_client:
             addition = getFoodMultiple()
 
         additionAmount = amount * addition
-        amount = amount + additionAmount
+        additionAmountResult = amount + additionAmount
 
         tempData['additionAmount'] = additionAmount # Add addition amount to tempData
-        tempData["money"] = amount # Add calculated amount to tempData
+        tempData["money"] = additionAmountResult # Add calculated amount to tempData
         updateTempData(user_id, tempData)
 
         # Covert to message
-        amount = f'{amount} (+{additionAmount})'
+        amount = f'{amount} + {additionAmount}'
         
         confirmAmount(category, subject, amount, exchangeRate, reply_token) 
         
