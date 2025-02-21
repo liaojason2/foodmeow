@@ -24,39 +24,39 @@ load_dotenv()
 configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 
-def passUserTypedAmountToConfirmMenu(userId, event, tempData):
-    """Pass user-typed amount to confirm menu."""
-    replyToken = event.reply_token
-    user_id = event.source.user_id
+# def passUserTypedAmountToConfirmMenu(userId, event, tempData):
+#     """Pass user-typed amount to confirm menu."""
+#     replyToken = event.reply_token
+#     user_id = event.source.user_id
 
-    category = tempData["category"]
-    subject = tempData["subject"]
-    amount = tempData["money"]
+#     category = tempData["category"]
+#     subject = tempData["subject"]
+#     amount = tempData["money"]
 
-    # Get exchange rate
-    exchangeRate = getExchangeRate(userId)
-    # Count exchange rate and convert to integer
-    amount = float(amount) * float(exchangeRate)
-    tempData["exchangeRate"] = exchangeRate
-    updateTempData(user_id, tempData)
+#     # Get exchange rate
+#     exchangeRate = getExchangeRate(userId)
+#     # Count exchange rate and convert to integer
+#     amount = float(amount) * float(exchangeRate)
+#     tempData["exchangeRate"] = exchangeRate
+#     updateTempData(user_id, tempData)
     
-    # Add food multiple
-    addition = 0.0
-    if category == "food":
-        addition = getFoodMultiple()
+#     # Add food multiple
+#     addition = 0.0
+#     if category == "food":
+#         addition = getFoodMultiple()
 
-    additionAmount = amount * addition
-    additionResult = amount + additionAmount
+#     additionAmount = amount * addition
+#     additionResult = amount + additionAmount
 
-    amount = additionResult
-    tempData = getTempData(user_id)
-    tempData["money"] = amount
-    updateTempData(user_id, tempData)
+#     amount = additionResult
+#     tempData = getTempData(user_id)
+#     tempData["money"] = amount
+#     updateTempData(user_id, tempData)
 
-    # Covert to message
-    amount = f'{amount} (+{additionAmount})'
+#     # Covert to message
+#     amount = f'{amount} (+{additionAmount})'
     
-    confirmAmount(category, subject, amount, exchangeRate, replyToken)
+#     confirmAmount(category, subject, amount, exchangeRate, replyToken)
 
 def sendReplyMessage(line_bot_api, reply_token, message_text):
     """Send a reply message."""
@@ -177,7 +177,7 @@ with ApiClient(configuration) as api_client:
 
         try:
             tempData = getTempData(user_id)
-            
+
             category = tempData["category"]
             subject = tempData["subject"]
             amount = tempData["money"]

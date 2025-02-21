@@ -52,28 +52,28 @@ def callback():
     return 'OK'
 
 
-def passUserTypedAmountToConfirmMenu(userId, event):
-    receivedMessage = event.message.text
-    replyToken = event.reply_token
+# def passUserTypedAmountToConfirmMenu(userId, event):
+#     receivedMessage = event.message.text
+#     replyToken = event.reply_token
 
-    # Get amount subject from previous action
-    subject = user.getTempData(userId)
-    # Get amount from user
-    amount = receivedMessage
-    # Get exchange rate
-    exchangeRate = user.getExchangeRate(userId)
-    # Count exchange rate and convert to integer
-    amount = int(float(amount) * float(exchangeRate))
-    # Covert to string for showing prompt_message
-    amount = str(amount)
-    # Define prompt_message to confirm section
-    prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
-    if (exchangeRate != 1.0):
-        prompt_message = '請確認是否要將 ' + amount + " 的 " + \
-            subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
-    # Pass to confirmAmount section
-    menu.confirmAmount(subject, amount, prompt_message,
-                       replyToken)
+#     # Get amount subject from previous action
+#     subject = user.getTempData(userId)
+#     # Get amount from user
+#     amount = receivedMessage
+#     # Get exchange rate
+#     exchangeRate = user.getExchangeRate(userId)
+#     # Count exchange rate and convert to integer
+#     amount = int(float(amount) * float(exchangeRate))
+#     # Covert to string for showing prompt_message
+#     amount = str(amount)
+#     # Define prompt_message to confirm section
+#     prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
+#     if (exchangeRate != 1.0):
+#         prompt_message = '請確認是否要將 ' + amount + " 的 " + \
+#             subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
+#     # Pass to confirmAmount section
+#     menu.confirmAmount(subject, amount, prompt_message,
+#                        replyToken)
 
 
 @handler.add(MessageEvent, message=TextMessageContent)
