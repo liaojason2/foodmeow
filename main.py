@@ -51,6 +51,7 @@ def callback():
 
     return 'OK'
 
+# DEPRECATED: addFoodAmount Merge with addData in 1.2.0
 
 # def passUserTypedAmountToConfirmMenu(userId, event):
 #     receivedMessage = event.message.text
@@ -96,6 +97,8 @@ def handle_text_message(event):
         elif (receivedMessage == "開啟選單"):
             menu.welcomeMenu(event, configuration)
 
+        # DEPRECATED: addFoodAmount Merge with addData in 1.2.0
+
         # Add food amount
         # elif (user.checkUserStatus(userId) == "addFoodAmount"):
         #     '''
@@ -138,6 +141,8 @@ def handle_text_message(event):
             '''
             addData.addDataMoneyRequest(event)
 
+        # DEPRECATED: confirmAddData menu move to and will prompt in addDataMoneyRequest (1.2.0)
+
         # elif (user.checkUserStatus(userId) == "addDataMoney"):
         #     '''
         #     Add amount step 4
@@ -178,6 +183,8 @@ def handle_postback_message(event):
             menu.amountMenu(event)
 
         # Add food amount
+        # DEPRECATED: addFoodAmount Merge with addData in 1.2.0
+        # TODO: Remove addFoodAmount postbackData and merge with addData with category "food"
         elif (postbackData == "addFoodAmount"):
             '''
             Add food amount step 1
@@ -188,7 +195,6 @@ def handle_postback_message(event):
             '''
             addFoodAmount.addFoodAmountRequest(event)
 
-     
         # elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
         #     '''
         #     Add food amount step 4

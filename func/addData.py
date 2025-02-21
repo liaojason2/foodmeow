@@ -24,6 +24,8 @@ load_dotenv()
 configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 
+# DEPRECATED: addFoodAmount Merge with addData in 1.2.0
+
 # def passUserTypedAmountToConfirmMenu(userId, event, tempData):
 #     """Pass user-typed amount to confirm menu."""
 #     replyToken = event.reply_token
