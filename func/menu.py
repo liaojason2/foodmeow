@@ -1,5 +1,8 @@
+
+import os
 from linebot.v3.messaging import (
     ApiClient,
+    Configuration,
     MessagingApi,
     ReplyMessageRequest,
     FlexMessage,
@@ -17,8 +20,6 @@ from linebot.v3.messaging.models import (
     URIAction
 )
 
-import json
-
 # Import amount and foodmeow version
 from . import amount
 from .config import getFoodmeowVersion, getCategory
@@ -27,13 +28,14 @@ from .config import getFoodmeowVersion, getCategory
 from dotenv import load_dotenv
 load_dotenv()
 
-
 foodmeow_version = "foodmeow v" + getFoodmeowVersion()
+configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
 
 
-def welcomeMenu(event, configuration):
-    with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
+with ApiClient(configuration) as api_client:
+    line_bot_api = MessagingApi(api_client)
+
+    def welcomeMenu(event, configuration):
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
@@ -92,9 +94,7 @@ def welcomeMenu(event, configuration):
         )
 
 
-def amountMenu(event, configuration):
-    with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
+    def amountMenu(event, configuration):
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
@@ -181,31 +181,29 @@ def amountMenu(event, configuration):
         )
 
 
-def confirmAmount(category, subject, money, currencyRate, reply_token, configuration):
-    """Create a confirmation message for adding data."""
-    categorys = getCategory()
-    category = categorys[category]
+    def confirmAmount(category, subject, money, currencyRate, reply_token, configuration):
+        """Create a confirmation message for adding data."""
+        categorys = getCategory()
+        category = categorys[category]
 
-    datas = {
-        "類別": category,
-        "名稱": subject,
-        "匯率": currencyRate if currencyRate != 1.0 else None,
-        "金額": money,
-    }
+        datas = {
+            "類別": category,
+            "名稱": subject,
+            "匯率": currencyRate if currencyRate != 1.0 else None,
+            "金額": money,
+        }
 
-    bodyContents = [
-        FlexBox(
-            layout='baseline',
-            spacing='sm',
-            contents=[
-                FlexText(text=key, color='#aaaaaa', size='md', flex=1, align='start'),
-                FlexText(text=str(value), wrap=True, color='#666666', size='md', flex=5)
-            ]
-        ) for key, value in datas.items() if value is not None
-    ]
+        bodyContents = [
+            FlexBox(
+                layout='baseline',
+                spacing='sm',
+                contents=[
+                    FlexText(text=key, color='#aaaaaa', size='md', flex=1, align='start'),
+                    FlexText(text=str(value), wrap=True, color='#666666', size='md', flex=5)
+                ]
+            ) for key, value in datas.items() if value is not None
+        ]
 
-    with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=reply_token,
@@ -243,12 +241,10 @@ def confirmAmount(category, subject, money, currencyRate, reply_token, configura
         )
 
 
-def giveAmountConfirm(event, configuration):
-    total = amount.getTotalAmount()
-    continue_data = str(total)
-    prompt_message = '目前累積總額為 ' + str(total) + " ，確認結帳？（若有小數會自動退位）"
-    with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
+    def giveAmountConfirm(event, configuration):
+        total = amount.getTotalAmount()
+        continue_data = str(total)
+        prompt_message = '目前累積總額為 ' + str(total) + " ，確認結帳？（若有小數會自動退位）"
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
@@ -275,10 +271,8 @@ def giveAmountConfirm(event, configuration):
         )
 
 
-def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token, configuration):
-    continue_data = exchangeRate
-    with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
+    def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token, configuration):
+        continue_data = exchangeRate
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=reply_token,
@@ -305,24 +299,22 @@ def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token, configu
         )
 
 
-def selectDataCategory(event, configuration):
+    def selectDataCategory(event, configuration):
 
-    # Get category list
-    category_list = getCategory()
-    selectCategoryContent = []
-    for category in category_list:
-        selectCategoryContent.append(
-            FlexButton(
-                action=PostbackAction(
-                    label=category_list[category],
-                    data=category
-                ),
-                style="primary"
+        # Get category list
+        category_list = getCategory()
+        selectCategoryContent = []
+        for category in category_list:
+            selectCategoryContent.append(
+                FlexButton(
+                    action=PostbackAction(
+                        label=category_list[category],
+                        data=category
+                    ),
+                    style="primary"
+                )
             )
-        )
 
-    with ApiClient(configuration) as api_client:
-        line_bot_api = MessagingApi(api_client)
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
