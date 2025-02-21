@@ -1,4 +1,3 @@
-
 import os
 from linebot.v3.messaging import (
     ApiClient,
@@ -183,11 +182,10 @@ with ApiClient(configuration) as api_client:
 
     def confirmAmount(category, subject, money, currencyRate, reply_token, configuration):
         """Create a confirmation message for adding data."""
-        categorys = getCategory()
-        category = categorys[category]
-
-        datas = {
-            "類別": category,
+        categoryMap = getCategory()
+        categoryLabel = categoryMap[category]
+        infoItems = {
+            "類別": categoryLabel,
             "名稱": subject,
             "匯率": currencyRate if currencyRate != 1.0 else None,
             "金額": money,
@@ -201,7 +199,8 @@ with ApiClient(configuration) as api_client:
                     FlexText(text=key, color='#aaaaaa', size='md', flex=1, align='start'),
                     FlexText(text=str(value), wrap=True, color='#666666', size='md', flex=5)
                 ]
-            ) for key, value in datas.items() if value is not None
+            )
+            for key, value in infoItems.items() if value is not None
         ]
 
         line_bot_api.reply_message_with_http_info(
@@ -214,8 +213,18 @@ with ApiClient(configuration) as api_client:
                             body=FlexBox(
                                 layout="vertical",
                                 contents=[
-                                    FlexText(text='新增資料確認', weight='bold', size='xl', align='center'),
-                                    FlexBox(layout='vertical', margin='lg', spacing='sm', contents=bodyContents),
+                                    FlexText(
+                                        text='新增資料確認',
+                                        weight='bold',
+                                        size='xl',
+                                        align='center'
+                                    ),
+                                    FlexBox(
+                                        layout='vertical',
+                                        margin='lg',
+                                        spacing='sm',
+                                        contents=bodyContents
+                                    ),
                                 ],
                             ),
                             footer=FlexBox(
