@@ -123,10 +123,18 @@ def handle_text_message(event):
         #     addData.selectDataCategory(event)
 
         elif (user.checkUserStatus(userId) == "addDataSubject"):
+            '''
+            Add amount step 3
+            
+            Receive user-typed subject and prompt for user to input the amount of money.
+            '''
             addData.addDataSubjectRequest(event)
 
         elif (user.checkUserStatus(userId) == "addDataMoney"):
             '''
+            Add amount step 4
+
+            Receive user-typed amount and prompt for user to confirm the amount.
             '''
             addData.addDataMoneyRequest(event)
 
@@ -192,12 +200,18 @@ def handle_postback_message(event):
         #     addFoodAmount.addFoodDataToDatabase(event)
         
 
-        # Add amount
+        # Add data
         elif (postbackData[:7] =="addData"):
             '''
-            Add amount step 1
+            Add data step 1
+
+            User request to add data.
             
-            Receive Postback event "addData"
+            Receive Postback event "addData" or with category name after space like "addData food".
+
+            if {category} is not include in postback message, it will prompt the category menu for user to select category.
+            if {category} include in postback message, it will skip category menu and prompt for user to input the subject of data they want to add.
+            - include category message might come from user want to add data when was added a data.
             '''
 
             if len(postbackData.split(" ")) > 1:
@@ -211,9 +225,10 @@ def handle_postback_message(event):
             '''
             Add amount step 2
 
+            User was selected category and prompt for user to input the subject of data they want to add.
+
             Receive Postback event "addDataCategory"
 
-            Prompt for user to input the subject of data they want to add.
             '''
             addData.addDataCategoryRequest(event)
 
@@ -221,9 +236,9 @@ def handle_postback_message(event):
             '''
             Add amount step 5
 
-            Receive Postback event "addDataMoney"
-
             Add data to the database based on previous user input.
+
+            Receive Postback event "addDataMoney"
             '''
             addData.addDataToDatabase(event)
 
