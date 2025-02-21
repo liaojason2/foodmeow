@@ -179,6 +179,57 @@ with ApiClient(configuration) as api_client:
             )
         )
 
+    def selectDataCategory(event, configuration):
+
+        # Get category list
+        category_list = getCategory()
+        selectCategoryContent = []
+        for category in category_list:
+            selectCategoryContent.append(
+                FlexButton(
+                    action=PostbackAction(
+                        label=category_list[category],
+                        data=category
+                    ),
+                    style="primary"
+                )
+            )
+
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[
+                    FlexMessage(
+                        altText="menu",
+                        contents=FlexBubble(
+                            header=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(
+                                        text="請選擇記帳類別",
+                                        align="center"
+                                    ),
+                                ]
+                            ),
+                            body=FlexBox(
+                                layout="vertical",
+                                contents=selectCategoryContent
+                            ),
+                            footer=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(
+                                        text=foodmeow_version,
+                                        align="center"
+                                    ),
+                                ]
+                            )
+                        )
+                    )
+                ]
+            )
+        )
+    
 
     def confirmAmount(category, subject, money, currencyRate, reply_token):
         """Create a confirmation message for adding data."""
@@ -308,53 +359,4 @@ with ApiClient(configuration) as api_client:
         )
 
 
-    def selectDataCategory(event, configuration):
 
-        # Get category list
-        category_list = getCategory()
-        selectCategoryContent = []
-        for category in category_list:
-            selectCategoryContent.append(
-                FlexButton(
-                    action=PostbackAction(
-                        label=category_list[category],
-                        data=category
-                    ),
-                    style="primary"
-                )
-            )
-
-        line_bot_api.reply_message_with_http_info(
-            ReplyMessageRequest(
-                reply_token=event.reply_token,
-                messages=[
-                    FlexMessage(
-                        altText="menu",
-                        contents=FlexBubble(
-                            header=FlexBox(
-                                layout="vertical",
-                                contents=[
-                                    FlexText(
-                                        text="請選擇記帳類別",
-                                        align="center"
-                                    ),
-                                ]
-                            ),
-                            body=FlexBox(
-                                layout="vertical",
-                                contents=selectCategoryContent
-                            ),
-                            footer=FlexBox(
-                                layout="vertical",
-                                contents=[
-                                    FlexText(
-                                        text=foodmeow_version,
-                                        align="center"
-                                    ),
-                                ]
-                            )
-                        )
-                    )
-                ]
-            )
-        )
