@@ -11,11 +11,10 @@ from linebot.v3.messaging import (
 from linebot.v3 import (
     WebhookHandler
 )
-
 from .user import (
     changeUserStatus, updateTempData, getTempData, getExchangeRate, deleteTempData
 )
-from .menu import confirmAmount, selectDataCategory
+from .menu import selectDataCategory, confirmAmount, addDataSuccess
 from . import amount
 from .amount import insertData
 from .config import getFoodMultiple
@@ -25,36 +24,41 @@ load_dotenv()
 configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 
-def passUserTypedAmountToConfirmMenu(userId, event, tempData):
-    """Pass user-typed amount to confirm menu."""
-    replyToken = event.reply_token
-    user_id = event.source.user_id
+# DEPRECATED: addFoodAmount Merge with addData in 1.2.0
 
-    category = tempData["category"]
-    subject = tempData["subject"]
-    amount = tempData["money"]
+# def passUserTypedAmountToConfirmMenu(userId, event, tempData):
+#     """Pass user-typed amount to confirm menu."""
+#     replyToken = event.reply_token
+#     user_id = event.source.user_id
 
-    # Get exchange rate
-    exchangeRate = getExchangeRate(userId)
-    # Count exchange rate and convert to integer
-    amount = float(amount) * float(exchangeRate)
+#     category = tempData["category"]
+#     subject = tempData["subject"]
+#     amount = tempData["money"]
 
-    addition = 0.0
-    if category == "food":
-        addition = getFoodMultiple()
-
-    additionAmount = amount * addition
-    additionResult = amount + additionAmount
-
-    amount = additionResult
-    tempData = getTempData(user_id)
-    tempData["money"] = amount
-    updateTempData(user_id, tempData)
-
-    # Covert to message
-    amount = f'{amount} (+{additionAmount})'
+#     # Get exchange rate
+#     exchangeRate = getExchangeRate(userId)
+#     # Count exchange rate and convert to integer
+#     amount = float(amount) * float(exchangeRate)
+#     tempData["exchangeRate"] = exchangeRate
+#     updateTempData(user_id, tempData)
     
-    confirmAmount(category, subject, amount, exchangeRate, replyToken, configuration)
+#     # Add food multiple
+#     addition = 0.0
+#     if category == "food":
+#         addition = getFoodMultiple()
+
+#     additionAmount = amount * addition
+#     additionResult = amount + additionAmount
+
+#     amount = additionResult
+#     tempData = getTempData(user_id)
+#     tempData["money"] = amount
+#     updateTempData(user_id, tempData)
+
+#     # Covert to message
+#     amount = f'{amount} (+{additionAmount})'
+    
+#     confirmAmount(category, subject, amount, exchangeRate, replyToken)
 
 def sendReplyMessage(line_bot_api, reply_token, message_text):
     """Send a reply message."""
@@ -84,7 +88,7 @@ with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, _ = extractEventVariables(event)
 
-        selectDataCategory(event, configuration)
+        selectDataCategory(event)
         changeUserStatus(user_id, "addDataCategory")
 
     def addDataCategoryRequest(event):
@@ -132,10 +136,35 @@ with ApiClient(configuration) as api_client:
 
         tempData = getTempData(user_id)
 
+        # Save user-typed amount to tempData
         tempData["money"] = message_text
 
+        # Get data from tempData
+        category = tempData["category"]
+        subject = tempData["subject"]
+        amount = tempData["money"]
+
+        # Count exchange rate
+        exchangeRate = getExchangeRate(user_id)
+        amount = float(amount) * float(exchangeRate)
+        tempData["exchangeRate"] = exchangeRate # Add exchange rate to tempData
+        
+        # Add specify category multiple condition
+        addition = 0.0
+        if category == "food":
+            addition = getFoodMultiple()
+
+        additionAmount = amount * addition
+        additionResult = amount + additionAmount
+
+        amount = additionResult
+        tempData["money"] = amount # Add calculated amount to tempData
         updateTempData(user_id, tempData)
-        passUserTypedAmountToConfirmMenu(user_id, event, tempData)  
+
+        # Covert to message
+        amount = f'{amount} (+{additionAmount})'
+        
+        confirmAmount(category, subject, amount, exchangeRate, reply_token) 
         
     def addDataToDatabase(event):
         """
@@ -154,12 +183,13 @@ with ApiClient(configuration) as api_client:
             category = tempData["category"]
             subject = tempData["subject"]
             amount = tempData["money"]
-            
+            exchangeRate = tempData["exchangeRate"]
+
             insertData(subject, amount, category)
+            addDataSuccess(category, subject, amount, exchangeRate, reply_token)
             deleteTempData(user_id)
             changeUserStatus(user_id, "free")
-            sendReplyMessage(line_bot_api, reply_token, "新增成功")
-        except:
-            sendReplyMessage(line_bot_api, reply_token, "新增失敗，請重新輸入")
+        except Exception as e:
+            sendReplyMessage(line_bot_api, reply_token, f"新增失敗: 請再試一次\n{e}")
 
 

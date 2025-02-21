@@ -51,29 +51,30 @@ def callback():
 
     return 'OK'
 
+# DEPRECATED: addFoodAmount Merge with addData in 1.2.0
 
-def passUserTypedAmountToConfirmMenu(userId, event):
-    receivedMessage = event.message.text
-    replyToken = event.reply_token
+# def passUserTypedAmountToConfirmMenu(userId, event):
+#     receivedMessage = event.message.text
+#     replyToken = event.reply_token
 
-    # Get amount subject from previous action
-    subject = user.getTempData(userId)
-    # Get amount from user
-    amount = receivedMessage
-    # Get exchange rate
-    exchangeRate = user.getExchangeRate(userId)
-    # Count exchange rate and convert to integer
-    amount = int(float(amount) * float(exchangeRate))
-    # Covert to string for showing prompt_message
-    amount = str(amount)
-    # Define prompt_message to confirm section
-    prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
-    if (exchangeRate != 1.0):
-        prompt_message = '請確認是否要將 ' + amount + " 的 " + \
-            subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
-    # Pass to confirmAmount section
-    menu.confirmAmount(subject, amount, prompt_message,
-                       replyToken, configuration)
+#     # Get amount subject from previous action
+#     subject = user.getTempData(userId)
+#     # Get amount from user
+#     amount = receivedMessage
+#     # Get exchange rate
+#     exchangeRate = user.getExchangeRate(userId)
+#     # Count exchange rate and convert to integer
+#     amount = int(float(amount) * float(exchangeRate))
+#     # Covert to string for showing prompt_message
+#     amount = str(amount)
+#     # Define prompt_message to confirm section
+#     prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
+#     if (exchangeRate != 1.0):
+#         prompt_message = '請確認是否要將 ' + amount + " 的 " + \
+#             subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
+#     # Pass to confirmAmount section
+#     menu.confirmAmount(subject, amount, prompt_message,
+#                        replyToken)
 
 
 @handler.add(MessageEvent, message=TextMessageContent)
@@ -96,6 +97,8 @@ def handle_text_message(event):
         elif (receivedMessage == "開啟選單"):
             menu.welcomeMenu(event, configuration)
 
+        # DEPRECATED: addFoodAmount Merge with addData in 1.2.0
+
         # Add food amount
         # elif (user.checkUserStatus(userId) == "addFoodAmount"):
         #     '''
@@ -114,16 +117,31 @@ def handle_text_message(event):
             # addFoodAmount.confirmAddFoodData(event)
 
         # Add amount
-        elif (user.checkUserStatus(userId) == "addDataCategory"):
-            addData.selectDataCategory(event)
+        # elif (user.checkUserStatus(userId) == "addDataCategory"):
+        #     '''
+        #     Add amount step 3
+
+        #     Receive user-typed subject and prompt for user to input the amount of money.
+        #     '''
+        #     addData.selectDataCategory(event)
 
         elif (user.checkUserStatus(userId) == "addDataSubject"):
+            '''
+            Add amount step 3
+            
+            Receive user-typed subject and prompt for user to input the amount of money.
+            '''
             addData.addDataSubjectRequest(event)
 
         elif (user.checkUserStatus(userId) == "addDataMoney"):
             '''
+            Add amount step 4
+
+            Receive user-typed amount and prompt for user to confirm the amount.
             '''
             addData.addDataMoneyRequest(event)
+
+        # DEPRECATED: confirmAddData menu move to and will prompt in addDataMoneyRequest (1.2.0)
 
         # elif (user.checkUserStatus(userId) == "addDataMoney"):
         #     '''
@@ -162,9 +180,11 @@ def handle_postback_message(event):
 
         # Open Amount Menu
         if (postbackData == "Amount"):
-            menu.amountMenu(event, configuration)
+            menu.amountMenu(event)
 
         # Add food amount
+        # DEPRECATED: addFoodAmount Merge with addData in 1.2.0
+        # TODO: Remove addFoodAmount postbackData and merge with addData with category "food"
         elif (postbackData == "addFoodAmount"):
             '''
             Add food amount step 1
@@ -175,7 +195,6 @@ def handle_postback_message(event):
             '''
             addFoodAmount.addFoodAmountRequest(event)
 
-     
         # elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
         #     '''
         #     Add food amount step 4
@@ -187,22 +206,35 @@ def handle_postback_message(event):
         #     addFoodAmount.addFoodDataToDatabase(event)
         
 
-        # Add amount
-        elif (postbackData == "addData"):
+        # Add data
+        elif (postbackData[:7] =="addData"):
             '''
-            Add amount step 1
+            Add data step 1
+
+            User request to add data.
             
-            Receive Postback event "addData"
+            Receive Postback event "addData" or with category name after space like "addData food".
+
+            if {category} is not include in postback message, it will prompt the category menu for user to select category.
+            if {category} include in postback message, it will skip category menu and prompt for user to input the subject of data they want to add.
+            - include category message might come from user want to add data when was added a data.
             '''
+
+            if len(postbackData.split(" ")) > 1:
+                event.postback.data = postbackData.split(" ")[1]
+                addData.addDataCategoryRequest(event)
+                return
+            
             addData.selectDataCategoryRequest(event)
 
         if (user.checkUserStatus(userId) == "addDataCategory"):
             '''
             Add amount step 2
 
+            User was selected category and prompt for user to input the subject of data they want to add.
+
             Receive Postback event "addDataCategory"
 
-            Prompt for user to input the subject of data they want to add.
             '''
             addData.addDataCategoryRequest(event)
 
@@ -210,9 +242,9 @@ def handle_postback_message(event):
             '''
             Add amount step 5
 
-            Receive Postback event "addDataMoney"
-
             Add data to the database based on previous user input.
+
+            Receive Postback event "addDataMoney"
             '''
             addData.addDataToDatabase(event)
 
