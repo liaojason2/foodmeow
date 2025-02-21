@@ -114,8 +114,13 @@ def handle_text_message(event):
             # addFoodAmount.confirmAddFoodData(event)
 
         # Add amount
-        elif (user.checkUserStatus(userId) == "addDataCategory"):
-            addData.selectDataCategory(event)
+        # elif (user.checkUserStatus(userId) == "addDataCategory"):
+        #     '''
+        #     Add amount step 3
+
+        #     Receive user-typed subject and prompt for user to input the amount of money.
+        #     '''
+        #     addData.selectDataCategory(event)
 
         elif (user.checkUserStatus(userId) == "addDataSubject"):
             addData.addDataSubjectRequest(event)
