@@ -11,9 +11,6 @@ from linebot.v3.messaging import (
 from linebot.v3 import (
     WebhookHandler
 )
-
-import logging
-
 from .user import (
     changeUserStatus, updateTempData, getTempData, getExchangeRate, deleteTempData
 )
@@ -180,17 +177,17 @@ with ApiClient(configuration) as api_client:
 
         try:
             tempData = getTempData(user_id)
-            logging.info(f"TempData: {tempData}")
+            
             category = tempData["category"]
             subject = tempData["subject"]
             amount = tempData["money"]
             exchangeRate = tempData["exchangeRate"]
-            print(tempData)
+
             insertData(subject, amount, category)
             addDataSuccess(category, subject, amount, exchangeRate, reply_token)
             deleteTempData(user_id)
             changeUserStatus(user_id, "free")
-        except  Exception as e:
+        except Exception as e:
             sendReplyMessage(line_bot_api, reply_token, f"新增失敗: 請再試一次\n{e}")
 
 
