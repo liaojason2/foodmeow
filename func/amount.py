@@ -31,14 +31,14 @@ data = db.data
 #     )
 #     return "新增" + " " + str(total) + " 元 " + subject + " 成功"
 
-
+# BUG: The value of money should be before addition 
 def insertData(subject: str, money: float, addition: float, category: str):
     try:
         data.insert_one(
             {
                 "time": currentTime,
                 "subject": subject,
-                "category": category,  # todo function
+                "category": category,
                 "money": money,
                 "addition": addition,
                 "total": money,
