@@ -232,7 +232,7 @@ with ApiClient(configuration) as api_client:
     
 
     def confirmAmount(category, subject, money, currencyRate, reply_token):
-        """Create a confirmation message for adding data."""
+        """Create a confirmation message before adding data."""
         categoryMap = getCategory()
         categoryLabel = categoryMap[category]
         infoItems = {
@@ -301,7 +301,7 @@ with ApiClient(configuration) as api_client:
         )
 
     def addDataSuccess(category, subject, money, currencyRate, reply_token):
-        """Create a confirmation message for adding data."""
+        """Send a confirmation message after adding data."""
         categoryMap = getCategory()
         categoryLabel = categoryMap[category]
         infoItems = {
