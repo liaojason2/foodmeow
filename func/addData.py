@@ -83,7 +83,7 @@ with ApiClient(configuration) as api_client:
         """
         Handle the request when user wants to add new data.
 
-        Prompt for user to input the subject of they want to add.
+        Prompt category menu to let user to pick select data category.
         """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, _ = extractEventVariables(event)
@@ -93,7 +93,9 @@ with ApiClient(configuration) as api_client:
 
     def addDataCategoryRequest(event):
         """
+        Handle the request when user selected category.
 
+        Prompt for user to input the subject of data they want to add.
         """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, postback_data = extractEventVariables(event)
@@ -109,9 +111,9 @@ with ApiClient(configuration) as api_client:
 
     def addDataSubjectRequest(event):
         """
-        Handle the request when user wants to add new data.
+        Handle the event when a user requests to add a subject.
 
-        Prompt for user to input the subject of they want to add.
+        Prompt for user to input the amount of money for the subject typed in previous subject.
         """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, message_text, _ = extractEventVariables(event)
@@ -129,7 +131,7 @@ with ApiClient(configuration) as api_client:
         """
         Handle the event when a user requests to add the amount of money for a subject typed in previous subject.
 
-        Prompt for user to input the subject of they want to add.
+        Prompt confirm menu to let user confirm the data they typed in. 
         """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, message_text, _ = extractEventVariables(event)
@@ -171,9 +173,7 @@ with ApiClient(configuration) as api_client:
         """
         Add data to the database based on previous user input.
 
-        Process the data to extract the name and amount, and insert
-        this information into the database. If the operation is successful, send
-        a success message to the user. If there is an error, send a failure message.
+        Add data to the database and send a success message to the user.
         """
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, postback_data = extractEventVariables(event)
