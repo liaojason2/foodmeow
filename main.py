@@ -227,7 +227,7 @@ def handle_postback_message(event):
             
             addData.selectDataCategoryRequest(event)
 
-        if (user.checkUserStatus(userId) == "addDataCategory"):
+        elif (user.checkUserStatus(userId) == "addDataCategory"):
             '''
             Add amount step 2
 
@@ -238,7 +238,7 @@ def handle_postback_message(event):
             '''
             addData.addDataCategoryRequest(event)
 
-        if user.checkUserStatus(userId) == "addDataMoney" and postbackData == "Yes":
+        elif user.checkUserStatus(userId) == "addDataMoney" and postbackData == "Yes":
             '''
             Add amount step 5
 
