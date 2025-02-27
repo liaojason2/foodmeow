@@ -230,7 +230,7 @@ with ApiClient(configuration) as api_client:
             )
         )
     
-
+    # TODO: Let alttext show the detail of the data going to be added
     def confirmAmount(category, subject, money, currencyRate, reply_token):
         """Create a confirmation message before adding data."""
         categoryMap = getCategory()
@@ -300,6 +300,7 @@ with ApiClient(configuration) as api_client:
             )
         )
 
+    # TODO: Let alttext show the detail of the data going to be added
     def addDataSuccess(category, subject, money, currencyRate, reply_token):
         """Send a confirmation message after adding data."""
         categoryMap = getCategory()

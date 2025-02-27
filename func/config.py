@@ -14,5 +14,6 @@ def getFoodMultiple():
 def getFoodmeowVersion():
     return foodmeowVersion
 
+# TODO: Change data structure to dictionary in dictionary and merge multiple
 def getCategory():
     return category
