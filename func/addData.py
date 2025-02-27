@@ -104,8 +104,12 @@ with ApiClient(configuration) as api_client:
             "category": postback_data
         }
 
-        updateTempData(user_id, tempData)        
-        sendReplyMessage(line_bot_api, reply_token, "請輸入欲新增的項目")
+        updateTempData(user_id, tempData)
+        reply_message = "請輸入欲新增的項目"
+        if postback_data == "food":
+            reply_message = "請輸入欲新增的食物"
+        changeUserStatus(user_id, "addDataSubject")        
+        sendReplyMessage(line_bot_api, reply_token, reply_message)
         changeUserStatus(user_id, "addDataSubject")
 
 
