@@ -200,7 +200,7 @@ with ApiClient(configuration) as api_client:
                 reply_token=event.reply_token,
                 messages=[
                     FlexMessage(
-                        altText="menu",
+                        altText="選擇記錄類別",
                         contents=FlexBubble(
                             header=FlexBox(
                                 layout="vertical",
@@ -259,7 +259,7 @@ with ApiClient(configuration) as api_client:
                 reply_token=reply_token,
                 messages=[
                     FlexMessage(
-                        altText="新增資料確認",
+                        altText="資料資料內容確認",
                         contents=FlexBubble(
                             body=FlexBox(
                                 layout="vertical",
@@ -328,7 +328,7 @@ with ApiClient(configuration) as api_client:
                 reply_token=reply_token,
                 messages=[
                     FlexMessage(
-                        altText="新增資料確認",
+                        altText="已新增資料",
                         contents=FlexBubble(
                             body=FlexBox(
                                 layout="vertical",
