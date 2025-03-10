@@ -14,6 +14,7 @@ dnspython==2.7.0
 Flask==3.1.0
 frozenlist==1.5.0
 future==1.0.0
+gunicorn==23.0.0
 idna==3.10
 importlib_metadata==8.6.1
 itsdangerous==2.2.0
@@ -21,12 +22,14 @@ Jinja2==3.1.6
 line-bot-sdk==3.16.2
 MarkupSafe==3.0.2
 multidict==6.1.0
+packaging==24.2
 propcache==0.3.0
 pydantic==2.10.6
 pydantic_core==2.27.2
 pymongo==4.11.2
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
+pytz==2025.1
 requests==2.32.3
 six==1.17.0
 typing_extensions==4.12.2
