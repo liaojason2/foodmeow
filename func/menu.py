@@ -116,7 +116,7 @@ with ApiClient(configuration) as api_client:
                                     FlexButton(
                                         action=PostbackAction(
                                             label="食物記帳",
-                                            data="addFoodAmount"
+                                            data="addData food"
                                         ),
                                         style="primary",
                                     ),
