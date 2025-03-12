@@ -51,32 +51,6 @@ def callback():
 
     return 'OK'
 
-# DEPRECATED: addFoodAmount Merge with addData in 1.2.0
-
-# def passUserTypedAmountToConfirmMenu(userId, event):
-#     receivedMessage = event.message.text
-#     replyToken = event.reply_token
-
-#     # Get amount subject from previous action
-#     subject = user.getTempData(userId)
-#     # Get amount from user
-#     amount = receivedMessage
-#     # Get exchange rate
-#     exchangeRate = user.getExchangeRate(userId)
-#     # Count exchange rate and convert to integer
-#     amount = int(float(amount) * float(exchangeRate))
-#     # Covert to string for showing prompt_message
-#     amount = str(amount)
-#     # Define prompt_message to confirm section
-#     prompt_message = '請確認是否要將 ' + amount + " 的 " + subject + "加入資料庫中"
-#     if (exchangeRate != 1.0):
-#         prompt_message = '請確認是否要將 ' + amount + " 的 " + \
-#             subject + " 加入資料庫中（匯率 " + str(exchangeRate) + "）。"
-#     # Pass to confirmAmount section
-#     menu.confirmAmount(subject, amount, prompt_message,
-#                        replyToken)
-
-
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_text_message(event):
     with ApiClient(configuration) as api_client:
@@ -97,34 +71,6 @@ def handle_text_message(event):
         elif (receivedMessage == "開啟選單"):
             menu.welcomeMenu(event, configuration)
 
-        # DEPRECATED: addFoodAmount Merge with addData in 1.2.0
-
-        # Add food amount
-        # elif (user.checkUserStatus(userId) == "addFoodAmount"):
-        #     '''
-        #     Add food amount step 2
-
-        #     Receive user-typed food subject and prompt for user to input the amount of money.
-        #     '''
-        #     addFoodAmount.addFoodAmountMoneyRequest(event)
-
-        # elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
-        #     '''
-        #     Add food amount step 3
-
-        #     Receive user-typed amount and prompt for user to confirm the amount.
-            # '''
-            # addFoodAmount.confirmAddFoodData(event)
-
-        # Add amount
-        # elif (user.checkUserStatus(userId) == "addDataCategory"):
-        #     '''
-        #     Add amount step 3
-
-        #     Receive user-typed subject and prompt for user to input the amount of money.
-        #     '''
-        #     addData.selectDataCategory(event)
-
         elif (user.checkUserStatus(userId) == "addDataSubject"):
             '''
             Add amount step 3
@@ -140,16 +86,6 @@ def handle_text_message(event):
             Receive user-typed amount and prompt for user to confirm the amount.
             '''
             addData.addDataMoneyRequest(event)
-
-        # DEPRECATED: confirmAddData menu move to and will prompt in addDataMoneyRequest (1.2.0)
-
-        # elif (user.checkUserStatus(userId) == "addDataMoney"):
-        #     '''
-        #     Add amount step 4
-
-        #     Receive user-typed amount and prompt for user to confirm the amount.
-        #     '''
-        #     addData.confirmAddData(event)
 
         # User request to change exchange rate
         elif (user.checkUserStatus(userId) == "updateExchangeRate"):
@@ -181,29 +117,6 @@ def handle_postback_message(event):
         # Open Amount Menu
         if (postbackData == "Amount"):
             menu.amountMenu(event)
-
-        # Add food amount
-        # DEPRECATED: addFoodAmount Merge with addData in 1.2.0
-        # TODO: Remove addFoodAmount postbackData and merge with addData with category "food"
-        elif (postbackData == "addFoodAmount"):
-            '''
-            Add food amount step 1
-
-            Receive Postback event "addFoodAmount"
-            
-            Prompt for user to input the subject of food they want to add.
-            '''
-            addFoodAmount.addFoodAmountRequest(event)
-
-        # elif (user.checkUserStatus(userId) == "addFoodAmountMoney"):
-        #     '''
-        #     Add food amount step 4
-
-        #     Receive Postback event "addFoodAmountMoney"
-            
-        #     Handle the event to confirm to add food data to database.
-        #     '''
-        #     addFoodAmount.addFoodDataToDatabase(event)
         
 
         # Add data
