@@ -179,8 +179,9 @@ def handle_postback_message(event):
             user.changeUserStatus(userId, "giveAmount")
             menu.giveAmountConfirm(event, configuration)
 
-        if (user.checkUserStatus(userId) == "giveAmount"):
+        elif (user.checkUserStatus(userId) == "giveAmount"):
             total = event.postback.data
+            print("total", total)
             # TODO: customize the amount, checkout to cent 
             total = convertAmountToCent(total) // 100 * 100
 
