@@ -22,7 +22,9 @@ from linebot.v3.webhooks import (
     TextMessageContent,
     PostbackEvent,
 )
+
 from func import addData, amount, menu, user, addData
+from func.utils import convertAmountToCent, convertCentToDecimalString
 
 load_dotenv()
 
@@ -179,14 +181,17 @@ def handle_postback_message(event):
 
         if (user.checkUserStatus(userId) == "giveAmount"):
             total = event.postback.data
-            total = math.floor(float(total))
-            amount.giveAmount(float(total))
+            # TODO: customize the amount, checkout to cent 
+            total = convertAmountToCent(total) // 100 * 100
+
+            replyMessage = f"結帳完成，總金額為 {convertCentToDecimalString(total)} 元"
+
+            amount.giveAmount(total)
             user.changeUserStatus(userId, "free")
             line_bot_api.reply_message_with_http_info(
                 ReplyMessageRequest(
                     reply_token=replyToken,
-                    messages=[TextMessage(
-                        text="已完成結帳，金額 " + str(total) + " 元")]
+                    messages=[TextMessage(text=replyMessage)]
                 )
             )
 
