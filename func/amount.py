@@ -74,6 +74,10 @@ def getHistory():
         if food['baseAmount'] == food['total']: 
             food['baseAmount'] /= 1.5 
             food['baseAmount'] = round(food['baseAmount'], 2)
+
+        if type(food['baseAmount']) == int:
+            food['baseAmount'] = convertCentToDecimalString(food['baseAmount'])
+            food['total'] = convertCentToDecimalString(food['total'])
         
         reply = f"{count}. {food['subject']} {food['baseAmount']}/{food['total']}\n"
         message += reply
