@@ -49,6 +49,20 @@ def convertAmountToCent(amount):
             return int(dollars) * 100 + int(cents)
         else:
             return int(amount) * 100
+        
+def convertCentToDecimalString(amount):
+    """
+    Convert the amount in cents to a decimal string.
+
+    :param amount: The amount in cents (e.g., 14000)
+    :return: The amount in dollars as a string (e.g., "140.00")
+    """
+    if type(amount) == int:
+        dollars = amount // 100
+        cents = amount % 100
+        return f"{dollars}.{cents:02d}"
+    else:
+        raise ValueError("Amount must be an integer.")
 
 with ApiClient(configuration) as api_client:
 
@@ -124,16 +138,16 @@ with ApiClient(configuration) as api_client:
         tempData = getTempData(user_id)
 
         # Save user-typed amount to tempData
-        tempData["money"] = message_text
+        tempData["amount"] = message_text
+        tempData["baseAmount"] = convertAmountToCent(message_text)
 
         # Get data from tempData
         category = tempData["category"]
         subject = tempData["subject"]
-        amount = tempData["money"]
+        amount = tempData["amount"]
 
         # Convert amount to cents
         amountCents = convertAmountToCent(amount)
-
 
         exchangeRate = getExchangeRate(user_id)
         exchRateCents = convertAmountToCent(exchangeRate)
@@ -148,7 +162,7 @@ with ApiClient(configuration) as api_client:
         additionAmountResult = amount + additionAmount
 
         tempData["additionAmount"] = additionAmount
-        tempData["money"] = additionAmountResult
+        tempData["amount"] = additionAmountResult
         updateTempData(user_id, tempData)
 
         # Covert to message
@@ -170,11 +184,16 @@ with ApiClient(configuration) as api_client:
 
             category = tempData["category"]
             subject = tempData["subject"]
-            amount = tempData["money"]
-            exchangeRate = tempData["exchangeRate"]
+            baseAmount = tempData["baseAmount"]
+            amount = tempData["amount"]
             additionAmount = tempData["additionAmount"]
 
-            insertData(subject, amount, additionAmount, category)
+            exchangeRate = tempData["exchangeRate"]
+
+            insertData(subject, baseAmount, amount, additionAmount, category)
+
+            amount = convertCentToDecimalString(amount)
+
             addDataSuccess(category, subject, amount, exchangeRate, reply_token)
             deleteTempData(user_id)
             changeUserStatus(user_id, "free")

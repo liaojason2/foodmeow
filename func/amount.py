@@ -14,17 +14,16 @@ conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 data = db.data
 
-# BUG: The value of money should be before addition 
-def insertData(subject: str, money: float, addition: float, category: str):
+def insertData(subject: str, baseAmount: int, addition: int, total: int, category: str):
     try:
         data.insert_one(
             {
                 "time": currentTime,
                 "subject": subject,
                 "category": category,
-                "money": money,
+                "baseAmount": baseAmount,
                 "addition": addition,
-                "total": money,
+                "total": total,
             }
         )
         return True
