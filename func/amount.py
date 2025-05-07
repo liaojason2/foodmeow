@@ -93,8 +93,18 @@ def getHistory():
     count = 0
     for food in foods:
         count += 1
-        reply = ""
-        reply = str(count) + ". " + str(food['subject']) + " " + \
-            str(food['money']) + "/" + str(food['total']) + '\n'
+
+        # Compatible with old data added < v1.2.1
+        # `money` field changed to `total` field in v1.2.2 
+        if hasattr(food, 'baseAmount') == False:
+            food['baseAmount'] = food['money']
+        
+        # Compatible with bug when refactor in 1.2.0 > 1.2.1
+        # https://github.com/liaojason2/foodmeow/blob/248291c0b9ab5fc9e195eb2fbd95cb10a4b339ec/func/amount.py
+        if food['baseAmount'] == food['total']: 
+            food['baseAmount'] /= 1.5 
+            food['baseAmount'] = round(food['baseAmount'], 2)
+        
+        reply = f"{count}. {food['subject']} {food['baseAmount']}/{food['total']}\n"
         message += reply
     return message
