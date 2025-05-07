@@ -191,7 +191,7 @@ with ApiClient(configuration) as api_client:
 
             exchangeRate = tempData["exchangeRate"]
 
-            insertData(subject, baseAmount, amount, additionAmount, category)
+            insertData(subject, baseAmount, additionAmount, amount, category)
 
             amount = convertCentToDecimalString(amount)
 
