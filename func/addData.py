@@ -152,6 +152,7 @@ with ApiClient(configuration) as api_client:
         exchangeRate = getExchangeRate(user_id)
         exchRateCents = convertAmountToCent(exchangeRate)
         amount = (amountCents * exchRateCents) // 100
+        tempData["baseAmount"] = amount # Save amount after currency conversion base amount to tempData (int)
         tempData["exchangeRate"] = str(exchangeRate) # save exchange rate to tempData (float)
 
         addition = 0
