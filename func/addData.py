@@ -132,16 +132,20 @@ with ApiClient(configuration) as api_client:
         amount = tempData["money"]
 
         # Convert amount to cents
-        amountCents = convertAmountToCent(message_text)
-        exchRateCents = convertAmountToCent(getExchangeRate(user_id))
-        finalAmountCents = (amountCents * exchRateCents) // 100
-        tempData["exchangeRate"] = str(exchRateCents)  # or keep as int
+        amountCents = convertAmountToCent(amount)
+
+
+        exchangeRate = getExchangeRate(user_id)
+        exchRateCents = convertAmountToCent(exchangeRate)
+        amount = (amountCents * exchRateCents) // 100
+        tempData["exchangeRate"] = str(exchangeRate) # save exchange rate to tempData (float)
 
         addition = 0
         if category == "food":
-            addition = convertAmountToCent(getFoodMultiple())
-        additionAmount = (finalAmountCents * addition) // 100
-        additionAmountResult = finalAmountCents + additionAmount
+            addition = getFoodMultiple()
+            addition = convertAmountToCent(addition)
+        additionAmount = (amount * addition) // 100
+        additionAmountResult = amount + additionAmount
 
         tempData["additionAmount"] = additionAmount
         tempData["money"] = additionAmountResult
