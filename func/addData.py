@@ -152,9 +152,9 @@ with ApiClient(configuration) as api_client:
         updateTempData(user_id, tempData)
 
         # Covert to message
-        amount = f'{finalAmountCents} + {additionAmount}'
+        amount = f"{amount // 100}.{amount % 100:02d} + { additionAmount// 100}.{additionAmount % 100:02d}"
         
-        confirmAmount(category, subject, amount, exchRateCents, reply_token) 
+        confirmAmount(category, subject, amount, exchangeRate, reply_token) 
         
     def addDataToDatabase(event):
         """
