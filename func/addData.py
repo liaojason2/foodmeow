@@ -33,6 +33,23 @@ def sendReplyMessage(line_bot_api, reply_token, message_text):
         )
     )
 
+def convertAmountToCent(amount):
+    """
+    Convert the amount to cents.
+
+    :param amount: The amount in dollars (e.g., 140.00)
+    :return: The amount in cents (e.g., 14000)
+    """
+    if type(amount) == float:
+        return int(amount * 100)
+    if type(amount) == str:
+        if '.' in amount:
+            dollars, cents = amount.split('.')
+            cents = (cents + '00')[:2]  # ensure 2 digits
+            return int(dollars) * 100 + int(cents)
+        else:
+            return int(amount) * 100
+
 with ApiClient(configuration) as api_client:
 
     def extractEventVariables(event):
@@ -114,28 +131,26 @@ with ApiClient(configuration) as api_client:
         subject = tempData["subject"]
         amount = tempData["money"]
 
-        # Count exchange rate
-        # TODO: Use int instead of float to avoid decimal point
-        exchangeRate = getExchangeRate(user_id)
-        amount = float(amount) * float(exchangeRate)
-        tempData["exchangeRate"] = exchangeRate # Add exchange rate to tempData
-        
-        # Add specify category multiple condition
-        addition = 0.0
+        # Convert amount to cents
+        amountCents = convertAmountToCent(message_text)
+        exchRateCents = convertAmountToCent(getExchangeRate(user_id))
+        finalAmountCents = (amountCents * exchRateCents) // 100
+        tempData["exchangeRate"] = str(exchRateCents)  # or keep as int
+
+        addition = 0
         if category == "food":
-            addition = getFoodMultiple()
+            addition = convertAmountToCent(getFoodMultiple())
+        additionAmount = (finalAmountCents * addition) // 100
+        additionAmountResult = finalAmountCents + additionAmount
 
-        additionAmount = amount * addition
-        additionAmountResult = amount + additionAmount
-
-        tempData['additionAmount'] = additionAmount # Add addition amount to tempData
-        tempData["money"] = additionAmountResult # Add calculated amount to tempData
+        tempData["additionAmount"] = additionAmount
+        tempData["money"] = additionAmountResult
         updateTempData(user_id, tempData)
 
         # Covert to message
-        amount = f'{amount} + {additionAmount}'
+        amount = f'{finalAmountCents} + {additionAmount}'
         
-        confirmAmount(category, subject, amount, exchangeRate, reply_token) 
+        confirmAmount(category, subject, amount, exchRateCents, reply_token) 
         
     def addDataToDatabase(event):
         """
