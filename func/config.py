@@ -1,5 +1,5 @@
 foodMultiple = 0.5
-foodmeowVersion = "1.2.2 Beta 1"
+foodmeowVersion = "1.2.2"
 category = {
     "food": "食物",
     "education": "教育",
