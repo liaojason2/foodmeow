@@ -58,16 +58,16 @@ def giveAmount(money):
 
 
 def getHistory():
-    foods = data.find().sort("time", -1).limit(20)
+    fetchedDatas = data.find().sort("time", -1).limit(20)
     message = ""
     count = 0
-    for food in foods:
+    for fetchedData in fetchedDatas:
         count += 1
 
         # Compatible with old data added < v1.2.1
         # `money` field changed name to `total` field in v1.2.2 
-        if 'baseAmount' not in food and 'money' in food:
-            food['baseAmount'] = food['money']
+        if 'baseAmount' not in fetchedData and 'money' in fetchedData:
+            fetchedData['baseAmount'] = fetchedData['money']
 
         # DEPRECATED: Manually fix thr wrong data in 1.2.3
         # # Compatible with bug when refactor in 1.2.0 > 1.2.1
@@ -78,10 +78,10 @@ def getHistory():
         #     food['baseAmount'] /= 1.5 
         #     food['baseAmount'] = round(food['baseAmount'], 2)
 
-        if type(food['baseAmount']) == int:
-            food['baseAmount'] = convertCentToDecimalString(food['baseAmount'])
-            food['total'] = convertCentToDecimalString(food['total'])
+        if type(fetchedData['baseAmount']) == int:
+            fetchedData['baseAmount'] = convertCentToDecimalString(fetchedData['baseAmount'])
+            fetchedData['total'] = convertCentToDecimalString(fetchedData['total'])
         
-        reply = f"{count}. {food['subject']} {food['baseAmount']}/{food['total']}\n"
+        reply = f"{count}. {fetchedData['subject']} {fetchedData['baseAmount']}/{fetchedData['total']}\n"
         message += reply
     return message
