@@ -50,7 +50,7 @@ def giveAmount(money):
     data.insert_one({
         "time": currentTime,
         "subject": currentTime.strftime("%Y/%m/%d"),
-        "money": -money,
+        "category": 'checkout',
         "addition": 0,
         "total": -money,
     })
