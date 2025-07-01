@@ -69,11 +69,14 @@ def getHistory():
         if 'baseAmount' not in food and 'money' in food:
             food['baseAmount'] = food['money']
 
-        # Compatible with bug when refactor in 1.2.0 > 1.2.1
-        # https://github.com/liaojason2/foodmeow/blob/248291c0b9ab5fc9e195eb2fbd95cb10a4b339ec/func/amount.py
-        if food['baseAmount'] == food['total']: 
-            food['baseAmount'] /= 1.5 
-            food['baseAmount'] = round(food['baseAmount'], 2)
+        # DEPRECATED: Manually fix thr wrong data in 1.2.3
+        # # Compatible with bug when refactor in 1.2.0 > 1.2.1
+        # # https://github.com/liaojason2/foodmeow/blob/248291c0b9ab5fc9e195eb2fbd95cb10a4b339ec/func/amount.py
+        # if food['baseAmount'] == food['total']:
+        #     # Check attr exist
+        #     if hasattr('food', 'category')
+        #     food['baseAmount'] /= 1.5 
+        #     food['baseAmount'] = round(food['baseAmount'], 2)
 
         if type(food['baseAmount']) == int:
             food['baseAmount'] = convertCentToDecimalString(food['baseAmount'])
