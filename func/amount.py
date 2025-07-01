@@ -51,6 +51,7 @@ def giveAmount(money):
         "time": currentTime,
         "subject": currentTime.strftime("%Y/%m/%d"),
         "category": 'checkout',
+        "baseAmount": -money,
         "addition": 0,
         "total": -money,
     })
