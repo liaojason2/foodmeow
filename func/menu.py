@@ -261,8 +261,11 @@ with ApiClient(configuration) as api_client:
                     FlexMessage(
                         altText="資料資料內容確認",
                         contents=FlexBubble(
-                            body=FlexBox(
+                            header=FlexBox(
                                 layout="vertical",
+                                background_color='#ffeb3b',
+                                padding_top='xl',
+                                padding_bottom='xl',
                                 contents=[
                                     FlexText(
                                         text='新增資料確認',
@@ -270,6 +273,12 @@ with ApiClient(configuration) as api_client:
                                         size='xl',
                                         align='center'
                                     ),
+                                ]
+                            ),
+                            body=FlexBox(
+                                layout="vertical",
+                                padding_top='2px',
+                                contents=[                                 
                                     FlexBox(
                                         layout='vertical',
                                         margin='lg',
