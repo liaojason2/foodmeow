@@ -14,8 +14,8 @@ from linebot.v3 import (
 from .user import (
     changeUserStatus, updateTempData, getTempData, getExchangeRate, deleteTempData
 )
-from .menu import confirmChangeExchangeRate, confirmChangeCurrency
-from .user import updateExchangeRate, updateUserCurrency
+from .menu import confirmChangeExchangeRate, confirmChangeCurrency, confirmTemplate
+from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency
 from .config import getFoodMultiple
 from .utils import convertAmountToCent, convertCentToDecimalString
 
@@ -130,6 +130,68 @@ with ApiClient(configuration) as api_client:
             ReplyMessageRequest(
                 reply_token=reply_token,
                 messages=[TextMessage(text="變更成功，新的預設貨幣為 " + newCurrency)]
+            )
+        )
+
+    def updateNewDataCurrencyRequest(event):
+        """
+        Handle the request when user wants to change data currency.
+        """
+        user_id, reply_token, _, _ = extractEventVariables(event)
+        line_bot_api = MessagingApi(api_client)
+
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=reply_token,
+                messages=[TextMessage(text="請輸入新的資料所要使用的貨幣")]
+            )
+        )
+
+        changeUserStatus(user_id, "updateNewDataCurrency")
+
+    def updateNewDataCurrencyConfirm(event):
+        user_id, reply_token, message, _ = extractEventVariables(event)
+        line_bot_api = MessagingApi(api_client)
+
+        tempData = getTempData(user_id)
+
+        newCurrency = message
+
+        tempData = {
+            "dataCurrency": newCurrency
+        }
+        updateTempData(user_id, tempData)
+            
+        # Prompt user to confirm the new currency
+        confirmTemplate(
+            reply_token,
+            headerTitle="變更新增資料貨幣確認",
+            bodyItems={
+                "新貨幣": newCurrency,
+            },
+            footerItems={
+                "新增": "Yes",
+            }
+        )
+        
+        changeUserStatus(user_id, "updateNewDataCurrencyConfirm")
+
+    def confirmUpdateNewDataCurrency(event):
+        user_id, reply_token, _, _ = extractEventVariables(event)
+        line_bot_api = MessagingApi(api_client)
+
+        tempData = getTempData(user_id)
+        newCurrency = tempData['dataCurrency']
+
+        # Update the data currency in the database
+        updateNewDataCurrency(user_id, newCurrency)
+        deleteTempData(user_id)
+
+        changeUserStatus(user_id, "free")
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=reply_token,
+                messages=[TextMessage(text="變更成功，新的資料貨幣為 " + newCurrency)]
             )
         )
 

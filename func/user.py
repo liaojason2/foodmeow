@@ -118,6 +118,19 @@ def updateUserCurrency(userId, userCurrency: str):
         }
     })
 
+def updateNewDataCurrency(userId, dataCurrency: str):
+    """
+    Update the data currency in the database.
+    """
+    users.update_one({
+        "userId": userId,
+    },
+        {
+        '$set': {
+            "dataCurrency": dataCurrency,
+        }
+    })
+
 
 # Clear all data to default if there is anything error.
 def clearDataToDefault(userId):

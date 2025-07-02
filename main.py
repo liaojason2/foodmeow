@@ -104,6 +104,13 @@ def handle_text_message(event):
             '''
             currency.updateUserCurrencyConfirm(event)
 
+        if (user.checkUserStatus(userId) == "updateNewDataCurrency"):
+            '''
+            Change data currency step 2
+            Receive user-typed currency and prompt for user to confirm the currency.
+            '''
+            currency.updateNewDataCurrencyConfirm(event)
+
 
 @handler.add(PostbackEvent)
 def handle_postback_message(event):
@@ -236,6 +243,24 @@ def handle_postback_message(event):
             Receive Postback event "updateUserCurrencyConfirm"
             '''
             currency.confirmUpdateUserCurrency(event)
+
+        # User request to change data currency
+        if (postbackData == "updateNewDataCurrency"):
+            '''
+            Change data currency step 1
+            Prompt user to input the new data currency.
+            '''
+            currency.updateNewDataCurrencyRequest(event)
+
+        elif user.checkUserStatus(userId) == "updateNewDataCurrencyConfirm" and postbackData == "Yes":
+            '''
+            Change data currency step 3
+            Update the data currency to database.
+
+            Receive Postback event "updateNewDataCurrencyConfirm"
+            '''
+            currency.confirmUpdateNewDataCurrency(event)
+
         # User request to change exchange rate
         if (postbackData == "updateExchangeRate"):
             '''
