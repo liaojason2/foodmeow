@@ -120,10 +120,10 @@ with ApiClient(configuration) as api_client:
         amountCents = convertAmountToCent(amount)
 
         exchangeRate = getExchangeRate(user_id)
-        exchRateCents = convertAmountToCent(exchangeRate)
-        amount = (amountCents * exchRateCents) // 100
+        amount = (amountCents * exchangeRate) // 100
         tempData["baseAmount"] = amount # Save amount after currency conversion base amount to tempData (int)
-        tempData["exchangeRate"] = str(exchangeRate) # save exchange rate to tempData (float)
+        exchangeRate = convertCentToDecimalString(exchangeRate)
+        tempData["exchangeRate"] = exchangeRate
 
         addition = 0
         if category == "food":
