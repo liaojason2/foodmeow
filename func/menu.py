@@ -415,7 +415,7 @@ with ApiClient(configuration) as api_client:
         )
 
 
-    def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token, configuration):
+    def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token):
         continue_data = exchangeRate
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
