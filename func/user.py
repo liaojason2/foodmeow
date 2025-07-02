@@ -105,6 +105,19 @@ def updateExchangeRate(userId, exchangeRate: float):
         }
     })
 
+def updateUserCurrency(userId, userCurrency: str):
+    """
+    Update the user currency in the database.
+    """
+    users.update_one({
+        "userId": userId,
+    },
+        {
+        '$set': {
+            "userCurrency": userCurrency,
+        }
+    })
+
 
 # Clear all data to default if there is anything error.
 def clearDataToDefault(userId):

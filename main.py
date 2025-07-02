@@ -97,6 +97,13 @@ def handle_text_message(event):
             '''
             currency.changeCurrencyRateAmountRequest(event)
 
+        if (user.checkUserStatus(userId) == "updateUserCurrency"):
+            '''
+            Change user currency step 2
+            Receive user-typed currency and prompt for user to confirm the currency.
+            '''
+            currency.updateUserCurrencyConfirm(event)
+
 
 @handler.add(PostbackEvent)
 def handle_postback_message(event):
@@ -214,6 +221,22 @@ def handle_postback_message(event):
             '''
             menu.currencyMenu(event)
 
+        if (postbackData == "updateUserCurrency"):
+            '''
+            Change user currency step 1
+            Prompt user to input the new user currency.
+            '''
+            currency.updateUserCurrencyRequest(event)
+
+        elif user.checkUserStatus(userId) == "updateUserCurrencyConfirm" and postbackData == "Yes":
+            '''
+            Change user currency step 3
+            Update the user currency to database.
+
+            Receive Postback event "updateUserCurrencyConfirm"
+            '''
+            currency.confirmUpdateUserCurrency(event)
+    
         if (postbackData == "updateExchangeRate"):
             '''
             Change exchange rate step 1
