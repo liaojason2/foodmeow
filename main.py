@@ -206,6 +206,14 @@ def handle_postback_message(event):
             )
 
         # User request to change exchange rate
+
+        if (postbackData == "currencyMenu"):
+            '''
+            Change exchange rate step 1
+            Prompt user to input the exchange rate.
+            '''
+            menu.currencyMenu(event)
+
         if (postbackData == "updateExchangeRate"):
             '''
             Change exchange rate step 1

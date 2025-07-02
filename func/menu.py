@@ -151,7 +151,7 @@ with ApiClient(configuration) as api_client:
                                     FlexButton(
                                         action=PostbackAction(
                                             label="變更匯率",
-                                            data="updateExchangeRate"
+                                            data="currencyMenu"
                                         ),
                                         style="primary"
                                     ),
@@ -408,6 +408,71 @@ with ApiClient(configuration) as api_client:
                                     data="forceQuit"
                                 )
                             ]
+                        )
+                    )
+                ]
+            )
+        )
+
+    def currencyMenu(event):
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[
+                    FlexMessage(
+                        altText="menu",
+                        contents=FlexBubble(
+                            header=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(
+                                        text="匯率功能選單",
+                                        align="center"
+                                    ),
+                                ],
+                            ),
+                            body=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexButton(
+                                        action=PostbackAction(
+                                            label="變更匯率",
+                                            data="updateExchangeRate"
+                                        ),
+                                        style="primary",
+                                    ),
+                                    FlexButton(
+                                        action=PostbackAction(
+                                            label="變更預設貨幣",
+                                            data="updateUserCurrency"
+                                        ),
+                                        style="primary"
+                                    ),
+                                    FlexButton(
+                                        action=PostbackAction(
+                                            label="變更新資料貨幣",
+                                            data="updateNewDataCurrency"
+                                        ),
+                                        style="primary"
+                                    ),
+                                    FlexButton(
+                                        action=PostbackAction(
+                                            label="退出、故障修復",
+                                            data="forceQuit"
+                                        ),
+                                        style="primary"
+                                    ),
+                                ],
+                            ),
+                            footer=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(
+                                        text=foodmeow_version,
+                                        align="center"
+                                    ),
+                                ],
+                            ),
                         )
                     )
                 ]
