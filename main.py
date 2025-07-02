@@ -23,7 +23,7 @@ from linebot.v3.webhooks import (
     PostbackEvent,
 )
 
-from func import addData, amount, menu, user, addData
+from func import addData, amount, menu, user, addData, currency
 from func.utils import convertAmountToCent, convertCentToDecimalString
 
 load_dotenv()
@@ -91,11 +91,11 @@ def handle_text_message(event):
 
         # User request to change exchange rate
         elif (user.checkUserStatus(userId) == "updateExchangeRate"):
-            exchangeRate = receivedMessage
-            prompt_message = '請確認匯價為 ' + exchangeRate
-            user.changeUserStatus(userId, "updateExchangeRateConfirm")
-            menu.confirmChangeExchangeRate(
-                exchangeRate, prompt_message, reply_token, configuration)
+            '''
+            Change exchange rate step 2
+            Receive user-typed exchange rate and prompt for user to confirm the exchange rate.
+            '''
+            currency.changeCurrencyRateAmountRequest(event)
 
 
 @handler.add(PostbackEvent)
@@ -207,24 +207,20 @@ def handle_postback_message(event):
 
         # User request to change exchange rate
         if (postbackData == "updateExchangeRate"):
-            user.changeUserStatus(userId, "updateExchangeRate")
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=replyToken,
-                    messages=[TextMessage(text="請輸入匯價")]
-                )
-            )
+            '''
+            Change exchange rate step 1
+            Prompt user to input the exchange rate.
+            '''
+            currency.changeCurrencyRateRequest(event)
 
         if (user.checkUserStatus(userId) == "updateExchangeRateConfirm"):
-            exchangeRate = float(postbackData)
-            user.updateExchangeRate(userId, exchangeRate)
-            user.changeUserStatus(userId, "free")
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=replyToken,
-                    messages=[TextMessage(text="變更成功")]
-                )
-            )
+            '''
+            Change exchange rate step 3
+            Update the exchange rate to database.
+
+            Receive Postback event "updateExchangeRateConfirm"
+            '''
+            currency.changeCurrencyRateAmount(event) 
 
 
 if __name__ == "__main__":
