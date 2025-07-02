@@ -212,8 +212,7 @@ def handle_postback_message(event):
                 )
             )
 
-        # User request to change exchange rate
-
+        # Currency Menu
         if (postbackData == "currencyMenu"):
             '''
             Change exchange rate step 1
@@ -221,6 +220,7 @@ def handle_postback_message(event):
             '''
             menu.currencyMenu(event)
 
+        # User request to change user currency
         if (postbackData == "updateUserCurrency"):
             '''
             Change user currency step 1
@@ -236,7 +236,7 @@ def handle_postback_message(event):
             Receive Postback event "updateUserCurrencyConfirm"
             '''
             currency.confirmUpdateUserCurrency(event)
-    
+        # User request to change exchange rate
         if (postbackData == "updateExchangeRate"):
             '''
             Change exchange rate step 1
