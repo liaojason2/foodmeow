@@ -1,4 +1,4 @@
-def convertAmountToCent(amount):
+def convertAmountToCent(amount, digits=2):
     """
     Convert the amount to cents.
 
@@ -6,7 +6,7 @@ def convertAmountToCent(amount):
     :return: The amount in cents (e.g., 14000)
     """
     if type(amount) == float:
-        return int(amount * 100)
+        return int(amount * (10 ** digits))
     if type(amount) == str:
         if '.' in amount:
             dollars, cents = amount.split('.')
@@ -26,5 +26,11 @@ def convertCentToDecimalString(amount):
         dollars = amount // 100
         cents = amount % 100
         return f"{dollars}.{cents:02d}"
+    elif type(amount) == float:
+        amount = str(amount)
+        dollars, cents = amount.split('.')
+        cents = (cents + '00')[:2]  # ensure 2 digits
+        return f"{dollars}.{cents}"
+        
     else:
         raise ValueError("Amount must be an integer.")
