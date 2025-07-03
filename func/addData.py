@@ -12,7 +12,7 @@ from linebot.v3 import (
     WebhookHandler
 )
 from .user import (
-    changeUserStatus, updateTempData, getTempData, getExchangeRate, deleteTempData
+    changeUserStatus, updateTempData, getTempData, getExchangeRate, deleteTempData, getDataCurrency, getUserCurrency
 )
 from .menu import selectDataCategory, confirmAmount, addDataSuccess
 from . import amount
@@ -119,18 +119,31 @@ with ApiClient(configuration) as api_client:
         # Convert amount to cents
         amountCents = convertAmountToCent(amount)
 
+        # Exchange rate conversion
+
+        # Get currency from user
+        userCurrency = getUserCurrency(user_id)
+        dataCurrency = getDataCurrency(user_id)
+        tempData["dataCurrency"] = dataCurrency
+
+        # TODO: Currency conversion
+        # If user currency is not the same as data currency, convert the amount to data currency
+
+        # Get exchange rate from user
         exchangeRate = getExchangeRate(user_id)
         amount = (amountCents * exchangeRate) // 100
         tempData["baseAmount"] = amount # Save amount after currency conversion base amount to tempData (int)
         exchangeRate = convertCentToDecimalString(exchangeRate)
         tempData["exchangeRate"] = exchangeRate
 
+        # Calculate addition amount based on category
         addition = 0
         if category == "food":
             addition = getFoodMultiple()
             addition = convertAmountToCent(addition)
         additionAmount = (amount * addition) // 100
         additionAmountResult = amount + additionAmount
+
 
         tempData["additionAmount"] = additionAmount
         tempData["amount"] = additionAmountResult
@@ -139,7 +152,7 @@ with ApiClient(configuration) as api_client:
         # Covert to message
         amount = f"{amount // 100}.{amount % 100:02d} + { additionAmount// 100}.{additionAmount % 100:02d}"
         
-        confirmAmount(category, subject, amount, exchangeRate, reply_token) 
+        confirmAmount(reply_token, category, subject, dataCurrency, exchangeRate, amount) 
         
     def addDataToDatabase(event):
         """
@@ -158,14 +171,15 @@ with ApiClient(configuration) as api_client:
             baseAmount = tempData["baseAmount"]
             amount = tempData["amount"]
             additionAmount = tempData["additionAmount"]
+            currency = getDataCurrency(user_id)
 
             exchangeRate = tempData["exchangeRate"]
 
-            insertData(subject, baseAmount, additionAmount, amount, category)
+            insertData(subject, baseAmount, additionAmount, amount, category, currency)
 
             amount = convertCentToDecimalString(amount)
 
-            addDataSuccess(category, subject, amount, exchangeRate, reply_token)
+            addDataSuccess(reply_token, category, subject, currency, exchangeRate, amount)
             deleteTempData(user_id)
             changeUserStatus(user_id, "free")
         except Exception as e:

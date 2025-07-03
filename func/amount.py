@@ -15,15 +15,17 @@ conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 data = db.data
 
-def insertData(subject: str, baseAmount: int, addition: int, total: int, category: str):
+def insertData(subject: str, baseAmount: int, addition: int, total: int, category: str, currency: str):
     try:
         data.insert_one(
             {
                 "time": currentTime,
                 "subject": subject,
                 "category": category,
+                "currency": currency,
                 "baseAmount": baseAmount,
                 "addition": addition,
+                
                 "total": total,
             }
         )

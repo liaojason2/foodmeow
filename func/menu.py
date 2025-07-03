@@ -308,9 +308,9 @@ with ApiClient(configuration) as api_client:
                 ]
             )
         )
-    
+
     # TODO: Let alttext show the detail of the data going to be added
-    def confirmAmount(category, subject, money, currencyRate, reply_token):
+    def confirmAmount(reply_token, category, subject, currency, currencyRate, money):
         """Create a confirmation message before adding data."""
         categoryMap = getCategory()
         categoryLabel = categoryMap[category]
@@ -321,6 +321,7 @@ with ApiClient(configuration) as api_client:
             bodyItems={
                 "類別": categoryLabel,
                 "名稱": subject,
+                "貨幣": currency,
                 "匯率": currencyRate if currencyRate != 1.0 else None,
                 "金額": money,
             },
@@ -385,13 +386,14 @@ with ApiClient(configuration) as api_client:
         # )
 
     # TODO: Let alttext show the detail of the data going to be added
-    def addDataSuccess(category, subject, money, currencyRate, reply_token):
+    def addDataSuccess(reply_token, category, subject, currency, currencyRate, money):
         """Send a confirmation message after adding data."""
         categoryMap = getCategory()
         categoryLabel = categoryMap[category]
         infoItems = {
             "類別": categoryLabel,
             "名稱": subject,
+            "貨幣": currency,
             "匯率": currencyRate if currencyRate != 1.0 else None,
             "金額": money,
         }
