@@ -51,8 +51,10 @@ with ApiClient(configuration) as api_client:
                 layout='baseline',
                 spacing='sm',
                 contents=[
-                    FlexText(text=key, color='#aaaaaa', size='md', flex=1, align='start'),
-                    FlexText(text=str(value), wrap=True, color='#666666', size='md', flex=5)
+                    FlexText(text=key, color='#aaaaaa',
+                             size='md', flex=1, align='start'),
+                    FlexText(text=str(value), wrap=True,
+                             color='#666666', size='md', flex=5)
                 ]
             )
             for key, value in bodyItems.items() if value is not None
@@ -169,8 +171,6 @@ with ApiClient(configuration) as api_client:
                 ]
             )
         )
-
-
 
     def amountMenu(event):
         line_bot_api.reply_message_with_http_info(
@@ -354,7 +354,7 @@ with ApiClient(configuration) as api_client:
         #                     body=FlexBox(
         #                         layout="vertical",
         #                         padding_top='2px',
-        #                         contents=[                                 
+        #                         contents=[
         #                             FlexBox(
         #                                 layout='vertical',
         #                                 margin='lg',
@@ -403,8 +403,10 @@ with ApiClient(configuration) as api_client:
                 layout='baseline',
                 spacing='sm',
                 contents=[
-                    FlexText(text=key, color='#aaaaaa', size='md', flex=1, align='start'),
-                    FlexText(text=str(value), wrap=True, color='#666666', size='md', flex=5)
+                    FlexText(text=key, color='#aaaaaa',
+                             size='md', flex=1, align='start'),
+                    FlexText(text=str(value), wrap=True,
+                             color='#666666', size='md', flex=5)
                 ]
             )
             for key, value in infoItems.items() if value is not None
@@ -441,17 +443,20 @@ with ApiClient(configuration) as api_client:
                                     FlexButton(
                                         style='primary',
                                         height='sm',
-                                        action=PostbackAction(label='新增資料', data='addData')
+                                        action=PostbackAction(
+                                            label='新增資料', data='addData')
                                     ),
                                     FlexButton(
                                         style='primary',
                                         height='sm',
-                                        action=PostbackAction(label='新增同類型資料', data=f'addData {category}')
+                                        action=PostbackAction(
+                                            label='新增同類型資料', data=f'addData {category}')
                                     ),
                                     FlexButton(
                                         style="link",
                                         size="sm",
-                                        action=PostbackAction(label="退出、故障修復", data="forceQuit"),
+                                        action=PostbackAction(
+                                            label="退出、故障修復", data="forceQuit"),
                                     ),
                                 ],
                             ),
@@ -555,8 +560,6 @@ with ApiClient(configuration) as api_client:
             )
         )
 
-
-    
     def confirmChangeCurrency(reply_token, currency):
 
         confirmTemplate(
@@ -630,7 +633,7 @@ with ApiClient(configuration) as api_client:
         #                     body=FlexBox(
         #                         layout="vertical",
         #                         padding_top='2px',
-        #                         contents=[                                 
+        #                         contents=[
         #                             FlexBox(
         #                                 layout='vertical',
         #                                 margin='lg',
@@ -649,7 +652,7 @@ with ApiClient(configuration) as api_client:
         #         ]
         #     )
         # )
-    
+
     def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token):
         confirmTemplate(
             reply_token,
@@ -661,7 +664,7 @@ with ApiClient(configuration) as api_client:
                 "變更": exchangeRate,
             }
         )
-        
+
         # continue_data = exchangeRate
         # line_bot_api.reply_message_with_http_info(
         #     ReplyMessageRequest(
@@ -686,6 +689,4 @@ with ApiClient(configuration) as api_client:
         #             )
         #         ]
         #     )
-        #)
-
-
+        # )
