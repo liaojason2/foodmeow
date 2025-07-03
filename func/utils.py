@@ -15,7 +15,7 @@ def convertAmountToCent(amount, digits=2):
         else:
             return int(amount) * 100
 
-def convertCentToDecimalString(amount):
+def convertCentToDecimalString(amount, digits=2):
     """
     Convert the amount in cents to a decimal string.
 
@@ -29,7 +29,7 @@ def convertCentToDecimalString(amount):
     elif type(amount) == float:
         amount = str(amount)
         dollars, cents = amount.split('.')
-        cents = (cents + '00')[:2]  # ensure 2 digits
+        cents = (cents + '00')[:digits]  # ensure 2 digits
         return f"{dollars}.{cents}"
         
     else:
