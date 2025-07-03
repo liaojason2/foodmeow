@@ -11,6 +11,7 @@ from linebot.v3.messaging import (
 from linebot.v3 import (
     WebhookHandler
 )
+import currencyapicom
 from .user import (
     changeUserStatus, updateTempData, getTempData, getExchangeRate, deleteTempData
 )
@@ -23,6 +24,14 @@ load_dotenv()
 
 configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
+
+currency_api_client = currencyapicom.Client(os.getenv('CURRENCY_COM_API_KEY'))
+
+def getCurrencyRate(base_currency, target_currency):
+
+    result = currency_api_client.latest(base_currency, [target_currency])
+    result = result['data']['TWD']['value']
+    return result
 
 with ApiClient(configuration) as api_client:
 
