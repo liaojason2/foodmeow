@@ -19,6 +19,7 @@ from . import amount
 from .amount import insertData
 from .config import getFoodMultiple
 from .utils import convertAmountToCent, convertCentToDecimalString
+from .currency import getCurrencyRate
 
 load_dotenv()
 
@@ -111,48 +112,75 @@ with ApiClient(configuration) as api_client:
         tempData["amount"] = message_text
         tempData["baseAmount"] = convertAmountToCent(message_text)
 
-        # Get data from tempData
+        # Get data from previous entries
         category = tempData["category"]
         subject = tempData["subject"]
-        amount = tempData["amount"]
+        amountCents = convertAmountToCent(tempData["amount"])
 
-        # Convert amount to cents
-        amountCents = convertAmountToCent(amount)
-
-        # Exchange rate conversion
-
-        # Get currency from user
+        # Currency Exchange
+        ## Get user based currency and data currency
         userCurrency = getUserCurrency(user_id)
         dataCurrency = getDataCurrency(user_id)
         tempData["dataCurrency"] = dataCurrency
 
-        # TODO: Currency conversion
-        # If user currency is not the same as data currency, convert the amount to data currency
+        ## Define variables for exchange rate and amounts
+        isExchange = userCurrency != dataCurrency
+        exchangeRate = 1
+        userCurrencyAmount = None
+        userCurrencyAdditionAmount = None
 
-        # Get exchange rate from user
-        exchangeRate = getExchangeRate(user_id)
-        amount = (amountCents * exchangeRate) // 100
-        tempData["baseAmount"] = amount # Save amount after currency conversion base amount to tempData (int)
-        exchangeRate = convertCentToDecimalString(exchangeRate)
-        tempData["exchangeRate"] = exchangeRate
-
-        # Calculate addition amount based on category
-        addition = 0
-        if category == "food":
-            addition = getFoodMultiple()
-            addition = convertAmountToCent(addition)
-        additionAmount = (amount * addition) // 100
-        additionAmountResult = amount + additionAmount
-
+        ## If the data currency is different is with user currency,
+        ## count the exchange rate and convert the amount to user currency
+        if isExchange:
+            try:
+                exchangeRateVal = getCurrencyRate(userCurrency, dataCurrency)
+                exchangeRateCents = convertAmountToCent(exchangeRateVal, 4)
+                userCurrencyAmount = int(round(amountCents * 100 / exchangeRateCents * 100))
+                tempData["userCurrencyAmount"] = userCurrencyAmount
+                exchangeRate = f"{exchangeRateVal:.4f}"  # Format to 4 decimal places
+                tempData["exchangeRate"] = exchangeRate
+            except Exception as e:
+                sendReplyMessage(line_bot_api, reply_token, f"取得匯率失敗: {e}")
+        
+        # Addition for specific categories
+        addition = convertAmountToCent(getFoodMultiple()) if category == "food" else 0
+        additionAmount = (amountCents * addition) // 100
+        totalAmount = amountCents + additionAmount
 
         tempData["additionAmount"] = additionAmount
-        tempData["amount"] = additionAmountResult
+        tempData["amount"] = totalAmount
         updateTempData(user_id, tempData)
 
-        # Covert to message
-        amount = f"{amount // 100}.{amount % 100:02d} + { additionAmount// 100}.{additionAmount % 100:02d}"
-        
-        confirmAmount(reply_token, category, subject, dataCurrency, exchangeRate, amount) 
+        # Count for currency difference
+        if isExchange:
+            userCurrencyAdditionAmount = (userCurrencyAmount * addition) // 100
+            userCurrencyTotal = userCurrencyAmount + userCurrencyAdditionAmount
+            tempData["userCurrencyAdditionAmount"] = userCurrencyAdditionAmount
+            tempData["userCurrencyAmount"] = userCurrencyTotal
+
+        def formatAmount(cents):
+            return f"{cents // 100}.{cents % 100:02d}"
+
+        amountMsg = f"{formatAmount(amountCents)} + {formatAmount(additionAmount)}"
+        userCurrencyMsg = None
+        if isExchange:
+            userCurrencyMsg = f"{formatAmount(userCurrencyAmount)} + {formatAmount(userCurrencyAdditionAmount)}"
+
+        if isExchange:
+            msg = {
+            'userCurrency': userCurrency,
+            'dataCurrency': dataCurrency,
+            "amountMsg": amountMsg,
+            "userCurrencyMsg": userCurrencyMsg,
+            "exchangeRate": exchangeRate
+            }
+        else:
+            msg = {
+            'userCurrency': userCurrency,
+            "amountMsg": amountMsg,
+            }
+
+        confirmAmount(reply_token, category, subject, msg)
         
     def addDataToDatabase(event):
         """

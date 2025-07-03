@@ -310,21 +310,29 @@ with ApiClient(configuration) as api_client:
         )
 
     # TODO: Let alttext show the detail of the data going to be added
-    def confirmAmount(reply_token, category, subject, currency, currencyRate, money):
+    def confirmAmount(reply_token, category, subject, message):
         """Create a confirmation message before adding data."""
         categoryMap = getCategory()
         categoryLabel = categoryMap[category]
 
+        bodyItems = {
+            "類別": categoryLabel,
+            "名稱": subject,
+        }
+
+        if "dataCurrency" in message:
+            bodyItems["貨幣"] = f'{message["userCurrency"]} / {message["dataCurrency"]}'
+            bodyItems["匯率"] = f'{message["exchangeRate"]}'
+            bodyItems[message["dataCurrency"]] = message["amountMsg"]
+            bodyItems[message["userCurrency"]] = message["userCurrencyMsg"]
+        else:
+            bodyItems["貨幣"] = message["userCurrency"]
+            bodyItems["金額"] = message["amountMsg"]
+
         confirmTemplate(
             reply_token,
             headerTitle="新增資料確認",
-            bodyItems={
-                "類別": categoryLabel,
-                "名稱": subject,
-                "貨幣": currency,
-                "匯率": currencyRate if currencyRate != 1.0 else None,
-                "金額": money,
-            },
+            bodyItems=bodyItems,
             footerItems={
                 "新增": "Yes",
             }
