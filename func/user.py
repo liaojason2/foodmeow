@@ -118,6 +118,12 @@ def updateUserCurrency(userId, userCurrency: str):
         }
     })
 
+def getUserCurrency(userId):
+    user = users.find_one({
+        "userId": userId,
+    })
+    return user['userCurrency']
+
 def updateNewDataCurrency(userId, dataCurrency: str):
     """
     Update the data currency in the database.
@@ -130,6 +136,13 @@ def updateNewDataCurrency(userId, dataCurrency: str):
             "dataCurrency": dataCurrency,
         }
     })
+
+def getDataCurrency(userId):
+    user = users.find_one({
+        "userId": userId,
+    })
+    return user['dataCurrency']
+
 
 
 # Clear all data to default if there is anything error.
