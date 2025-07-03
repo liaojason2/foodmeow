@@ -30,7 +30,7 @@ currency_api_client = currencyapicom.Client(os.getenv('CURRENCY_COM_API_KEY'))
 def getCurrencyRate(base_currency, target_currency):
 
     result = currency_api_client.latest(base_currency, [target_currency])
-    result = result['data']['TWD']['value']
+    result = result['data'][target_currency]['value']
     return result
 
 with ApiClient(configuration) as api_client:
