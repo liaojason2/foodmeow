@@ -34,6 +34,86 @@ configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
 with ApiClient(configuration) as api_client:
     line_bot_api = MessagingApi(api_client)
 
+    def confirmTemplate(reply_token, headerTitle, bodyItems, footerItems):
+        """Create a confirmation message template."""
+
+        headerContents = [
+            FlexText(
+                text=headerTitle,
+                weight='bold',
+                size='xl',
+                align='center'
+            )
+        ]
+
+        bodyContents = [
+            FlexBox(
+                layout='baseline',
+                spacing='sm',
+                contents=[
+                    FlexText(text=key, color='#aaaaaa',
+                             size='md', flex=1, align='start'),
+                    FlexText(text=str(value), wrap=True,
+                             color='#666666', size='md', flex=5)
+                ]
+            )
+            for key, value in bodyItems.items() if value is not None
+        ]
+
+        footerContents = [
+            FlexButton(
+                style='primary',
+                height='sm',
+                action=PostbackAction(label=key, data=value)
+            ) for key, value in footerItems.items()
+        ]
+        footerContents.append(
+            FlexButton(
+                style='link',
+                height='sm',
+                action=PostbackAction(label="取消", data="forceQuit")
+            )
+        )
+
+        bubble = FlexBubble(
+            header=FlexBox(
+                layout="vertical",
+                background_color='#ffeb3b',
+                padding_top='xl',
+                padding_bottom='xl',
+                contents=headerContents
+            ),
+            body=FlexBox(
+                layout="vertical",
+                padding_top='2px',
+                contents=[
+                    FlexBox(
+                        layout='vertical',
+                        margin='lg',
+                        spacing='sm',
+                        contents=bodyContents
+                    ),
+                ],
+            ),
+            footer=FlexBox(
+                layout="vertical",
+                spacing='sm',
+                contents=footerContents
+            ),
+        )
+
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=reply_token,
+                messages=[
+                    FlexMessage(
+                        altText="資料內容確認",
+                        contents=bubble
+                    )
+                ]
+            )
+        )
+
     def welcomeMenu(event, configuration):
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
@@ -91,7 +171,6 @@ with ApiClient(configuration) as api_client:
                 ]
             )
         )
-
 
     def amountMenu(event):
         line_bot_api.reply_message_with_http_info(
@@ -151,7 +230,7 @@ with ApiClient(configuration) as api_client:
                                     FlexButton(
                                         action=PostbackAction(
                                             label="變更匯率",
-                                            data="updateExchangeRate"
+                                            data="currencyMenu"
                                         ),
                                         style="primary"
                                     ),
@@ -229,105 +308,127 @@ with ApiClient(configuration) as api_client:
                 ]
             )
         )
-    
+
     # TODO: Let alttext show the detail of the data going to be added
-    def confirmAmount(category, subject, money, currencyRate, reply_token):
+    def confirmAmount(reply_token, category, subject, message):
         """Create a confirmation message before adding data."""
         categoryMap = getCategory()
         categoryLabel = categoryMap[category]
-        infoItems = {
+
+        bodyItems = {
             "類別": categoryLabel,
             "名稱": subject,
-            "匯率": currencyRate if currencyRate != 1.0 else None,
-            "金額": money,
         }
 
-        bodyContents = [
-            FlexBox(
-                layout='baseline',
-                spacing='sm',
-                contents=[
-                    FlexText(text=key, color='#aaaaaa', size='md', flex=1, align='start'),
-                    FlexText(text=str(value), wrap=True, color='#666666', size='md', flex=5)
-                ]
-            )
-            for key, value in infoItems.items() if value is not None
-        ]
+        if "dataCurrency" in message:
+            bodyItems["貨幣"] = f'{message["dataCurrency"]} / {message["userCurrency"]}'
+            bodyItems["匯率"] = f'{message["exchangeRate"]}'
+            bodyItems[message["dataCurrency"]] = message["amountMsg"]
+            bodyItems[message["userCurrency"]] = message["userCurrencyMsg"]
+        else:
+            bodyItems["貨幣"] = message["userCurrency"]
+            bodyItems["金額"] = message["amountMsg"]
 
-        line_bot_api.reply_message_with_http_info(
-            ReplyMessageRequest(
-                reply_token=reply_token,
-                messages=[
-                    FlexMessage(
-                        altText="資料資料內容確認",
-                        contents=FlexBubble(
-                            header=FlexBox(
-                                layout="vertical",
-                                background_color='#ffeb3b',
-                                padding_top='xl',
-                                padding_bottom='xl',
-                                contents=[
-                                    FlexText(
-                                        text='新增資料確認',
-                                        weight='bold',
-                                        size='xl',
-                                        align='center'
-                                    ),
-                                ]
-                            ),
-                            body=FlexBox(
-                                layout="vertical",
-                                padding_top='2px',
-                                contents=[                                 
-                                    FlexBox(
-                                        layout='vertical',
-                                        margin='lg',
-                                        spacing='sm',
-                                        contents=bodyContents
-                                    ),
-                                ],
-                            ),
-                            footer=FlexBox(
-                                layout="vertical",
-                                spacing='sm',
-                                contents=[
-                                    FlexButton(
-                                        style='primary',
-                                        height='sm',
-                                        action=PostbackAction(label='新增', data='Yes')
-                                    ),
-                                    FlexButton(
-                                        style='link',
-                                        height='sm',
-                                        action=PostbackAction(label='取消', data='forceQuit')
-                                    ),
-                                ],
-                            ),
-                        )
-                    )
-                ]
-            )
+        confirmTemplate(
+            reply_token,
+            headerTitle="新增資料確認",
+            bodyItems=bodyItems,
+            footerItems={
+                "新增": "Yes",
+            }
         )
 
+        # line_bot_api.reply_message_with_http_info(
+        #     ReplyMessageRequest(
+        #         reply_token=reply_token,
+        #         messages=[
+        #             FlexMessage(
+        #                 altText="資料資料內容確認",
+        #                 contents=FlexBubble(
+        #                     header=FlexBox(
+        #                         layout="vertical",
+        #                         background_color='#ffeb3b',
+        #                         padding_top='xl',
+        #                         padding_bottom='xl',
+        #                         contents=[
+        #                             FlexText(
+        #                                 text='新增資料確認',
+        #                                 weight='bold',
+        #                                 size='xl',
+        #                                 align='center'
+        #                             ),
+        #                         ]
+        #                     ),
+        #                     body=FlexBox(
+        #                         layout="vertical",
+        #                         padding_top='2px',
+        #                         contents=[
+        #                             FlexBox(
+        #                                 layout='vertical',
+        #                                 margin='lg',
+        #                                 spacing='sm',
+        #                                 contents=bodyContents
+        #                             ),
+        #                         ],
+        #                     ),
+        #                     footer=FlexBox(
+        #                         layout="vertical",
+        #                         spacing='sm',
+        #                         contents=[
+        #                             FlexButton(
+        #                                 style='primary',
+        #                                 height='sm',
+        #                                 action=PostbackAction(label='新增', data='Yes')
+        #                             ),
+        #                             FlexButton(
+        #                                 style='link',
+        #                                 height='sm',
+        #                                 action=PostbackAction(label='取消', data='forceQuit')
+        #                             ),
+        #                         ],
+        #                     ),
+        #                 )
+        #             )
+        #         ]
+        #     )
+        # )
+
     # TODO: Let alttext show the detail of the data going to be added
-    def addDataSuccess(category, subject, money, currencyRate, reply_token):
+    def addDataSuccess(reply_token, category, subject, currency, currencyRate, money, exgCurrency=None, exgCurrencyAmount=None):
         """Send a confirmation message after adding data."""
         categoryMap = getCategory()
         categoryLabel = categoryMap[category]
+        #  = {
+        #     "類別": categoryLabel,
+        #     "名稱": subject,
+        #     "貨幣": currency,
+        #     "匯率": currencyRate if currencyRate != 1.0 else None,
+        #     "金額": money,
+        # }
+
         infoItems = {
             "類別": categoryLabel,
             "名稱": subject,
-            "匯率": currencyRate if currencyRate != 1.0 else None,
-            "金額": money,
         }
+
+        if exgCurrency:
+            infoItems["貨幣"] = f'{currency} / {exgCurrency}'
+            infoItems["匯率"] = f'{currencyRate}'
+            infoItems[currency] = money
+            infoItems[exgCurrency] = exgCurrencyAmount
+        else:
+            infoItems["貨幣"] = currency
+            infoItems["金額"] = money
 
         bodyContents = [
             FlexBox(
                 layout='baseline',
                 spacing='sm',
                 contents=[
-                    FlexText(text=key, color='#aaaaaa', size='md', flex=1, align='start'),
-                    FlexText(text=str(value), wrap=True, color='#666666', size='md', flex=5)
+                    FlexText(text=key, color='#aaaaaa',
+                             size='md', flex=1, align='start'),
+                    FlexText(text=str(value), wrap=True,
+                             color='#666666', size='md', flex=5)
                 ]
             )
             for key, value in infoItems.items() if value is not None
@@ -364,17 +465,20 @@ with ApiClient(configuration) as api_client:
                                     FlexButton(
                                         style='primary',
                                         height='sm',
-                                        action=PostbackAction(label='新增資料', data='addData')
+                                        action=PostbackAction(
+                                            label='新增資料', data='addData')
                                     ),
                                     FlexButton(
                                         style='primary',
                                         height='sm',
-                                        action=PostbackAction(label='新增同類型資料', data=f'addData {category}')
+                                        action=PostbackAction(
+                                            label='新增同類型資料', data=f'addData {category}')
                                     ),
                                     FlexButton(
                                         style="link",
                                         size="sm",
-                                        action=PostbackAction(label="退出、故障修復", data="forceQuit"),
+                                        action=PostbackAction(
+                                            label="退出、故障修復", data="forceQuit"),
                                     ),
                                 ],
                             ),
@@ -383,7 +487,6 @@ with ApiClient(configuration) as api_client:
                 ]
             )
         )
-
 
     def giveAmountConfirm(event, configuration):
         total = amount.getTotalAmount()
@@ -414,33 +517,198 @@ with ApiClient(configuration) as api_client:
             )
         )
 
-
-    def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token, configuration):
-        continue_data = exchangeRate
+    def currencyMenu(event):
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
-                reply_token=reply_token,
+                reply_token=event.reply_token,
                 messages=[
-                    TemplateMessage(
-                        altText='動作確認',
-                        template=ConfirmTemplate(
-                            title='加入資料庫確認',
-                            text=prompt_message,
-                            actions=[
-                                PostbackAction(
-                                    label='是',
-                                    data=continue_data
-                                ),
-                                PostbackAction(
-                                    label='否',
-                                    data="forceQuit"
-                                )
-                            ]
+                    FlexMessage(
+                        altText="menu",
+                        contents=FlexBubble(
+                            header=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(
+                                        text="匯率功能選單",
+                                        align="center"
+                                    ),
+                                ],
+                            ),
+                            body=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexButton(
+                                        action=PostbackAction(
+                                            label="變更匯率",
+                                            data="updateExchangeRate"
+                                        ),
+                                        style="primary",
+                                    ),
+                                    FlexButton(
+                                        action=PostbackAction(
+                                            label="變更預設貨幣",
+                                            data="updateUserCurrency"
+                                        ),
+                                        style="primary"
+                                    ),
+                                    FlexButton(
+                                        action=PostbackAction(
+                                            label="變更新資料貨幣",
+                                            data="updateNewDataCurrency"
+                                        ),
+                                        style="primary"
+                                    ),
+                                    FlexButton(
+                                        action=PostbackAction(
+                                            label="退出、故障修復",
+                                            data="forceQuit"
+                                        ),
+                                        style="primary"
+                                    ),
+                                ],
+                            ),
+                            footer=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(
+                                        text=foodmeow_version,
+                                        align="center"
+                                    ),
+                                ],
+                            ),
                         )
                     )
                 ]
             )
         )
 
+    def confirmChangeCurrency(reply_token, currency):
 
+        confirmTemplate(
+            reply_token,
+            headerTitle="變更貨幣確認",
+            bodyItems={
+                "貨幣": currency,
+            },
+            footerItems={
+                "變更": "Yes",
+                "取消": "forceQuit"
+            }
+        )
+        # """Create a confirmation message before changing currency."""
 
+        # headerTitle = "變更貨幣確認"
+
+        # headerContents = [
+        #     FlexText(
+        #         text= headerTitle,
+        #         weight='bold',
+        #         size='xl',
+        #         align='center'
+        #     ),
+        # ]
+
+        # bodyItems = {
+        #     "貨幣": currency,
+        # }
+
+        # bodyContents = [
+        #     FlexBox(
+        #         layout='baseline',
+        #         spacing='sm',
+        #         contents=[
+        #             FlexText(text=key, color='#aaaaaa', size='md', flex=1, align='start'),
+        #             FlexText(text=str(value), wrap=True, color='#666666', size='md', flex=5)
+        #         ]
+        #     )
+        #     for key, value in bodyItems.items() if value is not None
+        # ]
+
+        # footerItems = {
+        #     "變更": "Yes",
+        #     "取消": "forceQuit"
+        # }
+
+        # footerContents = [
+        #     FlexButton(
+        #         style='primary',
+        #         height='sm',
+        #         action=PostbackAction(label=key, data=value)
+        #     )
+        #     for key, value in footerItems.items()
+        # ]
+
+        # line_bot_api.reply_message_with_http_info(
+        #     ReplyMessageRequest(
+        #         reply_token=reply_token,
+        #         messages=[
+        #             FlexMessage(
+        #                 altText="資料內容確認",
+        #                 contents=FlexBubble(
+        #                     header=FlexBox(
+        #                         layout="vertical",
+        #                         background_color='#ffeb3b',
+        #                         padding_top='xl',
+        #                         padding_bottom='xl',
+        #                         contents=headerContents
+        #                     ),
+        #                     body=FlexBox(
+        #                         layout="vertical",
+        #                         padding_top='2px',
+        #                         contents=[
+        #                             FlexBox(
+        #                                 layout='vertical',
+        #                                 margin='lg',
+        #                                 spacing='sm',
+        #                                 contents=bodyContents
+        #                             ),
+        #                         ],
+        #                     ),
+        #                     footer=FlexBox(
+        #                         layout="vertical",
+        #                         spacing='sm',
+        #                         contents=footerContents
+        #                     ),
+        #                 )
+        #             )
+        #         ]
+        #     )
+        # )
+
+    def confirmChangeExchangeRate(exchangeRate, prompt_message, reply_token):
+        confirmTemplate(
+            reply_token,
+            headerTitle="變更匯率確認",
+            bodyItems={
+                "匯率": exchangeRate,
+            },
+            footerItems={
+                "變更": exchangeRate,
+            }
+        )
+
+        # continue_data = exchangeRate
+        # line_bot_api.reply_message_with_http_info(
+        #     ReplyMessageRequest(
+        #         reply_token=reply_token,
+        #         messages=[
+        #             TemplateMessage(
+        #                 altText='動作確認',
+        #                 template=ConfirmTemplate(
+        #                     title='加入資料庫確認',
+        #                     text=prompt_message,
+        #                     actions=[
+        #                         PostbackAction(
+        #                             label='是',
+        #                             data=continue_data
+        #                         ),
+        #                         PostbackAction(
+        #                             label='否',
+        #                             data="forceQuit"
+        #                         )
+        #                     ]
+        #                 )
+        #             )
+        #         ]
+        #     )
+        # )

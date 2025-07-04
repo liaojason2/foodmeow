@@ -15,16 +15,25 @@ conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 data = db.data
 
-def insertData(subject: str, baseAmount: int, addition: int, total: int, category: str):
+def insertData(
+        subject: str, baseAmount: int, addition: int, total: int, category: str, currency: str, 
+        exgCurrency: str = None, exgCurrencyRate: int = None, exgCurrencyBaseAmount: int = None, exgCurrencyAmount: int = None, exgCurrencyAdditionAmount: int = None
+    ):
     try:
         data.insert_one(
             {
                 "time": currentTime,
                 "subject": subject,
                 "category": category,
+                "currency": currency,
                 "baseAmount": baseAmount,
                 "addition": addition,
                 "total": total,
+                "exgCurrency": exgCurrency,
+                "exgCurrencyRate": exgCurrencyRate,
+                "exgCurrencyBaseAmount": exgCurrencyBaseAmount,  # Default to 0 if not provided
+                "exgCurrencyAdditionAmount": exgCurrencyAdditionAmount,
+                "exgCurrencyAmount": exgCurrencyAmount,
             }
         )
         return True

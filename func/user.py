@@ -105,6 +105,45 @@ def updateExchangeRate(userId, exchangeRate: float):
         }
     })
 
+def updateUserCurrency(userId, userCurrency: str):
+    """
+    Update the user currency in the database.
+    """
+    users.update_one({
+        "userId": userId,
+    },
+        {
+        '$set': {
+            "userCurrency": userCurrency,
+        }
+    })
+
+def getUserCurrency(userId):
+    user = users.find_one({
+        "userId": userId,
+    })
+    return user['userCurrency']
+
+def updateNewDataCurrency(userId, dataCurrency: str):
+    """
+    Update the data currency in the database.
+    """
+    users.update_one({
+        "userId": userId,
+    },
+        {
+        '$set': {
+            "dataCurrency": dataCurrency,
+        }
+    })
+
+def getDataCurrency(userId):
+    user = users.find_one({
+        "userId": userId,
+    })
+    return user['dataCurrency']
+
+
 
 # Clear all data to default if there is anything error.
 def clearDataToDefault(userId):
