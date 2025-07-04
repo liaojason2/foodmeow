@@ -28,6 +28,7 @@ def insertData(
                 "currency": currency,
                 "baseAmount": baseAmount,
                 "addition": addition,
+                
                 "total": total,
                 "exgCurrency": exgCurrency,
                 "exgCurrencyRate": exgCurrencyRate,
