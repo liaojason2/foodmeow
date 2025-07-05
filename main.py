@@ -72,6 +72,10 @@ def handle_text_message(event):
 
         elif (receivedMessage == "開啟選單"):
             menu.welcomeMenu(event, configuration)
+        
+        # -------------------------------
+        # Add data section
+        # -------------------------------
 
         elif (user.checkUserStatus(userId) == "addDataSubject"):
             '''
@@ -88,6 +92,10 @@ def handle_text_message(event):
             Receive user-typed amount and prompt for user to confirm the amount.
             '''
             addData.addDataMoneyRequest(event)
+
+        # -------------------------------
+        # Exchange section
+        # -------------------------------
 
         # User request to change exchange rate
         elif (user.checkUserStatus(userId) == "updateExchangeRate"):
@@ -133,8 +141,11 @@ def handle_postback_message(event):
         # Open Amount Menu
         if (postbackData == "Amount"):
             menu.amountMenu(event)
-        
 
+        # -------------------------------
+        # Add data section
+        # -------------------------------
+        
         # Add data
         elif (postbackData[:7] =="addData"):
             '''
@@ -177,6 +188,10 @@ def handle_postback_message(event):
             '''
             addData.addDataToDatabase(event)
 
+        # -------------------------------
+        # Get Total Amount section
+        # -------------------------------
+
         # Get total amount expect already checkout
         if (postbackData == "totalAmount"):
             total = amount.getTotalAmount()
@@ -188,7 +203,10 @@ def handle_postback_message(event):
                 )
             )
 
-        # Give amount confirm
+        # -------------------------------
+        # Checkout section
+        # -------------------------------
+
         if (postbackData == "giveAmount"):
             '''
             Checkout step 1
@@ -203,6 +221,9 @@ def handle_postback_message(event):
         elif (user.checkUserStatus(userId) == "checkoutConfirm"):
             checkout.requestCheckoutComplete(event)
 
+        # -------------------------------
+        # Get History Data section
+        # -------------------------------
 
         if (postbackData == "getHistoryAmount"):
             history = amount.getHistory()
@@ -212,6 +233,10 @@ def handle_postback_message(event):
                     messages=[TextMessage(text=history)]
                 )
             )
+
+        # -------------------------------
+        # Currency settings section
+        # -------------------------------
 
         # Currency Menu
         if (postbackData == "currencyMenu"):
