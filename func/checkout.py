@@ -1,5 +1,4 @@
 import os
-from typing import Tuple, Optional, Any
 from dotenv import load_dotenv
 from linebot.v3.messaging import (
     Configuration,

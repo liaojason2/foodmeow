@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta, timezone
 from pymongo import MongoClient
-from .config import getFoodMultiple
 import os
 from dotenv import load_dotenv
 from .utils import convertAmountToCent, convertCentToDecimalString

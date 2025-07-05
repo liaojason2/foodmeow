@@ -13,12 +13,11 @@ from linebot.v3 import (
 )
 import currencyapicom
 from .user import (
-    changeUserStatus, updateTempData, getTempData, getExchangeRate, deleteTempData
+    changeUserStatus, updateTempData, getTempData, deleteTempData
 )
 from .menu import confirmChangeExchangeRate, confirmChangeCurrency, confirmTemplate
 from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency
-from .config import getFoodMultiple
-from .utils import convertAmountToCent, convertCentToDecimalString
+from .utils import convertAmountToCent
 
 load_dotenv()
 

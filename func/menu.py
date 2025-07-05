@@ -6,9 +6,6 @@ from linebot.v3.messaging import (
     ReplyMessageRequest,
     FlexMessage,
     FlexBubble,
-    TemplateMessage,
-    ConfirmTemplate
-
 )
 
 from linebot.v3.messaging.models import (
@@ -20,7 +17,6 @@ from linebot.v3.messaging.models import (
 )
 
 # Import amount and foodmeow version
-from . import amount
 from .config import getFoodmeowVersion, getCategory
 
 # Load dotenv
