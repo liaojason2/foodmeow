@@ -690,7 +690,6 @@ with ApiClient(configuration) as api_client:
             },
             footerItems={
                 "變更": "Yes",
-                "取消": "forceQuit"
             }
         )
         # """Create a confirmation message before changing currency."""
