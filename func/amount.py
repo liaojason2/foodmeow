@@ -1,19 +1,19 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pymongo import MongoClient
 from .config import getFoodMultiple
 import os
 from dotenv import load_dotenv
-load_dotenv()
-
 from .utils import convertAmountToCent, convertCentToDecimalString
-
-currentTime = datetime.now() + timedelta(hours=8)
 
 load_dotenv()
 
 conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
-data = db.data
+#data = db.data
+data = db.data_20250704
+
+def currentTime():
+    return datetime.now(timezone.utc) + timedelta(hours=8)
 
 def insertData(
         subject: str, baseAmount: int, addition: int, total: int, category: str, currency: str, 
@@ -22,7 +22,7 @@ def insertData(
     try:
         data.insert_one(
             {
-                "time": currentTime,
+                "time": currentTime(),
                 "subject": subject,
                 "category": category,
                 "currency": currency,
@@ -72,8 +72,8 @@ def getTotalAmount():
 
 def checkout(amount: int, currency: str):
     data.insert_one({
-        "time": currentTime,
-        "subject": currentTime.strftime("%Y/%m/%d"),
+        "time": currentTime(),
+        "subject": currentTime().strftime("%Y/%m/%d"),
         "currency": currency,
         "category": 'checkout',
         "baseAmount": -amount,
