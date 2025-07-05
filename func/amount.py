@@ -28,7 +28,6 @@ def insertData(
                 "currency": currency,
                 "baseAmount": baseAmount,
                 "addition": addition,
-                
                 "total": total,
                 "exgCurrency": exgCurrency,
                 "exgCurrencyRate": exgCurrencyRate,
@@ -40,6 +39,21 @@ def insertData(
         return True
     except Exception as e:
         return e
+
+def updateCurrencyExchangeData(id, currency, exchangeRate, userCurrencyBaseAmount,userCurrencyAdditionAmount, userCurrencyTotal):
+    result = data.update_one(
+        filter={'_id': id},
+        update={
+            '$set': {
+                'exgCurrency': currency,
+                'exgCurrencyRate': exchangeRate,
+                'exgCurrencyBaseAmount': userCurrencyBaseAmount,
+                'exgCurrencyAdditionAmount': userCurrencyAdditionAmount,
+                'exgCurrencyAmount': userCurrencyTotal,
+            }
+        }
+    )
+    return result
 
 def getTotalAmount():
     totalAmount = 0
@@ -56,17 +70,21 @@ def getTotalAmount():
     return totalAmount
 
 
-def giveAmount(money):
+def checkout(amount: int, currency: str):
     data.insert_one({
         "time": currentTime,
         "subject": currentTime.strftime("%Y/%m/%d"),
+        "currency": currency,
         "category": 'checkout',
-        "baseAmount": -money,
+        "baseAmount": -amount,
         "addition": 0,
-        "total": -money,
+        "total": -amount,
     })
     return True
 
+def getLatestData(limit):
+    record = data.find().sort("time", -1).limit(limit)
+    return record
 
 def getHistory():
     fetchedDatas = data.find().sort("time", -1).limit(20)

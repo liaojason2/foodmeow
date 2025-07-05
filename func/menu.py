@@ -34,7 +34,7 @@ configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
 with ApiClient(configuration) as api_client:
     line_bot_api = MessagingApi(api_client)
 
-    def confirmTemplate(reply_token, headerTitle, bodyItems, footerItems):
+    def confirmTemplate(reply_token, headerTitle, bodyItems, footerItems, text=None):
         """Create a confirmation message template."""
 
         headerContents = [
@@ -46,19 +46,33 @@ with ApiClient(configuration) as api_client:
             )
         ]
 
-        bodyContents = [
+        bodyContents = []
+        if text:
+            bodyContents.append(
+                FlexBox(
+                    layout='baseline',
+                    spacing='sm',
+                    height='30px',
+                    contents=[
+                        FlexText(text=text, align='center')
+                    ]
+                )
+            )
+
+        # Use extend() to add all items from the generator
+        bodyContents.extend(
             FlexBox(
                 layout='baseline',
                 spacing='sm',
                 contents=[
                     FlexText(text=key, color='#aaaaaa',
-                             size='md', flex=1, align='start'),
+                            size='md', flex=1, align='start'),
                     FlexText(text=str(value), wrap=True,
-                             color='#666666', size='md', flex=5)
+                            color='#666666', size='md', flex=5)
                 ]
             )
             for key, value in bodyItems.items() if value is not None
-        ]
+        )
 
         footerContents = [
             FlexButton(
@@ -488,34 +502,118 @@ with ApiClient(configuration) as api_client:
             )
         )
 
-    def giveAmountConfirm(event, configuration):
-        total = amount.getTotalAmount()
-        continue_data = str(total)
-        prompt_message = '目前累積總額為 ' + str(total) + " ，確認結帳？（若有小數會自動退位）"
+    def giveAmountConfirm(reply_token, currency, amount):
+        confirmTemplate(
+            reply_token,
+            headerTitle="結帳確認",
+            bodyItems={
+                "貨幣": currency,
+                "金額": amount,
+            },
+            footerItems={
+                "確定結帳": "Yes",
+            }        
+        )
+
+        #total = amount.getTotalAmount()
+        #continue_data = str(total)
+        # prompt_message = '目前累積總額為 ' + str(total) + " ，確認結帳？（若有小數會自動退位）"
+        # line_bot_api.reply_message_with_http_info(
+        #     ReplyMessageRequest(
+        #         reply_token=event.reply_token,
+        #         messages=[
+        #             TemplateMessage(
+        #                 altText='動作確認',
+        #                 template=ConfirmTemplate(
+        #                     title='這是ConfirmTemplate',
+        #                     text=prompt_message,
+        #                     actions=[
+        #                         PostbackAction(
+        #                             label='是',
+        #                             data=continue_data
+        #                         ),
+        #                         PostbackAction(
+        #                             label='否',
+        #                             data="forceQuit"
+        #                         )
+        #                     ]
+        #                 )
+        #             )
+        #         ]
+        #     )
+        # )
+
+  # TODO: Let alttext show the detail of the data going to be added
+    def checkoutSuccess(reply_token, currency, amount):
+        """Send a confirmation message after adding data."""
+
+        infoItems = {
+            "貨幣": currency,
+            "金額": amount,
+        }
+
+        bodyContents = [
+            FlexBox(
+                layout='baseline',
+                spacing='sm',
+                contents=[
+                    FlexText(text=key, color='#aaaaaa',
+                             size='md', flex=1, align='start'),
+                    FlexText(text=str(value), wrap=True,
+                             color='#666666', size='md', flex=5)
+                ]
+            )
+            for key, value in infoItems.items() if value is not None
+        ]
+
         line_bot_api.reply_message_with_http_info(
             ReplyMessageRequest(
-                reply_token=event.reply_token,
+                reply_token=reply_token,
                 messages=[
-                    TemplateMessage(
-                        altText='動作確認',
-                        template=ConfirmTemplate(
-                            title='這是ConfirmTemplate',
-                            text=prompt_message,
-                            actions=[
-                                PostbackAction(
-                                    label='是',
-                                    data=continue_data
-                                ),
-                                PostbackAction(
-                                    label='否',
-                                    data="forceQuit"
-                                )
-                            ]
+                    FlexMessage(
+                        altText="已成功結帳",
+                        contents=FlexBubble(
+                            body=FlexBox(
+                                layout="vertical",
+                                contents=[
+                                    FlexText(
+                                        text='已完成結帳',
+                                        weight='bold',
+                                        size='xl',
+                                        align='center'
+                                    ),
+                                    FlexBox(
+                                        layout='vertical',
+                                        margin='lg',
+                                        spacing='sm',
+                                        contents=bodyContents
+                                    ),
+                                ],
+                            ),
+                            footer=FlexBox(
+                                layout="vertical",
+                                spacing='sm',
+                                contents=[
+                                    FlexButton(
+                                        style='primary',
+                                        height='sm',
+                                        action=PostbackAction(
+                                            label='新增資料', data='addData')
+                                    ),
+                                    FlexButton(
+                                        style="link",
+                                        size="sm",
+                                        action=PostbackAction(
+                                            label="退出、故障修復", data="forceQuit"),
+                                    ),
+                                ],
+                            ),
                         )
                     )
                 ]
             )
         )
+
 
     def currencyMenu(event):
         line_bot_api.reply_message_with_http_info(
@@ -712,3 +810,19 @@ with ApiClient(configuration) as api_client:
         #         ]
         #     )
         # )
+
+    def confirmExchangeWhileCheckout(reply_token, currency, amount, exchangeRate):
+        confirmTemplate(
+            reply_token,
+            headerTitle="貨幣轉換確認",
+            bodyItems={
+                "貨幣": currency,
+                "金額": amount,
+                "匯率": exchangeRate
+            },
+            footerItems={
+                "進行轉換": "confirmExchange",
+                #"自訂匯率": "customExchangeRate",
+            },
+            text="您有資料尚未結匯"
+        )

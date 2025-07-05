@@ -23,7 +23,7 @@ from linebot.v3.webhooks import (
     PostbackEvent,
 )
 
-from func import addData, amount, menu, user, addData, currency
+from func import addData, amount, menu, user, addData, currency, checkout
 from func.utils import convertAmountToCent, convertCentToDecimalString
 
 load_dotenv()
@@ -190,25 +190,19 @@ def handle_postback_message(event):
 
         # Give amount confirm
         if (postbackData == "giveAmount"):
-            user.changeUserStatus(userId, "giveAmount")
-            menu.giveAmountConfirm(event, configuration)
+            '''
+            Checkout step 1
+            Prompt user to confirm the amount they want to checkout.
+            '''
+            checkout.requestCheckout(event)
 
-        elif (user.checkUserStatus(userId) == "giveAmount"):
-            total = event.postback.data
-            print("total", total)
-            # TODO: customize the amount, checkout to cent 
-            total = convertAmountToCent(total) // 100 * 100
+        elif (user.checkUserStatus(userId) ==  "updateCurrencyWhileCheckout") and postbackData == "confirmExchange":
+            checkout.updateExchangeCurrencyToDatabase(event)
+            
 
-            replyMessage = f"結帳完成，總金額為 {convertCentToDecimalString(total)} 元"
+        elif (user.checkUserStatus(userId) == "checkoutConfirm"):
+            checkout.requestCheckoutComplete(event)
 
-            amount.giveAmount(total)
-            user.changeUserStatus(userId, "free")
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=replyToken,
-                    messages=[TextMessage(text=replyMessage)]
-                )
-            )
 
         if (postbackData == "getHistoryAmount"):
             history = amount.getHistory()
