@@ -23,7 +23,7 @@ from linebot.v3.webhooks import (
     PostbackEvent,
 )
 
-from func import addData, amount, menu, user, addData, currency, checkout
+from func import addData, amount, menu, user, addData, currency, checkout, getData
 from func.utils import convertAmountToCent, convertCentToDecimalString
 
 load_dotenv()
@@ -226,13 +226,10 @@ def handle_postback_message(event):
         # -------------------------------
 
         if (postbackData == "getHistoryAmount"):
-            history = amount.getHistory()
-            line_bot_api.reply_message_with_http_info(
-                ReplyMessageRequest(
-                    reply_token=replyToken,
-                    messages=[TextMessage(text=history)]
-                )
-            )
+            '''
+            Get history data
+            '''
+            getData.getHistoryDataRequest(event)
 
         # -------------------------------
         # Currency settings section

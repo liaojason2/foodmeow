@@ -6,6 +6,7 @@ from linebot.v3.messaging import (
     ReplyMessageRequest,
     FlexMessage,
     FlexBubble,
+    TextMessage
 )
 
 from linebot.v3.messaging.models import (
@@ -62,9 +63,9 @@ with ApiClient(configuration) as api_client:
                 spacing='sm',
                 contents=[
                     FlexText(text=key, color='#aaaaaa',
-                            size='md', flex=1, align='start'),
+                             size='md', flex=1, align='start'),
                     FlexText(text=str(value), wrap=True,
-                            color='#666666', size='md', flex=5)
+                             color='#666666', size='md', flex=5)
                 ]
             )
             for key, value in bodyItems.items() if value is not None
@@ -508,11 +509,11 @@ with ApiClient(configuration) as api_client:
             },
             footerItems={
                 "確定結帳": "Yes",
-            }        
+            }
         )
 
-        #total = amount.getTotalAmount()
-        #continue_data = str(total)
+        # total = amount.getTotalAmount()
+        # continue_data = str(total)
         # prompt_message = '目前累積總額為 ' + str(total) + " ，確認結帳？（若有小數會自動退位）"
         # line_bot_api.reply_message_with_http_info(
         #     ReplyMessageRequest(
@@ -610,6 +611,99 @@ with ApiClient(configuration) as api_client:
             )
         )
 
+    def getHistoryData(reply_token, bodyInfo, uncountCurrency):
+        """Send a message with the history data."""
+
+        headerContents = [
+            FlexText(
+                text="歷史資料",
+                weight='bold',
+                size='xl',
+                align='center'
+            )
+        ]
+                
+
+        bodyContents = []
+
+        # Add warning for uncounted currencies (only if not empty)
+        if uncountCurrency:
+            uncountCurrencyText = '有未計算的貨幣:'
+            for currency, count in uncountCurrency.items():
+                uncountCurrencyText += f"{currency}: {count}"
+                
+            bodyContents.append(  # Use append instead of extend
+                FlexBox(
+                    layout='horizontal',
+                    background_color='#FFCDD2',
+                    contents=[
+                        FlexText(text=uncountCurrencyText,
+                                align='center')
+                    ]
+                )
+            )
+
+        # Add header row
+        bodyContents.append(
+            FlexBox(
+                layout='horizontal',
+                background_color='#F5F5F5',
+                contents=[
+                    FlexText(text="標題", color='#aaaaaa',
+                            flex=1, align='start'),
+                    FlexText(text="金額 / 加總金額", color='#aaaaaa',
+                            flex=1, align='end'),
+                ],
+            )
+        )
+
+        # Add each data row
+        for data in bodyInfo:
+            bodyContents.append(  # Use append instead of extend
+                FlexBox(
+                    layout='horizontal',
+                    contents=[
+                        FlexText(text=data['subject'], wrap=True,
+                                flex=1, align='start'),
+                        FlexText(text=f"{data['baseAmount']} / {data['total']}",
+                                size='sm', flex=2, align='end'),
+                    ],
+                )
+            )
+
+        bubble = FlexBubble(
+            header=FlexBox(
+                layout="vertical",
+                background_color='#ffeb3b',
+                padding_top='xl',
+                padding_bottom='xl',
+                contents=headerContents
+            ),
+            body=FlexBox(
+                layout="vertical",
+                padding_top='2px',
+                contents=[
+                    FlexBox(
+                        layout='vertical',
+                        margin='lg',
+                        spacing='sm',
+                        contents=bodyContents
+                    ),
+                ],
+            ),
+        )
+
+        line_bot_api.reply_message_with_http_info(
+            ReplyMessageRequest(
+                reply_token=reply_token,
+                messages=[
+                    FlexMessage(
+                        altText="資料內容確認",
+                        contents=bubble
+                    )
+                ]
+            )
+        )
 
     def currencyMenu(event):
         line_bot_api.reply_message_with_http_info(
@@ -817,7 +911,7 @@ with ApiClient(configuration) as api_client:
             },
             footerItems={
                 "進行轉換": "confirmExchange",
-                #"自訂匯率": "customExchangeRate",
+                # "自訂匯率": "customExchangeRate",
             },
             text="您有資料尚未結匯"
         )
