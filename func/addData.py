@@ -19,7 +19,7 @@ from . import amount
 from .amount import insertData
 from .config import getFoodMultiple
 from .utils import convertAmountToCent, convertCentToDecimalString
-from .currency import getCurrencyRate
+from .currency import getCurrencyRate, multiCurrencyConversion
 
 load_dotenv()
 
@@ -117,55 +117,73 @@ with ApiClient(configuration) as api_client:
         subject = tempData["subject"]
         amountCents = convertAmountToCent(tempData["amount"])
 
-        # Currency Exchange
-        ## Get user based currency and data currency
-        userCurrency = getUserCurrency(user_id)
-        dataCurrency = getDataCurrency(user_id)
-        tempData["dataCurrency"] = dataCurrency
-
-        ## Define variables for exchange rate and amounts
-        isExchange = userCurrency != dataCurrency
-        exchangeRate = 1
-        userCurrencyAmount = None
-        userCurrencyAdditionAmount = None
-
         ## If the data currency is different is with user currency,
         ## count the exchange rate and convert the amount to user currency
-        if isExchange:
-            try:
-                exchangeRateVal = getCurrencyRate(dataCurrency, userCurrency)
-                exchangeRateCents = convertAmountToCent(exchangeRateVal, 4)
-                userCurrencyAmount = int((amountCents * 100 * exchangeRateCents) // 1000000)
-                tempData["userCurrencyBaseAmount"] = userCurrencyAmount
-                exchangeRate = f"{exchangeRateVal:.4f}"  # Format to 4 decimal places
-                tempData["exchangeRate"] = exchangeRate
-            except Exception as e:
-                sendReplyMessage(line_bot_api, reply_token, f"取得匯率失敗: {e}")
+        # if isExchange:
+        #     try:
+        #         exchangeRateVal = getCurrencyRate(dataCurrency, userCurrency)
+        #         exchangeRateCents = convertAmountToCent(exchangeRateVal, 4)
+        #         userCurrencyAmount = int((amountCents * 100 * exchangeRateCents) // 1000000)
+        #         tempData["userCurrencyBaseAmount"] = userCurrencyAmount
+        #         exchangeRate = f"{exchangeRateVal:.4f}"  # Format to 4 decimal places
+        #         tempData["exchangeRate"] = exchangeRate
+        #     except Exception as e:
+        #         sendReplyMessage(line_bot_api, reply_token, f"取得匯率失敗: {e}")
         
         # Addition for specific categories
         addition = convertAmountToCent(getFoodMultiple()) if category == "food" else 0
         additionAmount = (amountCents * addition) // 100
         totalAmount = amountCents + additionAmount
 
+
         tempData["additionAmount"] = additionAmount
         tempData["amount"] = totalAmount
 
-        # Count for currency difference
-        if isExchange:
-            userCurrencyAdditionAmount = (userCurrencyAmount * addition) // 100
-            userCurrencyTotal = userCurrencyAmount + userCurrencyAdditionAmount
-            tempData["userCurrencyAdditionAmount"] = userCurrencyAdditionAmount
-            tempData["userCurrencyAmount"] = userCurrencyTotal
+        # Currency Exchange
+        ## Get user based currency and data currency
+        userCurrency = getUserCurrency(user_id)
+        dataCurrency = getDataCurrency(user_id)
 
+        tempData["userCurrency"] = userCurrency
+        tempData["dataCurrency"] = dataCurrency
+
+
+        ## Define some variables
+        isExchange = userCurrency != dataCurrency
+        exchangeRate = 1
+        userCurrencyBaseAmount = None
+        userCurrencyAdditionAmount = None
+
+        ## Count for currency difference (include addition)
+        if isExchange:
+            exchangeRateVal = getCurrencyRate(dataCurrency, userCurrency)
+
+            exchangeResult = multiCurrencyConversion(
+                amountCents, addition, dataCurrency, userCurrency, exchangeRateVal
+            )
+
+            exchangeResult = exchangeResult[userCurrency]
+
+            userCurrencyBaseAmount = exchangeResult['baseAmount']
+            userCurrencyAdditionAmount = exchangeResult['addition']
+            exchangeRate = exchangeResult['exchangeRate']
+
+            tempData["exchangeRate"] = exchangeRate
+            tempData["userCurrencyBaseAmount"] = userCurrencyBaseAmount
+            tempData["userCurrencyAdditionAmount"] = userCurrencyAdditionAmount
+            tempData["userCurrencyTotal"] = exchangeResult['total']
+
+        # Store data to tempData
         updateTempData(user_id, tempData)
 
+        #Prompt confirm message
         def formatAmount(cents):
             return f"{cents // 100}.{cents % 100:02d}"
 
         amountMsg = f"{formatAmount(amountCents)} + {formatAmount(additionAmount)}"
         userCurrencyMsg = None
         if isExchange:
-            userCurrencyMsg = f"{formatAmount(userCurrencyAmount)} + {formatAmount(userCurrencyAdditionAmount)}"
+            userCurrencyMsg = f"{formatAmount(userCurrencyBaseAmount)} + {formatAmount(userCurrencyAdditionAmount)}"
 
         if isExchange:
             msg = {
@@ -195,30 +213,39 @@ with ApiClient(configuration) as api_client:
         try:
             tempData = getTempData(user_id)
 
+            # Define Variables
+            currencyExchange = {}
+            exgCurrency = None
+            exgCurrencyAmount = 0
+            userCurrency = tempData["userCurrency"]
+            exchangeRate = tempData['exchangeRate'] if 'exchangeRate' in tempData else 1
+
+            # Define inserted data
             category = tempData["category"]
             subject = tempData["subject"]
             baseAmount = tempData["baseAmount"]
             amount = tempData["amount"]
             additionAmount = tempData["additionAmount"]
             currency = tempData["dataCurrency"]
-            if "userCurrencyAmount" in tempData:
-                exgCurrency = getUserCurrency(user_id)
-                exgCurrencyRate = tempData['exchangeRate']
-                exgCurrencyBaseAmount = tempData["userCurrencyBaseAmount"]
-                exgCurrencyAdditionAmount = tempData["userCurrencyAdditionAmount"]
-                exgCurrencyAmount = tempData["userCurrencyAmount"]
-
-            exchangeRate = tempData.get("exchangeRate")
-
-            insertData(subject, baseAmount, additionAmount, amount, category, currency, 
-                    exgCurrency, exgCurrencyRate, exgCurrencyBaseAmount, exgCurrencyAmount, exgCurrencyAdditionAmount
-                )
-
+            if "exchangeRate" in tempData:
+                currencyExchange = {
+                    userCurrency: {
+                        'exchangeRate': tempData['exchangeRate'],
+                        'baseAmount': tempData["userCurrencyBaseAmount"],
+                        'addition': tempData["userCurrencyAdditionAmount"],
+                        'total': tempData["userCurrencyTotal"]
+                    }
+                }
+            insertData(subject, baseAmount, additionAmount, amount, category, currency, currencyExchange)
+            
+            # Prompt success message
             amount = convertCentToDecimalString(amount)
-            if exgCurrency:
-                exgCurrencyAmount = convertCentToDecimalString(exgCurrencyAmount)
-
+            if currencyExchange:
+                exgCurrency = userCurrency
+                exgCurrencyAmount = convertCentToDecimalString(currencyExchange[userCurrency]['total'])
             addDataSuccess(reply_token, category, subject, currency, exchangeRate, amount, exgCurrency, exgCurrencyAmount)
+            
+            # Clean up
             deleteTempData(user_id)
             changeUserStatus(user_id, "free")
         except Exception as e:

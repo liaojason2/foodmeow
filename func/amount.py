@@ -9,17 +9,16 @@ load_dotenv()
 conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
 #data = db.data
-data = db.data_20250704
+data = db.data_20250709
 
 def currentTime():
     return datetime.now(timezone.utc) + timedelta(hours=8)
 
 def insertData(
         subject: str, baseAmount: int, addition: int, total: int, category: str, currency: str, 
-        exgCurrency: str = None, exgCurrencyRate: int = None, exgCurrencyBaseAmount: int = None, exgCurrencyAmount: int = None, exgCurrencyAdditionAmount: int = None
-    ):
+        exgCurrency: dict):
     try:
-        data.insert_one(
+        result = data.insert_one(
             {
                 "time": currentTime(),
                 "subject": subject,
@@ -28,27 +27,19 @@ def insertData(
                 "baseAmount": baseAmount,
                 "addition": addition,
                 "total": total,
-                "exgCurrency": exgCurrency,
-                "exgCurrencyRate": exgCurrencyRate,
-                "exgCurrencyBaseAmount": exgCurrencyBaseAmount,  # Default to 0 if not provided
-                "exgCurrencyAdditionAmount": exgCurrencyAdditionAmount,
-                "exgCurrencyAmount": exgCurrencyAmount,
+                "currencyExchange": exgCurrency,
             }
         )
-        return True
+        return result
     except Exception as e:
         return e
 
-def updateCurrencyExchangeData(id, currency, exchangeRate, userCurrencyBaseAmount,userCurrencyAdditionAmount, userCurrencyTotal):
+def updateCurrencyExchangeData(id, currency, exchangeResult):
     result = data.update_one(
         filter={'_id': id},
         update={
-            '$set': {
-                'exgCurrency': currency,
-                'exgCurrencyRate': exchangeRate,
-                'exgCurrencyBaseAmount': userCurrencyBaseAmount,
-                'exgCurrencyAdditionAmount': userCurrencyAdditionAmount,
-                'exgCurrencyAmount': userCurrencyTotal,
+            "$set": {
+                f"currencyExchange.{currency}": exchangeResult
             }
         }
     )
@@ -80,6 +71,9 @@ def checkout(amount: int, currency: str):
         "total": -amount,
     })
     return True
+
+def getOneData(_id):
+    return data.find_one({'_id': _id})
 
 def getLatestData(limit):
     record = data.find().sort("time", -1).limit(limit)

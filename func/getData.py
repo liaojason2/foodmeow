@@ -12,14 +12,13 @@ from linebot.v3 import (
     WebhookHandler
 )
 from .user import (
-    changeUserStatus, updateTempData, getTempData, getExchangeRate, deleteTempData, getDataCurrency, getUserCurrency
+   getUserCurrency
 )
 from .menu import getHistoryData
 from . import amount
 from .amount import getLatestData
 from .config import getFoodMultiple
 from .utils import convertAmountToCent, convertCentToDecimalString
-from .currency import getCurrencyRate
 
 load_dotenv()
 
@@ -34,6 +33,9 @@ def sendReplyMessage(line_bot_api, reply_token, message_text):
             messages=[TextMessage(text=message_text)]
         )
     )
+
+def getOneData(_id):
+    return amount.getOneData(_id)
 
 with ApiClient(configuration) as api_client:
 

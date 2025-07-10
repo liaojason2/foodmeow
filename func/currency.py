@@ -16,8 +16,10 @@ from .user import (
     changeUserStatus, updateTempData, getTempData, deleteTempData
 )
 from .menu import confirmChangeExchangeRate, confirmChangeCurrency, confirmTemplate
-from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency
+from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency, getUserCurrency
 from .utils import convertAmountToCent
+from .amount import updateCurrencyExchangeData
+from .getData import getOneData
 
 load_dotenv()
 
@@ -31,6 +33,57 @@ def getCurrencyRate(base_currency, target_currency):
     result = currency_api_client.latest(base_currency, [target_currency])
     result = result['data'][target_currency]['value']
     return result
+
+def multiCurrencyConversion(amount: int, addition, currency, convertCurrency, exchangeRate):
+
+    exchangeRateCents = convertAmountToCent(exchangeRate, 4)
+    userCurrencyBaseAmount = int((amount * 100 * exchangeRateCents) // 1000000)
+    userCurrencyAdditionAmount = (userCurrencyBaseAmount * addition) // 100
+    userCurrencyTotal = userCurrencyBaseAmount + userCurrencyAdditionAmount
+
+    exchangeRate = f'{exchangeRate:.4f}'
+
+    data = {
+        convertCurrency:{
+            "exchangeRate": exchangeRate,
+            "baseAmount": userCurrencyBaseAmount,
+            "addition": userCurrencyAdditionAmount,
+            "total": userCurrencyTotal
+        }
+    }
+
+    return data
+
+def updateExchangeCurrencyToDatabase(event, record, addition, exchangeRate):
+
+    user_id, reply_token, _, _ = extractEventVariables(event)
+
+    print(record)
+
+    for item in record:
+
+        id = item['_id']
+        data = getOneData(id)
+
+        baseAmount = data['baseAmount']
+        currency = data['currency']
+        userCurrency = getUserCurrency(user_id)
+
+        exchangeResult = multiCurrencyConversion(
+            baseAmount,
+            addition,
+            currency,
+            userCurrency,
+            exchangeRate
+        )
+
+        exchangeResult = exchangeResult[userCurrency]
+
+        updateCurrencyExchangeData(
+            id, userCurrency, exchangeResult
+        )
+
+        changeUserStatus(user_id, "free")
 
 with ApiClient(configuration) as api_client:
 

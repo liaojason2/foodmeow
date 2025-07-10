@@ -12,10 +12,10 @@ from .user import (
     changeUserStatus, updateTempData, getTempData, getExchangeRate, deleteTempData, getDataCurrency, getUserCurrency
 )
 from .menu import giveAmountConfirm, confirmExchangeWhileCheckout, checkoutSuccess
-from .amount import checkout, getLatestData, updateCurrencyExchangeData
+from .amount import checkout, getLatestData
 from .config import getFoodMultiple
 from .utils import convertAmountToCent, convertCentToDecimalString
-from .currency import getCurrencyRate
+from .currency import getCurrencyRate, updateExchangeCurrencyToDatabase
 from .user import changeUserStatus
 
 load_dotenv()
@@ -67,8 +67,8 @@ with ApiClient(configuration) as api_client:
             if data['currency'] == checkoutCurrency:
                 total[checkoutCurrency] += data['total']
                 continue
-            elif 'exgCurrency' in data and data['exgCurrency'] == checkoutCurrency:
-                total[checkoutCurrency] += data['exgCurrencyAmount']
+            elif 'currencyExchange' in data and checkoutCurrency in data['currencyExchange']:
+                total[checkoutCurrency] += data['currencyExchange'][checkoutCurrency]['total']
             # The data does not have checkoutCurrency
             else:
                 newCurrency = data['currency']
@@ -101,7 +101,7 @@ with ApiClient(configuration) as api_client:
             updateTempData(user_id, tempData)
             changeUserStatus(user_id, "checkoutConfirm")
 
-    def updateExchangeCurrencyToDatabase(event):
+    def updateExchangeCurrency(event):
 
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, _ = extractEventVariables(event)
@@ -110,7 +110,6 @@ with ApiClient(configuration) as api_client:
             print("No temp data found")
             return 0
 
-        currency = tempData['currency']
         exchangeRate = tempData['exchangeRate']
         data = tempData['data']
 
@@ -122,16 +121,18 @@ with ApiClient(configuration) as api_client:
 
             addition = convertAmountToCent(getFoodMultiple()) if category == "food" else 0
 
-            exchangeRateCents = convertAmountToCent(exchangeRate, 4)
+            updateExchangeCurrencyToDatabase(event, [item], addition, exchangeRate)
 
-            userCurrencyBaseAmount = int((baseAmount * 100 * exchangeRateCents) // 1000000)
-            userCurrencyAdditionAmount = (userCurrencyBaseAmount * addition) // 100
-            userCurrencyTotal = userCurrencyBaseAmount + userCurrencyAdditionAmount
+            # exchangeRateCents = convertAmountToCent(exchangeRate, 4)
 
-            # Execute bulk update
-            updateCurrencyExchangeData(
-                id, currency, exchangeRate, userCurrencyBaseAmount, userCurrencyAdditionAmount, userCurrencyTotal
-            )
+            # userCurrencyBaseAmount = int((baseAmount * 100 * exchangeRateCents) // 1000000)
+            # userCurrencyAdditionAmount = (userCurrencyBaseAmount * addition) // 100
+            # userCurrencyTotal = userCurrencyBaseAmount + userCurrencyAdditionAmount
+
+            # # Execute bulk update
+            # updateCurrencyExchangeData(
+            #     id, currency, exchangeRate, userCurrencyBaseAmount, userCurrencyAdditionAmount, userCurrencyTotal
+            # )
 
         # TODO: Show the convert amount and some more detail data 
         line_bot_api.reply_message_with_http_info(

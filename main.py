@@ -215,10 +215,10 @@ def handle_postback_message(event):
             checkout.requestCheckout(event)
 
         elif (user.checkUserStatus(userId) ==  "updateCurrencyWhileCheckout") and postbackData == "confirmExchange":
-            checkout.updateExchangeCurrencyToDatabase(event)
+            checkout.updateExchangeCurrency(event)
             
 
-        elif (user.checkUserStatus(userId) == "checkoutConfirm"):
+        elif (user.checkUserStatus(userId) == "checkoutConfirm") and postbackData == "Yes":
             checkout.requestCheckoutComplete(event)
 
         # -------------------------------
