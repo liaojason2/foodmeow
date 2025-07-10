@@ -622,16 +622,16 @@ with ApiClient(configuration) as api_client:
                 align='center'
             )
         ]
-                
 
         bodyContents = []
 
         # Add warning for uncounted currencies (only if not empty)
         if uncountCurrency:
-            uncountCurrencyText = '有未計算的貨幣:'
-            for currency, count in uncountCurrency.items():
-                uncountCurrencyText += f"{currency}: {count}"
-                
+            uncountCurrencyText = '有未結匯的貨幣：'
+            currency_list = [f"{currency}: {count}" for currency, count in uncountCurrency.items()]
+            uncountCurrencyText += ", ".join(currency_list)
+
+
             bodyContents.append(  # Use append instead of extend
                 FlexBox(
                     layout='horizontal',
