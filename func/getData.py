@@ -82,10 +82,8 @@ with ApiClient(configuration) as api_client:
             # Check currency or exgCurrency have checkoutCurrency
             if data['currency'] == checkoutCurrency:
                 appendRecord(data)
-                continue
-            elif 'exgCurrency' in data and data['exgCurrency'] == checkoutCurrency:
+            elif 'currencyExchange' in data and checkoutCurrency in data['currencyExchange']:
                 appendRecord(data)
-                continue
             else:
                 if data['currency'] not in uncountCurrency:
                     uncountCurrency[data['currency']] = 0
@@ -95,10 +93,6 @@ with ApiClient(configuration) as api_client:
 
         getHistoryData(reply_token, bodyInfo, uncountCurrency)
              
-
-
-
-
     #         if type(fetchedData['baseAmount']) == int:
     #             fetchedData['baseAmount'] = convertCentToDecimalString(fetchedData['baseAmount'])
     #             fetchedData['total'] = convertCentToDecimalString(fetchedData['total'])
