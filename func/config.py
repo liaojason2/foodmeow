@@ -5,6 +5,7 @@ category = {
     "education": "教育",
     "family": "家裡費用",
     "borrow": "代墊款",
+    "rent": "房租",
     "others": "其他"
 }
 
