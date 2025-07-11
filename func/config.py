@@ -3,7 +3,7 @@ foodmeowVersion = "1.3.1 Beta 1"
 category = {
     "food": "食物",
     "education": "教育",
-    "family": "家裡費用",
+    "family_support": "家裡支援",
     "borrow": "代墊款",
     "rent": "房租",
     "others": "其他"
