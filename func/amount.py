@@ -8,8 +8,7 @@ load_dotenv()
 
 conn = MongoClient(os.getenv("MONGODB_CONNECTION"))
 db = conn.foodmeow
-#data = db.data
-data = db.data_20250709
+data = db.data
 
 def currentTime():
     return datetime.now(timezone.utc) + timedelta(hours=8)
