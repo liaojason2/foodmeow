@@ -1,13 +1,34 @@
 foodMultiple = 0.5
 foodmeowVersion = "1.3.1 Beta 1"
 category = {
-    "food": "食物",
-    "education": "教育",
-    "family_utility": "家裡費用",
-    "family_support": "家裡支援",
-    "borrow": "代墊款",
-    "rent": "房租",
-    "others": "其他"
+    "food": {
+        "cht_name": "食物",
+        "addition": 1.5
+    },
+    "education": {
+        "cht_name": "教育", 
+        "addition": 0
+    },
+    "family_utility": {
+        "cht_name": "家裡費用",
+        "addition": 0
+    },
+    "family_support": {
+        "cht_name": "家裡支援",
+        "addition": 0
+    },
+    "borrow": {
+        "cht_name": "代墊款",
+        "addition": 0
+    },
+    "rent": {
+        "cht_name": "房租",
+        "addition": -1,
+    },
+    "others": {
+        "cht_name": "其他",
+        "addition": 0
+    }
 }
 
 def getFoodMultiple(): 
