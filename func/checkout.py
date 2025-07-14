@@ -13,7 +13,7 @@ from .user import (
 )
 from .menu import giveAmountConfirm, confirmExchangeWhileCheckout, checkoutSuccess
 from .amount import checkout, getLatestData
-from .config import getFoodMultiple
+from .config import getFoodMultiple, getCategory
 from .utils import convertAmountToCent, convertCentToDecimalString
 from .currency import getCurrencyRate, updateExchangeCurrencyToDatabase
 from .user import changeUserStatus
@@ -106,6 +106,8 @@ with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, _, _ = extractEventVariables(event)
         tempData = getTempData(user_id)
+        categoryList = getCategory()
+
         if not tempData:
             print("No temp data found")
             return 0
@@ -118,9 +120,13 @@ with ApiClient(configuration) as api_client:
             id = item['_id']
             baseAmount = item['baseAmount']
             category = item['category']
-
-            addition = convertAmountToCent(getFoodMultiple()) if category == "food" else 0
-
+            
+            # DEPRECATED: Refactor to category list in 1.3.2
+            #addition = convertAmountToCent(getFoodMultiple()) if category == "food" else 0
+            addition = convertAmountToCent(categoryList[category]['addition'])
+            if addition is None:
+                addition = 0
+            
             updateExchangeCurrencyToDatabase(event, [item], addition, exchangeRate)
 
             # exchangeRateCents = convertAmountToCent(exchangeRate, 4)

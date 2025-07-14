@@ -17,7 +17,7 @@ from .user import (
 from .menu import selectDataCategory, confirmAmount, addDataSuccess
 from . import amount
 from .amount import insertData
-from .config import getFoodMultiple
+from .config import getFoodMultiple, getCategory
 from .utils import convertAmountToCent, convertCentToDecimalString
 from .currency import getCurrencyRate, multiCurrencyConversion
 
@@ -106,6 +106,8 @@ with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         user_id, reply_token, message_text, _ = extractEventVariables(event)
 
+        categoryList = getCategory()
+
         tempData = getTempData(user_id)
 
         # Save user-typed amount to tempData
@@ -131,7 +133,14 @@ with ApiClient(configuration) as api_client:
         #         sendReplyMessage(line_bot_api, reply_token, f"取得匯率失敗: {e}")
         
         # Addition for specific categories
-        addition = convertAmountToCent(getFoodMultiple()) if category == "food" else 0
+
+        # DEPRECATED: Refactor to category list in 1.3.2
+        # addition = convertAmountToCent(getFoodMultiple()) if category == "food" else 0
+        
+        addition = convertAmountToCent(categoryList[category]['addition'])
+        if addition is None:
+            addition = 0
+
         additionAmount = (amountCents * addition) // 100
         totalAmount = amountCents + additionAmount
 
