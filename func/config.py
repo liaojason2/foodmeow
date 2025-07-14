@@ -3,7 +3,7 @@ foodmeowVersion = "1.3.1 Beta 1"
 category = {
     "food": {
         "cht_name": "食物",
-        "addition": 1.5
+        "addition": 0.5
     },
     "education": {
         "cht_name": "教育", 
@@ -23,7 +23,7 @@ category = {
     },
     "rent": {
         "cht_name": "房租",
-        "addition": -1,
+        "addition": -1, #fix
     },
     "others": {
         "cht_name": "其他",
