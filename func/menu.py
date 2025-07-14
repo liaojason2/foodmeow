@@ -278,7 +278,7 @@ with ApiClient(configuration) as api_client:
             selectCategoryContent.append(
                 FlexButton(
                     action=PostbackAction(
-                        label=category_list[category],
+                        label=category_list[category]['cht_name'],
                         data=category
                     ),
                     style="primary"
@@ -324,7 +324,7 @@ with ApiClient(configuration) as api_client:
     def confirmAmount(reply_token, category, subject, message):
         """Create a confirmation message before adding data."""
         categoryMap = getCategory()
-        categoryLabel = categoryMap[category]
+        categoryLabel = categoryMap[category]['cht_name']
 
         bodyItems = {
             "類別": categoryLabel,
@@ -408,7 +408,7 @@ with ApiClient(configuration) as api_client:
     def addDataSuccess(reply_token, category, subject, currency, currencyRate, money, exgCurrency=None, exgCurrencyAmount=None):
         """Send a confirmation message after adding data."""
         categoryMap = getCategory()
-        categoryLabel = categoryMap[category]
+        categoryLabel = categoryMap[category]['cht_name']
         #  = {
         #     "類別": categoryLabel,
         #     "名稱": subject,
