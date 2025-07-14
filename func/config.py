@@ -23,7 +23,7 @@ category = {
     },
     "rent": {
         "cht_name": "房租",
-        "addition": -1, #fix
+        "addition": 0, #fix
     },
     "others": {
         "cht_name": "其他",
