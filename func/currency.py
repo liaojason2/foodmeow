@@ -35,7 +35,6 @@ def getCurrencyRate(base_currency, target_currency):
     # Try to get cache exchange rate based on userCurrency from db
     exchangeCurrencyRate = getCurrencyData(base_currency)
     if exchangeCurrencyRate is not None:
-        print(exchangeCurrencyRate)
         result = exchangeCurrencyRate['currencyExchangeRate'][target_currency]['value']
     # If there is no data or data expired, get new exchange rate
     else:
