@@ -78,11 +78,11 @@ def updateExchangeCurrencyToDatabase(event, record, addition: int = 0, exchangeR
         id = item['_id']
 
         try:
-            baseAmount = data['baseAmount']
-            currency = data['currency']
-            category = data['category']
+            baseAmount = item['baseAmount']
+            currency = item['currency']
+            category = item['category']
         except KeyError:
-            data = getOneData(id)
+            item = getOneData(id)
 
         # Currency exchange
         userCurrency = getUserCurrency(user_id)
