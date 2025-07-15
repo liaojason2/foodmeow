@@ -20,6 +20,7 @@ from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency,
 from .utils import convertAmountToCent
 from .amount import updateCurrencyExchangeData
 from .getData import getOneData
+from func.db.currency import insertCurrencyData, getCurrencyData
 
 load_dotenv()
 
@@ -29,9 +30,17 @@ handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 currency_api_client = currencyapicom.Client(os.getenv('CURRENCY_COM_API_KEY'))
 
 def getCurrencyRate(base_currency, target_currency):
-
-    result = currency_api_client.latest(base_currency, [target_currency])
-    result = result['data'][target_currency]['value']
+    result = 0
+    # Try to get cache exchange rate based on userCurrency from db
+    exchangeCurrencyRate = getCurrencyData(base_currency)
+    if exchangeCurrencyRate is not None:
+        result = exchangeCurrencyRate[target_currency]['value']
+    # If there is no data or data expired, get new exchange rate
+    else:
+        # Get exchange rate and save for next time use
+        exchangeCurrencyRate = currency_api_client.latest(base_currency, [target_currency])
+        insertCurrencyData(base_currency, exchangeCurrencyRate['data'])
+        result = exchangeCurrencyRate['data'][target_currency]['value']
     return result
 
 def multiCurrencyConversion(amount: int, addition, currency, convertCurrency, exchangeRate):
