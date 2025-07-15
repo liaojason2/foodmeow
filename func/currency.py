@@ -20,6 +20,7 @@ from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency,
 from .utils import convertAmountToCent
 from .amount import updateCurrencyExchangeData
 from .getData import getOneData
+from .config import getCategory
 from func.db.currency import insertCurrencyData, getCurrencyData
 
 load_dotenv()
@@ -34,7 +35,8 @@ def getCurrencyRate(base_currency, target_currency):
     # Try to get cache exchange rate based on userCurrency from db
     exchangeCurrencyRate = getCurrencyData(base_currency)
     if exchangeCurrencyRate is not None:
-        result = exchangeCurrencyRate[target_currency]['value']
+        print(exchangeCurrencyRate)
+        result = exchangeCurrencyRate['currencyExchangeRate'][target_currency]['value']
     # If there is no data or data expired, get new exchange rate
     else:
         # Get exchange rate and save for next time use
@@ -43,7 +45,7 @@ def getCurrencyRate(base_currency, target_currency):
         result = exchangeCurrencyRate['data'][target_currency]['value']
     return result
 
-def multiCurrencyConversion(amount: int, addition, currency, convertCurrency, exchangeRate):
+def multiCurrencyConversion(amount: int, addition:int, currency, convertCurrency, exchangeRate: float | str):
 
     exchangeRateCents = convertAmountToCent(exchangeRate, 4)
     userCurrencyBaseAmount = int((amount * 100 * exchangeRateCents) // 1000000)
@@ -63,20 +65,35 @@ def multiCurrencyConversion(amount: int, addition, currency, convertCurrency, ex
 
     return data
 
-def updateExchangeCurrencyToDatabase(event, record, addition, exchangeRate):
-
+def updateExchangeCurrencyToDatabase(event, record, addition: int = 0, exchangeRate=None):
+    """
+    Update the exchange currency to the database.
+    """
     user_id, reply_token, _, _ = extractEventVariables(event)
-
+    categoryList = getCategory()
+    
     print(record)
 
     for item in record:
 
         id = item['_id']
-        data = getOneData(id)
 
-        baseAmount = data['baseAmount']
-        currency = data['currency']
+        try:
+            baseAmount = data['baseAmount']
+            currency = data['currency']
+            category = data['category']
+        except KeyError:
+            data = getOneData(id)
+
+        # Currency exchange
         userCurrency = getUserCurrency(user_id)
+        if exchangeRate is 1:
+            exchangeRate = getCurrencyRate(currency, userCurrency)
+
+        # Addition
+        addition = convertAmountToCent(categoryList[category]['addition'])
+        if addition is None:
+            addition = 0
 
         exchangeResult = multiCurrencyConversion(
             baseAmount,
@@ -84,7 +101,7 @@ def updateExchangeCurrencyToDatabase(event, record, addition, exchangeRate):
             currency,
             userCurrency,
             exchangeRate
-        )
+        )  
 
         exchangeResult = exchangeResult[userCurrency]
 

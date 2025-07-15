@@ -32,9 +32,9 @@ def getCurrencyData(currency):
             "baseCurrency": currency,
             "time": {"$gte": currentTime() - timedelta(hours=8)}
         },
-        sort=[("time", -1)]
+        # sort=[("time", -1)]
     )
-    return result['currencyExchangeRate']
+    return result
   except Exception as e:
     return e
   
