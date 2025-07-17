@@ -16,7 +16,7 @@ from .user import (
     changeUserStatus, updateTempData, getTempData, deleteTempData
 )
 from .menu import confirmChangeExchangeRate, confirmChangeCurrency, confirmTemplate
-from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency, getUserCurrency
+from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency, getUserCurrency, getDataCurrency
 from .utils import convertAmountToCent
 from .amount import updateCurrencyExchangeData
 from .getData import getOneData
@@ -120,6 +120,10 @@ with ApiClient(configuration) as api_client:
         postback_data = event.postback.data if hasattr(event, 'postback') else None
         return user_id, reply_token, message_text, postback_data
     
+    # -------------------------------
+    # Change Currency Rate section
+    # -------------------------------
+
     def changeCurrencyRateRequest(event):
         """
         Handle the request when user wants to change currency rate.
@@ -162,6 +166,10 @@ with ApiClient(configuration) as api_client:
             )
         )
 
+    # -------------------------------
+    # Update user currency section
+    # -------------------------------
+
     def updateUserCurrencyRequest(event):
         """
         Handle the request when user wants to change user currency.
@@ -184,21 +192,21 @@ with ApiClient(configuration) as api_client:
 
         tempData = getTempData(user_id)
 
+        oldCurrency = getUserCurrency(user_id)
         newCurrency = message
 
         tempData = {
             "userCurrency": newCurrency
         }
         updateTempData(user_id, tempData)
+
+        confirmTitle = "變更預設貨幣確認"
             
         # Prompt user to confirm the new currency
         confirmChangeCurrency(
-            reply_token, newCurrency)
+            reply_token, confirmTitle, newCurrency, oldCurrency)
         
         changeUserStatus(user_id, "updateUserCurrencyConfirm")
-
-
-
 
     def confirmUpdateUserCurrency(event):
         user_id, reply_token, _, _ß = extractEventVariables(event)
@@ -218,6 +226,10 @@ with ApiClient(configuration) as api_client:
                 messages=[TextMessage(text="變更成功，新的預設貨幣為 " + newCurrency)]
             )
         )
+    
+    # -------------------------------
+    # Update data currency section
+    # -------------------------------
 
     def updateNewDataCurrencyRequest(event):
         """
@@ -241,24 +253,31 @@ with ApiClient(configuration) as api_client:
 
         tempData = getTempData(user_id)
 
-        newCurrency = message
+        newDataCurrency = message
+        oldDataCurrency = getDataCurrency(user_id)
 
         tempData = {
-            "dataCurrency": newCurrency
+            "dataCurrency": newDataCurrency
         }
         updateTempData(user_id, tempData)
-            
+
+        confirmTitle = "變更資料貨幣確認"
+             
         # Prompt user to confirm the new currency
-        confirmTemplate(
-            reply_token,
-            headerTitle="變更新增資料貨幣確認",
-            bodyItems={
-                "新貨幣": newCurrency,
-            },
-            footerItems={
-                "新增": "Yes",
-            }
-        )
+        confirmChangeCurrency(
+            reply_token, confirmTitle, newDataCurrency, oldDataCurrency)
+        
+        # confirmTemplate(
+        #     reply_token,
+        #     headerTitle="變更新增資料貨幣確認",
+        #     bodyItems={
+        #         "舊貨幣": oldDataCurrency,
+        #         "新貨幣": newCurrency,
+        #     },
+        #     footerItems={
+        #         "新增": "Yes",
+        #     }
+        # )
         
         changeUserStatus(user_id, "updateNewDataCurrencyConfirm")
 
