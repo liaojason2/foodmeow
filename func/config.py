@@ -30,6 +30,10 @@ category = {
         "addition": 0
     }
 }
+validCurrencyList = ['USD', 'JPY', 'HKD', 'TWD', "CAD", "KRW", "EUR", "GBP"]
+
+def getValidCurrencyList():
+    return validCurrencyList
 
 def getFoodMultiple(): 
     return foodMultiple

@@ -20,7 +20,7 @@ from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency,
 from .utils import convertAmountToCent
 from .amount import updateCurrencyExchangeData
 from .getData import getOneData
-from .config import getCategory
+from .config import getCategory, getValidCurrencyList
 from func.db.currency import insertCurrencyData, getCurrencyData
 
 load_dotenv()
@@ -110,6 +110,14 @@ def updateExchangeCurrencyToDatabase(event, record, addition: int = 0, exchangeR
 
         changeUserStatus(user_id, "free")
 
+def validateCurrencyCode(currencyCode):
+    validCurrencyList = getValidCurrencyList()
+    if currencyCode in validCurrencyList:
+        return True
+    else:
+        return False
+
+
 with ApiClient(configuration) as api_client:
 
     def extractEventVariables(event):
@@ -195,6 +203,16 @@ with ApiClient(configuration) as api_client:
         oldCurrency = getUserCurrency(user_id)
         newCurrency = message
 
+        validate = validateCurrencyCode(newCurrency)
+        if not validate:
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=reply_token,
+                    messages=[TextMessage(text="不支援此貨幣")]
+                )
+            )
+            changeUserStatus(user_id, "free")
+
         tempData = {
             "userCurrency": newCurrency
         }
@@ -255,6 +273,16 @@ with ApiClient(configuration) as api_client:
 
         newDataCurrency = message
         oldDataCurrency = getDataCurrency(user_id)
+
+        validate = validateCurrencyCode(newDataCurrency)
+        if not validate:
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=reply_token,
+                    messages=[TextMessage(text="不支援此貨幣")]
+                )
+            )
+            changeUserStatus(user_id, "free")
 
         tempData = {
             "dataCurrency": newDataCurrency
