@@ -1,4 +1,5 @@
-foodMultiple = 0.5
+# DEPRECATED: Refactor to category list in 1.3.2
+# foodMultiple = 0.5
 foodmeowVersion = "1.3.2 Beta 1"
 category = {
     "food": {
@@ -35,8 +36,9 @@ validCurrencyList = ['USD', 'JPY', 'HKD', 'TWD', "CAD", "KRW", "EUR", "GBP"]
 def getValidCurrencyList():
     return validCurrencyList
 
-def getFoodMultiple(): 
-    return foodMultiple
+# DEPRECATED: Refactor to category list in 1.3.2
+# def getFoodMultiple(): 
+#     return foodMultiple
 
 def getFoodmeowVersion():
     return foodmeowVersion
