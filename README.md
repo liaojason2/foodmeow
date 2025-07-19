@@ -8,16 +8,13 @@
 
 /* TODO */
 
-## Story
+## Overview & Story
 
-I runaway from home when I was 18 because we have different opinion on education. A week later my dad said he would give me money for meals as pocket money. He created a group and asked me to report the amount by typing "previously accumulated money + this time's money" each time. I found this too troublesome, so I wrote a bot to do the calculations.
+Foodmeow is a spending tracker bot founded on 2020 because of I runaway from home because of education opinion. Weeks later my dad said it would sponsor some expensive especially in meal. Originaly he asked me to create message include this time's amount and accumulated amount, but I felled it is so problematic so I decided to develop a bot because I am on another project [CBFHSS](https://github.com/CBFHSS) and learning on software development.
 
-It was too difficult to create a bot from scratch suddenly, so at that time, I just modified from [CBFHSS](https://github.com/CBFHSS). The code was so ugly that I didn't even want to admit I wrote it, and maintaining this infrastructure cost NT$300 a month. You can found the oldest version in [here (moneycalaulater)](https://github.com/liaojason2/moneycalaulater).
+The beginning of Foodmeow use Django, MySQL on Google Cloud SQL as database and deployed on Heroku. But because of the cost, I decided to migrate to MongoDB Atlas and deployed on Google Cloud Run because it is free, also use the lightwight framework flask.
 
-In 2021, I discovered that MongoDB Atlas is free, so I decided to rewrite the code and migrate the data to MongoDB Atlas. I don't rally liked Heroku and I found GCP Cloud Run to be fantastic. Currently, both application and database are hosted on Google Cloud's asia-east1 (Taiwan).
-
-In 2024, After years of working in software industry, I decided to refactor this project to makes it meet industry standard. I am trying to clean code and add testing into this project.
-
+After years of working in software industry, I started to refactor code to make it to industrial standards, including better structure, clean code and testing. Foodmeow is not just a CRUD and text prompt -- it have more user friendly UX improvement, currency conversion, and maybe more feature in the future.
 ## How to use
 
 /* TODO */
