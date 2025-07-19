@@ -29,8 +29,10 @@ After gaining several years of experience in the software industry, I began refa
 ### Deployment
 
 - [ngrok](https://ngrok.com/)
-   - For local development.
+  - For local development.
+  - Create a [ngrok](https://ngrok.com/) account and install ngrok on your computer
 - [Google Cloud Run](https://cloud.google.com/run) 
+  - For hosting a service.
   - Initialize a [Google Cloud](https://cloud.google.com/) service from Google account.
 
 ## How to use
