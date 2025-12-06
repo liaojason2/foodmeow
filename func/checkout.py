@@ -13,7 +13,7 @@ from .user import (
 )
 from .menu import giveAmountConfirm, confirmExchangeWhileCheckout, checkoutSuccess
 from .amount import checkout, getLatestData
-from .config import getFoodMultiple, getCategory
+from .config import getCategory#, getFoodMultiple
 from .utils import convertAmountToCent, convertCentToDecimalString
 from .currency import getCurrencyRate, updateExchangeCurrencyToDatabase
 from .user import changeUserStatus

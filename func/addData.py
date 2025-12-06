@@ -17,7 +17,7 @@ from .user import (
 from .menu import selectDataCategory, confirmAmount, addDataSuccess
 from . import amount
 from .amount import insertData
-from .config import getFoodMultiple, getCategory
+from .config import getCategory#, getFoodMultiple
 from .utils import convertAmountToCent, convertCentToDecimalString
 from .currency import getCurrencyRate, multiCurrencyConversion
 
