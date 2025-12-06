@@ -52,7 +52,7 @@ with ApiClient(configuration) as api_client:
         """
         user_id, reply_token, _, _ = extractEventVariables(event)
 
-        record = getLatestData(200)
+        record = getLatestData(1000)
 
         checkoutCurrency = getUserCurrency(user_id)
         total = {checkoutCurrency: 0}
