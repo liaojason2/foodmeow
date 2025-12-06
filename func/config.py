@@ -1,6 +1,6 @@
 # DEPRECATED: Refactor to category list in 1.3.2
 # foodMultiple = 0.5
-foodmeowVersion = "1.3.2 Beta 1"
+foodmeowVersion = "1.3.3 Beta 1"
 category = {
     "food": {
         "cht_name": "食物",
