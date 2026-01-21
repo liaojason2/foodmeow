@@ -31,7 +31,7 @@ configuration = Configuration(access_token=os.getenv('CHANNEL_TOKEN'))
 with ApiClient(configuration) as api_client:
     line_bot_api = MessagingApi(api_client)
 
-    def confirmTemplate(reply_token, headerTitle, bodyItems, footerItems, text=None):
+    def confirmTemplate(reply_token, headerTitle, bodyItems, footerItems, text=None, flex=[1, 5]):
         """Create a confirmation message template."""
 
         headerContents = [
@@ -63,9 +63,9 @@ with ApiClient(configuration) as api_client:
                 spacing='sm',
                 contents=[
                     FlexText(text=key, color='#aaaaaa',
-                             size='md', flex=1, align='start'),
+                             size='md', flex=flex[0], align='start'),
                     FlexText(text=str(value), wrap=True,
-                             color='#666666', size='md', flex=5)
+                             color='#666666', size='md', flex=flex[1])
                 ]
             )
             for key, value in bodyItems.items() if value is not None
@@ -278,7 +278,7 @@ with ApiClient(configuration) as api_client:
             selectCategoryContent.append(
                 FlexButton(
                     action=PostbackAction(
-                        label=category_list[category],
+                        label=category_list[category]['cht_name'],
                         data=category
                     ),
                     style="primary"
@@ -324,7 +324,7 @@ with ApiClient(configuration) as api_client:
     def confirmAmount(reply_token, category, subject, message):
         """Create a confirmation message before adding data."""
         categoryMap = getCategory()
-        categoryLabel = categoryMap[category]
+        categoryLabel = categoryMap[category]['cht_name']
 
         bodyItems = {
             "類別": categoryLabel,
@@ -408,7 +408,7 @@ with ApiClient(configuration) as api_client:
     def addDataSuccess(reply_token, category, subject, currency, currencyRate, money, exgCurrency=None, exgCurrencyAmount=None):
         """Send a confirmation message after adding data."""
         categoryMap = getCategory()
-        categoryLabel = categoryMap[category]
+        categoryLabel = categoryMap[category]['cht_name']
         #  = {
         #     "類別": categoryLabel,
         #     "名稱": subject,
@@ -770,17 +770,20 @@ with ApiClient(configuration) as api_client:
             )
         )
 
-    def confirmChangeCurrency(reply_token, currency):
+    def confirmChangeCurrency(reply_token, title, currency, oldCurrency):
 
         confirmTemplate(
             reply_token,
-            headerTitle="變更貨幣確認",
+            headerTitle=title,
             bodyItems={
-                "貨幣": currency,
+                "舊貨幣": oldCurrency,
+                "新貨幣": currency,
             },
             footerItems={
                 "變更": "Yes",
-            }
+            },
+            text=None,
+            flex=[2, 7]
         )
         # """Create a confirmation message before changing currency."""
 

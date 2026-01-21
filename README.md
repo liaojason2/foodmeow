@@ -4,38 +4,127 @@
 
 ![Diagram](assets/diagram.jpeg)
 
-## Demo
+## Overview & Story
 
-/* TODO */
+Foodmeow is a spending tracker bot founded in 2020. The idea came about after I ran away from home because I have a different opinion with my parents on education. A few weeks later, my dad offered to cover some of my expenses, especially for meals.
 
-## Story
+Originally, he asked me to send him a message with each new expense and a running total. I found this process tedious. Since I was already working on another project, [CBFHSS](https://github.com/CBFHSS), and learning about software development, I was inspired to build a bot to automate this task.
 
-I runaway from home when I was 18 because we have different opinion on education. A week later my dad said he would give me money for meals as pocket money. He created a group and asked me to report the amount by typing "previously accumulated money + this time's money" each time. I found this too troublesome, so I wrote a bot to do the calculations.
+Initially, Foodmeow was built with Django, used MySQL on Google Cloud SQL as its database, and was deployed on Heroku. However, due to cost, I migrated the project to MongoDB Atlas and Google Cloud Run to take advantage of their free tiers. I also switched to the lightweight Flask framework.
 
-It was too difficult to create a bot from scratch suddenly, so at that time, I just modified from [CBFHSS](https://github.com/CBFHSS). The code was so ugly that I didn't even want to admit I wrote it, and maintaining this infrastructure cost NT$300 a month. You can found the oldest version in [here (moneycalaulater)](https://github.com/liaojason2/moneycalaulater).
+After gaining several years of experience in the software industry, I began refactoring the codebase to meet professional standards. This involved improving the project structure, writing cleaner code, and implementing tests. Foodmeow has evolved beyond a simple text-based CRUD app; it now features a more user-friendly experience, currency conversion capabilities, with more features planned for the future.
 
-In 2021, I discovered that MongoDB Atlas is free, so I decided to rewrite the code and migrate the data to MongoDB Atlas. I don't rally liked Heroku and I found GCP Cloud Run to be fantastic. Currently, both application and database are hosted on Google Cloud's asia-east1 (Taiwan).
 
-In 2024, After years of working in software industry, I decided to refactor this project to makes it meet industry standard. I am trying to clean code and add testing into this project.
+## Requirements
+
+- [Python 3.11](https://www.python.org/download)
+- [Flask](https://flask.palletsprojects.com/)  
+- [MongoDB](https://www.mongodb.com/)
+  - Create a [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) instance for free.  
+- [LINE bot Python SDK](https://developers.line.biz/en/reference/)
+  - Create a LINE bot from LINE Developer console.
+- [currencyapi.com](https://www.currencyapi.com/)  
+  - Create a new account and get API key from currencyapi.com
+
+### Deployment
+
+- [ngrok](https://ngrok.com/)
+  - For local development.
+  - Create a [ngrok](https://ngrok.com/) account and install ngrok on your computer
+- [Google Cloud Run](https://cloud.google.com/run) 
+  - For hosting a service.
+  - Initialize a [Google Cloud](https://cloud.google.com/) service from Google account.
 
 ## How to use
 
-/* TODO */
+### Create .env file
+
+```shell
+MONGODB_CONNECTION="" // MongoDB Link
+CHANNEL_TOKEN="" // LINE Channel Token
+CHANNEL_SECRET="" // LINE Channel Secret
+CURRENCY_COM_API_KEY="" // currencyapi.com API Key
+```
+
+### Install `requirement.txt`
+
+```shell
+pip install -r requirements.txt
+```
+
+### Run
+
+```shell
+# Start flask app 
+flask --app main run --port 3000 # flask default port is 5000, but it will cause conflict on MacOS
+
+or 
+
+# Start flask app with debug mode (If you want to monitor log in development)
+flask --app main run --port 3000 --debug
+```
+
+### Expose to internet with ngrok
+
+
+```shell
+# ngrok
+# Use ngrok to expose the Flask app to the internet
+ngrok http 3000
+
+# Paste back to LINE Developer Console
+# https://developers.line.biz/console/
+# https:/<link provide from ngrok>/callback
+https:/abcdefg.ngrok-free.app/callback
+```
+
+### Deploy to Google Cloud Run
+
+[Deploy to Cloud Run from a Git repository](https://cloud.google.com/run/docs/quickstarts/deploy-continuously)
+
+- Go to Google Cloud Console
+- Select "Cloud Run"
+- Select "Connect repo"
+  - Connect github repo
+  - Define service name
+  - Allow all ingress
+- In "Containers, Volumes, Networking, Security"
+  - Select "container"
+  - Add environment variable:
+
+```shell
+# environment variables
+MONGODB_CONNECTION <value> // MongoDB Link
+CHANNEL_TOKEN <value> // LINE Channel Token
+CHANNEL_SECRET <value> // LINE Channel Secret
+CURRENCY_COM_API_KEY <value> // currencyapi.com API Key
+```
+
+- Select "Create"
+
+
 
 ## Features
 
-- Expense Tracking
-  - Add food expenses
-  - Add general expenses
-  - View unsettled total
-  - Delete unsettled total
-  - View historical data
-  - Exit and delete temporary data
+### Basic Expense Functionality
+
+- Add expense data
+  - Select category for each data for future analysis.
+  - Calculate more or less depend on category.
+- ~~View balance~~ Tempoary not available but can view in checkout function.
+- Checkout and clear balance.
+- ~~Delete unsettled total (todo after refactor)~~
+- View historical data.
+
+### Currency exchange
+
+- Add data with data currency code while add new expense.
+- Save different currency rate if user defined checkout currency is different currency.
+- Checkout with different currency.
 
 ## Contributing
 
-Contributions for new features are welcome!  
-As long as the variable names and code are clear, I will review all pull requests ❤️
+Contributions for new features are welcome! I will review all pull requests as I could ❤️
 
 ## Terms of Use
 

@@ -17,7 +17,7 @@ from .user import (
 from .menu import getHistoryData
 from . import amount
 from .amount import getLatestData
-from .config import getFoodMultiple
+# from .config import getFoodMultiple
 from .utils import convertAmountToCent, convertCentToDecimalString
 
 load_dotenv()

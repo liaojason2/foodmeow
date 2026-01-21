@@ -16,10 +16,12 @@ from .user import (
     changeUserStatus, updateTempData, getTempData, deleteTempData
 )
 from .menu import confirmChangeExchangeRate, confirmChangeCurrency, confirmTemplate
-from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency, getUserCurrency
+from .user import updateExchangeRate, updateUserCurrency, updateNewDataCurrency, getUserCurrency, getDataCurrency
 from .utils import convertAmountToCent
 from .amount import updateCurrencyExchangeData
 from .getData import getOneData
+from .config import getCategory, getValidCurrencyList
+from func.db.currency import insertCurrencyData, getCurrencyData
 
 load_dotenv()
 
@@ -29,12 +31,20 @@ handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 currency_api_client = currencyapicom.Client(os.getenv('CURRENCY_COM_API_KEY'))
 
 def getCurrencyRate(base_currency, target_currency):
-
-    result = currency_api_client.latest(base_currency, [target_currency])
-    result = result['data'][target_currency]['value']
+    result = 0
+    # Try to get cache exchange rate based on userCurrency from db
+    exchangeCurrencyRate = getCurrencyData(base_currency)
+    if exchangeCurrencyRate is not None:
+        result = exchangeCurrencyRate['currencyExchangeRate'][target_currency]['value']
+    # If there is no data or data expired, get new exchange rate
+    else:
+        # Get exchange rate and save for next time use
+        exchangeCurrencyRate = currency_api_client.latest(base_currency, [target_currency])
+        insertCurrencyData(base_currency, exchangeCurrencyRate['data'])
+        result = exchangeCurrencyRate['data'][target_currency]['value']
     return result
 
-def multiCurrencyConversion(amount: int, addition, currency, convertCurrency, exchangeRate):
+def multiCurrencyConversion(amount: int, addition:int, currency, convertCurrency, exchangeRate: float | str):
 
     exchangeRateCents = convertAmountToCent(exchangeRate, 4)
     userCurrencyBaseAmount = int((amount * 100 * exchangeRateCents) // 1000000)
@@ -54,20 +64,35 @@ def multiCurrencyConversion(amount: int, addition, currency, convertCurrency, ex
 
     return data
 
-def updateExchangeCurrencyToDatabase(event, record, addition, exchangeRate):
-
+def updateExchangeCurrencyToDatabase(event, record, addition: int = 0, exchangeRate=None):
+    """
+    Update the exchange currency to the database.
+    """
     user_id, reply_token, _, _ = extractEventVariables(event)
-
+    categoryList = getCategory()
+    
     print(record)
 
     for item in record:
 
         id = item['_id']
-        data = getOneData(id)
 
-        baseAmount = data['baseAmount']
-        currency = data['currency']
+        try:
+            baseAmount = item['baseAmount']
+            currency = item['currency']
+            category = item['category']
+        except KeyError:
+            item = getOneData(id)
+
+        # Currency exchange
         userCurrency = getUserCurrency(user_id)
+        if exchangeRate is 1:
+            exchangeRate = getCurrencyRate(currency, userCurrency)
+
+        # Addition
+        addition = convertAmountToCent(categoryList[category]['addition'])
+        if addition is None:
+            addition = 0
 
         exchangeResult = multiCurrencyConversion(
             baseAmount,
@@ -75,7 +100,7 @@ def updateExchangeCurrencyToDatabase(event, record, addition, exchangeRate):
             currency,
             userCurrency,
             exchangeRate
-        )
+        )  
 
         exchangeResult = exchangeResult[userCurrency]
 
@@ -84,6 +109,14 @@ def updateExchangeCurrencyToDatabase(event, record, addition, exchangeRate):
         )
 
         changeUserStatus(user_id, "free")
+
+def validateCurrencyCode(currencyCode):
+    validCurrencyList = getValidCurrencyList()
+    if currencyCode in validCurrencyList:
+        return True
+    else:
+        return False
+
 
 with ApiClient(configuration) as api_client:
 
@@ -95,6 +128,10 @@ with ApiClient(configuration) as api_client:
         postback_data = event.postback.data if hasattr(event, 'postback') else None
         return user_id, reply_token, message_text, postback_data
     
+    # -------------------------------
+    # Change Currency Rate section
+    # -------------------------------
+
     def changeCurrencyRateRequest(event):
         """
         Handle the request when user wants to change currency rate.
@@ -137,6 +174,10 @@ with ApiClient(configuration) as api_client:
             )
         )
 
+    # -------------------------------
+    # Update user currency section
+    # -------------------------------
+
     def updateUserCurrencyRequest(event):
         """
         Handle the request when user wants to change user currency.
@@ -159,21 +200,31 @@ with ApiClient(configuration) as api_client:
 
         tempData = getTempData(user_id)
 
+        oldCurrency = getUserCurrency(user_id)
         newCurrency = message
+
+        validate = validateCurrencyCode(newCurrency)
+        if not validate:
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=reply_token,
+                    messages=[TextMessage(text="不支援此貨幣")]
+                )
+            )
+            changeUserStatus(user_id, "free")
 
         tempData = {
             "userCurrency": newCurrency
         }
         updateTempData(user_id, tempData)
+
+        confirmTitle = "變更預設貨幣確認"
             
         # Prompt user to confirm the new currency
         confirmChangeCurrency(
-            reply_token, newCurrency)
+            reply_token, confirmTitle, newCurrency, oldCurrency)
         
         changeUserStatus(user_id, "updateUserCurrencyConfirm")
-
-
-
 
     def confirmUpdateUserCurrency(event):
         user_id, reply_token, _, _ß = extractEventVariables(event)
@@ -193,6 +244,10 @@ with ApiClient(configuration) as api_client:
                 messages=[TextMessage(text="變更成功，新的預設貨幣為 " + newCurrency)]
             )
         )
+    
+    # -------------------------------
+    # Update data currency section
+    # -------------------------------
 
     def updateNewDataCurrencyRequest(event):
         """
@@ -216,24 +271,41 @@ with ApiClient(configuration) as api_client:
 
         tempData = getTempData(user_id)
 
-        newCurrency = message
+        newDataCurrency = message
+        oldDataCurrency = getDataCurrency(user_id)
+
+        validate = validateCurrencyCode(newDataCurrency)
+        if not validate:
+            line_bot_api.reply_message_with_http_info(
+                ReplyMessageRequest(
+                    reply_token=reply_token,
+                    messages=[TextMessage(text="不支援此貨幣")]
+                )
+            )
+            changeUserStatus(user_id, "free")
 
         tempData = {
-            "dataCurrency": newCurrency
+            "dataCurrency": newDataCurrency
         }
         updateTempData(user_id, tempData)
-            
+
+        confirmTitle = "變更資料貨幣確認"
+             
         # Prompt user to confirm the new currency
-        confirmTemplate(
-            reply_token,
-            headerTitle="變更新增資料貨幣確認",
-            bodyItems={
-                "新貨幣": newCurrency,
-            },
-            footerItems={
-                "新增": "Yes",
-            }
-        )
+        confirmChangeCurrency(
+            reply_token, confirmTitle, newDataCurrency, oldDataCurrency)
+        
+        # confirmTemplate(
+        #     reply_token,
+        #     headerTitle="變更新增資料貨幣確認",
+        #     bodyItems={
+        #         "舊貨幣": oldDataCurrency,
+        #         "新貨幣": newCurrency,
+        #     },
+        #     footerItems={
+        #         "新增": "Yes",
+        #     }
+        # )
         
         changeUserStatus(user_id, "updateNewDataCurrencyConfirm")
 
